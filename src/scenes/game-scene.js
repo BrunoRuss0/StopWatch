@@ -1,3 +1,5 @@
+//cuando se pierde: this.scene.start('GameOver');
+
 let player;
 let teclas;
 const VELOCIDAD_JUGADOR = 300;
