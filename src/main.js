@@ -1,5 +1,6 @@
 import { GameScene } from "./scenes/game-scene.js"; 
 
+const VELOCIDAD_PLAYER = 200;
 const config ={
 type: Phaser.AUTO, 
 scene: GameScene,
