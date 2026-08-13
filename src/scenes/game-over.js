@@ -15,7 +15,7 @@ export class GameOver extends Phaser.Scene {
    const bg = this.add.image(gameWidth / 2,gameHeight / 2,'game-over');
    bg.setDisplaySize(gameWidth, gameHeight);
    
-const menuboton = this.add.text(25,450,'MAIN MENU',
+const menuboton = this.add.text(550,450,'MAIN MENU',
     {fontSize: '32px',color: '#000000',backgroundColor: '#ff3636',padding: {left: 30,right: 30,top: 15,bottom: 15}
     });
     menuboton.setInteractive({useHandCursor: true});
@@ -25,7 +25,7 @@ const menuboton = this.add.text(25,450,'MAIN MENU',
      menuboton.on('pointerout', () => {menuboton.setStyle({backgroundColor: '#ff3636'});})
 
 
-   const restartboton = this.add.text(25,500,'RESTART GAME',
+   const restartboton = this.add.text(520,500,'RESTART GAME',
    {fontSize: '32px',color: '#000000',backgroundColor: '#ff3636',padding: {left: 30,right: 30,top: 15,bottom: 15}
    });
    restartboton.setInteractive({useHandCursor: true});

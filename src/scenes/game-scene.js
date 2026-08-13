@@ -135,4 +135,5 @@ player.body.setVelocityY(VELOCIDAD_JUGADOR);
 player.body.setVelocityY(0);
 }
 }
+
 }
