@@ -2,6 +2,8 @@
 let player;
 let teclas;
 let enemy;
+let time = 100;
+let timerText;
 const VELOCIDAD_JUGADOR = 300;
 
 
@@ -41,16 +43,31 @@ player.body.setCollideWorldBounds(true);
 teclas = this.input.keyboard.createCursorKeys();
 //PLAYER-------------------------------------------------------------------------------------------------
 
+
 //ENEMY-------------------------------------------------------------------------------------------------
 enemy = this.physics.add.image(1050, 190, 'enemy');
 enemy.setScale(0.3);
 this.physics.add.overlap(player, enemy, (player, enemy) => {
 this.physics.pause();
-this.scene.start('GameOver');
+this.scene.start('GameOver'); 
 });
-
-
+//timer
+timerText = this.add.text(16, 46, 'Time: ' + time, { fontSize: '32px', fill: '#000' });
+this.time.addEvent({ delay: 1000,callback: actualizarTiempo,callbackScope: this,loop: true });
+  function actualizarTiempo() {
+    time -= 1;
+    timerText.setText('Time: ' + time);
+    if (time < 0) {
+        time = 0;
+        timerText.setText('Time: 0');
+        timerEvent.remove();
+        this.physics.pause();
+      }
+    }
 }
+
+
+
 update(){
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
 this.physics.moveToObject(enemy, player, 150);
