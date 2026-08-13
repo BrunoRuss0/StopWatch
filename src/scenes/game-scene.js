@@ -2,6 +2,7 @@
 let player;
 let teclas;
 let enemy;
+let balas
 let time = 100;
 let timerText;
 const VELOCIDAD_JUGADOR = 300;
@@ -25,6 +26,7 @@ preload(){
 this.load.image('background','assets/background.png')
 this.load.image('player','assets/player.png')
 this.load.image('enemy','assets/enemy.png')
+this.load.image("balas", "assets/bala.jpg")
 }
 create(){
 //BACKGROUND-------------------------------------------------------------------------------------------------
@@ -64,9 +66,39 @@ this.time.addEvent({ delay: 1000,callback: actualizarTiempo,callbackScope: this,
         this.physics.pause();
       }
     }
+  //balas
+this.balas = this.physics.add.group({
+    defaultKey: 'balas',
+    maxSize: 1000000
+});
+
+this.input.on('pointerdown', (pointer) => {
+    this.disparar(pointer);
+});
 }
 
+disparar(pointer) {
+  let bala = this.balas.get(player.x, player.y);
 
+  if (bala) {
+      bala.setActive(true);
+      bala.setVisible(true);
+      bala.setScale(0.2);
+      bala.body.reset(player.x, player.y);
+      this.physics.moveToObject(bala, pointer, 400);
+      let angle = Phaser.Math.Angle.Between(
+          player.x,
+          player.y,
+          pointer.x,
+          pointer.y
+      );
+      bala.setRotation(angle);
+      this.physics.add.overlap(bala, enemy, (bala, enemy) => {
+        enemy.disableBody(true, true);
+        bala.disableBody(true, true);
+      });
+  }
+}
 
 update(){
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
