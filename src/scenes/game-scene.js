@@ -46,8 +46,7 @@ enemy = this.physics.add.image(1050, 190, 'enemy');
 enemy.setScale(0.3);
 this.physics.add.overlap(player, enemy, (player, enemy) => {
 this.physics.pause();
-//ENEMY-------------------------------------------------------------------------------------------------
-
+this.scene.start('GameOver');
 });
 
 
@@ -55,7 +54,7 @@ this.physics.pause();
 update(){
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
 this.physics.moveToObject(enemy, player, 150);
-//MOVIMIENTO IZQ DER----------------------------------------------------------------------------------------
+//MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
 if (teclas.left.isDown) {
 player.body.setVelocityX(-VELOCIDAD_JUGADOR);
 } else if (teclas.right.isDown) {
@@ -63,7 +62,7 @@ player.body.setVelocityX(VELOCIDAD_JUGADOR);
 } else {
 player.body.setVelocityX(0);
 }
-//MOVIMIENTO ARR ABA--------------------------------------------------------------
+//MOVIMIENTO ARR, ABA--------------------------------------------------------------
 if (teclas.up.isDown) {
 player.body.setVelocityY(-VELOCIDAD_JUGADOR);
 } else if (teclas.down.isDown) {
