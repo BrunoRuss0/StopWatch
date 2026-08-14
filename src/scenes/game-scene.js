@@ -1,4 +1,4 @@
-//cuando se pierde: this.scene.start('GameOver');
+
 let player;
 let teclas;
 let enemy;
@@ -36,26 +36,38 @@ bg.setDisplaySize(gameWidth, gameHeight);
 
 //PLAYER-------------------------------------------------------------------------------------------------
 player = this.add.image(0,0, 'player')
-player.setPosition(265,190).setScale(0.5);
+player.setPosition(265,190).setScale(0.2);
 this.physics.add.existing(player);
 player.body.setCollideWorldBounds(true);
 teclas = this.input.keyboard.createCursorKeys();
 
 //ENEMY-------------------------------------------------------------------------------------------------
 enemy = this.physics.add.image(1050, 190, 'enemy');
-enemy.setScale(0.3);
-this.physics.add.overlap(player, enemy, (player, enemy) => {
-if (!hitCooldown) {
-time -= 1;
-if (time < 0) {
-time = 0;
-}
-timerText.setText('Time: ' + time);
-hitCooldown = true;
-this.time.delayedCall(500, () => {hitCooldown = false;});
-}
+enemy.setScale(0.7);
+enemy.setImmovable(true);
+enemy.body.setCollideWorldBounds(true);
+this.physics.add.collider(player, enemy, (player, enemy) => {
+    if (!hitCooldown) {
+      time -= 1;
+      if (time < 0) { time = 0;}
+      timerText.setText('Time: ' + time);
+      hitCooldown = true;
+        this.tweens.add({
+      targets: player,
+      alpha: 0,
+      duration: 100,      
+      ease: 'Linear',
+      yoyo: true,        
+      repeat: 5,
+    });
+  }
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
 
-})
+
+
 //TIMES-------------------------------------------------------------------------------------------------
 timerText = this.add.text(580, 10, 'Time: ' + time, { fontSize: '32px', fill: '#8a1ee3',fontStyle: 'bold italic'});
 this.time.addEvent({ delay: 1000,callback: actualizarTiempo,callbackScope: this,loop: true });
