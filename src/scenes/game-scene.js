@@ -46,27 +46,27 @@ enemy = this.physics.add.image(1050, 190, 'enemy');
 enemy.setScale(0.7);
 enemy.setImmovable(true);
 enemy.body.setCollideWorldBounds(true);
-this.physics.add.collider(player, enemy, (player, enemy) => {
-    if (!hitCooldown) {
-      time -= 1;
-      if (time < 0) { time = 0;}
-      timerText.setText('Time: ' + time);
-      hitCooldown = true;
-        this.tweens.add({
-      targets: player,
-      alpha: 0,
-      duration: 100,      
-      ease: 'Linear',
-      yoyo: true,        
-      repeat: 5,
-    });
-  }
-      this.time.delayedCall(500, () => {
-        hitCooldown = false;
-      });
-    });
+this.physics.add.collider(player, enemy, () => {
+if (hitCooldown) return;
+time -= 3;
+if (time < 0) {
+time = 0;
+}
+timerText.setText('Time: ' + time);
+hitCooldown = true;
+this.tweens.add({
+targets: player,
+alpha: 0,
+duration: 100,
+ease: 'Linear',
+yoyo: true,
+repeat: 5,
+});
 
-
+  this.time.delayedCall(500, () => {
+      hitCooldown = false;
+  });
+});
 
 //TIMES-------------------------------------------------------------------------------------------------
 timerText = this.add.text(580, 10, 'Time: ' + time, { fontSize: '32px', fill: '#8a1ee3',fontStyle: 'bold italic'});
