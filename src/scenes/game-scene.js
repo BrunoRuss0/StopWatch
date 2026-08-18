@@ -32,7 +32,7 @@ time = 30;
 hitCooldown = false;
 this.input.setDefaultCursor('none');
 this.cursor = this.add.image(0, 0, 'cursor');
-this.cursor.setScale(0.2);
+this.cursor.setScale(0.1);
 this.cursor.setDepth(100000000);
 
 
@@ -163,3 +163,4 @@ player.setTexture('player');
 }
 }
 }
+//165 lineas de pura dinamita
