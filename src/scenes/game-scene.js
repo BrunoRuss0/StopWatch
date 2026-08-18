@@ -8,6 +8,7 @@ let hitCooldown = false;
 let puedeDisparar = true;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
+let enemy2;
 
 export class GameScene extends Phaser.Scene {
 constructor() {
@@ -21,6 +22,7 @@ preload(){
 this.load.image('background','assets/background.png')
 this.load.image('player','assets/player.png')
 this.load.image('enemy','assets/enemy.png')
+this.load.image('enemy2','assets/agustin.jpg')
 this.load.image("cursor", "assets/cursor.png")
 this.load.image("balas", "assets/bala.png")
 this.load.image("player-back", "assets/player-back.png")
@@ -58,7 +60,7 @@ enemy.setImmovable(true);
 enemy.body.setCollideWorldBounds(true);
 this.physics.add.collider(player, enemy, () => {
 if (hitCooldown) return;
-time -= 3;
+time -= 0;
 if (time < 0) {
 time = 0;
 }
@@ -77,6 +79,18 @@ repeat: 1,
       hitCooldown = false;
   });
 });
+//enemy 2
+this.enemy2 = this.physics.add.image(500, 400, 'enemy2');
+this.enemy2.setScale(0.05);
+this.enemy2.setCollideWorldBounds(true);
+this.time.addEvent({
+  delay: 500,
+  callback: this.moverenemigoAleatorio,
+  callbackScope: this,
+  loop: true
+});
+
+
 
 //TIMES-------------------------------------------------------------------------------------------------
 timerText = this.add.text(580, 10, 'Time: ' + time, { fontSize: '32px', fill: '#8a1ee3',fontStyle: 'bold italic'});
@@ -102,11 +116,32 @@ this.physics.add.overlap(this.balas, enemy, (bala, enemy) => {bala.disableBody(t
 this.input.on('pointerdown', (pointer) => {
 this.disparar(pointer);   
 });
+this.balas = this.physics.add.group({defaultKey: 'balasenemy',maxSize: 1000000,});
+this.physics.add.overlap(this.balasenemy, player, (balaenemy, player) => {bala.disableBody(true, true);player.disableBody(true, true);});
 }  
 //FIN CREATE-------------------------------------------------------------------------------------------------
 
+moverenemigoAleatorio() {
+  const velocidad = 300;
+
+  const direcciones = [
+    
+      { x: velocidad, y: 0 },
+      { x: -velocidad, y: 0 },
+      { x: 0, y: velocidad },
+      { x: 0, y: -velocidad }
+  ];
+
+  const nuevaDireccion = Phaser.Math.RND.pick(direcciones);
+
+  this.enemy2.setVelocity(
+      nuevaDireccion.x,
+      nuevaDireccion.y
+  );
+}
+
 //DISPARAR-------------------------------------------------------------------------------------------------
-disparar(pointer) {
+disparar(pointer){
   if (!puedeDisparar) {
     return;
   }
@@ -135,13 +170,38 @@ disparar(pointer) {
   }
 }
 
+dispararenemy(player){
 
+  let balaenemy = this.balas.get(enemy2.x, enemy2.y);
+
+
+  if (balaenemy) {
+      bala.enableBody(true, enemy2.x, enemy2.y, true, true);
+      bala.setScale(0.2);
+      let angle = Phaser.Math.Angle.Between(
+          enemy2.x,
+          enemy2.y,
+          player.x,
+          player.y
+      );
+      bala.setRotation(angle);
+      this.physics.velocityFromRotation(
+          angle,
+          400,
+          balaenemy.body.velocity
+      );
+      this.time.delayedCall(DELAY_BALA, () => {
+        puedeDisparar = true;
+    });
+  }
+}
 
 update(){
   this.cursor.x = this.input.activePointer.x;
 this.cursor.y = this.input.activePointer.y;
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
 this.physics.moveToObject(enemy, player, 150);
+
 //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
 if (teclas.left.isDown) {
 player.body.setVelocityX(-VELOCIDAD_JUGADOR);
@@ -163,4 +223,3 @@ player.setTexture('player');
 }
 }
 }
-//165 lineas de pura dinamita
