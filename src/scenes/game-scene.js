@@ -6,6 +6,7 @@ let time = 100;
 let timerText;  
 let hitCooldown = false;
 let puedeDisparar = true;
+let gun;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
 let enemy2;
@@ -27,6 +28,7 @@ this.load.image("cursor", "assets/cursor.png")
 this.load.image("balas", "assets/bala.png")
 this.load.image("player-back", "assets/player-back.png")
 this.load.image("cursor", "assets/cursor.png")
+this.load.image('gun', 'assets/gun.png')
 
 }
 create(){
@@ -36,7 +38,6 @@ this.input.setDefaultCursor('none');
 this.cursor = this.add.image(0, 0, 'cursor');
 this.cursor.setScale(0.1);
 this.cursor.setDepth(100000000);
-
 
 
 //BACKGROUND-------------------------------------------------------------------------------------------------
@@ -52,6 +53,12 @@ player.setPosition(265,190).setScale(0.2);
 this.physics.add.existing(player);
 player.body.setCollideWorldBounds(true);
 teclas = this.input.keyboard.createCursorKeys();
+
+//GUN-----------------------------------------------------------------------------------------------------
+gun = this.add.image(player.x, player.y, 'gun');
+gun.setScale(0.03);
+gun.setOrigin(0.1, 0.5);
+gun.setDepth(player.depth + 1);
 
 //ENEMY-------------------------------------------------------------------------------------------------
 enemy = this.physics.add.image(1050, 190, 'enemy');
@@ -116,8 +123,6 @@ this.physics.add.overlap(this.balas, enemy, (bala, enemy) => {bala.disableBody(t
 this.input.on('pointerdown', (pointer) => {
 this.disparar(pointer);   
 });
-this.balas = this.physics.add.group({defaultKey: 'balasenemy',maxSize: 1000000,});
-this.physics.add.overlap(this.balasenemy, player, (balaenemy, player) => {bala.disableBody(true, true);player.disableBody(true, true);});
 }  
 //FIN CREATE-------------------------------------------------------------------------------------------------
 
@@ -144,60 +149,72 @@ moverenemigoAleatorio() {
 disparar(pointer){
   if (!puedeDisparar) {
     return;
-  }
-  let bala = this.balas.get(player.x, player.y);
-
-
-  if (bala) {
-    puedeDisparar = false;
-      bala.enableBody(true, player.x, player.y, true, true);
-      bala.setScale(0.2);
-      let angle = Phaser.Math.Angle.Between(
-          player.x,
-          player.y,
-          pointer.x,
-          pointer.y
-      );
-      bala.setRotation(angle);
-      this.physics.velocityFromRotation(
-          angle,
-          400,
-          bala.body.velocity
-      );
-      this.time.delayedCall(DELAY_BALA, () => {
-        puedeDisparar = true;
-    });
-  }
-}
-
+     }
+    let bala = this.balas.get(gun.x, gun.y);
+    if (bala) {
+        puedeDisparar = false;
+          bala.enableBody(true, gun.x, gun.y, true, true);
+          bala.setScale(0.1);
+          let angle = Phaser.Math.Angle.Between(
+              gun.x,
+              gun.y,
+              pointer.x,
+              pointer.y
+          );
+          bala.setRotation(angle);
+          this.physics.velocityFromRotation(
+              angle,
+              400,
+              bala.body.velocity
+          );
+          this.time.delayedCall(DELAY_BALA, () => {
+            puedeDisparar = true;
+        });
+      }
+    }
+    
+    
+    
 dispararenemy(player){
 
-  let balaenemy = this.balas.get(enemy2.x, enemy2.y);
+let balaenemy = this.balas.get(enemy2.x, enemy2.y);
 
 
-  if (balaenemy) {
-      bala.enableBody(true, enemy2.x, enemy2.y, true, true);
-      bala.setScale(0.2);
-      let angle = Phaser.Math.Angle.Between(
-          enemy2.x,
-          enemy2.y,
-          player.x,
-          player.y
-      );
-      bala.setRotation(angle);
-      this.physics.velocityFromRotation(
-          angle,
-          400,
-          balaenemy.body.velocity
-      );
-      this.time.delayedCall(DELAY_BALA, () => {
-        puedeDisparar = true;
-    });
-  }
+if (balaenemy) {
+bala.enableBody(true, enemy2.x, enemy2.y, true, true);
+bala.setScale(0.2);
+let angle = Phaser.Math.Angle.Between(
+enemy2.x,
+enemy2.y,
+ player.x,
+player.y
+);
+bala.setRotation(angle);
+this.physics.velocityFromRotation(
+angle,
+400,
+balaenemy.body.velocity
+);
+this.time.delayedCall(DELAY_BALA, () => {
+puedeDisparar = true;
+});
+}
 }
 
 update(){
-  this.cursor.x = this.input.activePointer.x;
+//GUN------------------------------------------------------------------------------------------------------
+const angle = Phaser.Math.Angle.Between(
+player.x,
+player.y,
+this.input.activePointer.x,
+this.input.activePointer.y
+);
+const distancia = 35;
+gun.x = player.x + Math.cos(angle) * distancia;
+gun.y = player.y + Math.sin(angle) * distancia;
+gun.rotation = angle;
+
+this.cursor.x = this.input.activePointer.x;
 this.cursor.y = this.input.activePointer.y;
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
 this.physics.moveToObject(enemy, player, 150);
