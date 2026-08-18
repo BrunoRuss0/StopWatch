@@ -9,7 +9,9 @@ let puedeDisparar = true;
 let gun;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
-let enemy2;
+let puedeDispararEnemigo = true;
+const DELAY_BALA_ENEMIGO = 1200;
+
 
 export class GameScene extends Phaser.Scene {
 constructor() {
@@ -32,6 +34,7 @@ this.load.image('gun', 'assets/gun.png')
 
 }
 create(){
+puedeDisparar = true;
 time = 30;
 hitCooldown = false;
 this.input.setDefaultCursor('none');
@@ -67,7 +70,7 @@ enemy.setImmovable(true);
 enemy.body.setCollideWorldBounds(true);
 this.physics.add.collider(player, enemy, () => {
 if (hitCooldown) return;
-time -= 0;
+time -= 3;
 if (time < 0) {
 time = 0;
 }
@@ -123,7 +126,38 @@ this.physics.add.overlap(this.balas, enemy, (bala, enemy) => {bala.disableBody(t
 this.input.on('pointerdown', (pointer) => {
 this.disparar(pointer);   
 });
-}  
+// BALAS DEL ENEMIGO
+this.balasEnemy = this.physics.add.group({defaultKey: 'balas', maxSize: 100});
+this.time.addEvent({
+  delay: DELAY_BALA_ENEMIGO,
+  callback: () => {this.dispararenemy();
+  },
+  callbackScope: this,
+  loop: true
+});
+this.physics.add.overlap(
+  this.balasEnemy,
+  player,
+  this.recibirDisparo,
+  null,
+  this
+);
+      timerText.setText('Time: ' + time);
+      hitCooldown = true;
+      this.tweens.add({
+          targets: player,
+          alpha: 0,
+          duration: 100,
+          ease: 'Linear',
+          yoyo: true,
+          repeat: 1
+      });
+      this.time.delayedCall(500, () => {hitCooldown = false;
+      });
+  }
+
+
+  
 //FIN CREATE-------------------------------------------------------------------------------------------------
 
 moverenemigoAleatorio() {
@@ -172,34 +206,61 @@ disparar(pointer){
         });
       }
     }
-    
-    
-    
-dispararenemy(player){
-
-let balaenemy = this.balas.get(enemy2.x, enemy2.y);
-
-
+//balas enemigo
+dispararenemy() {
+if (!puedeDispararEnemigo) {
+return;
+}
+let balaenemy = this.balasEnemy.get(
+this.enemy2.x,
+this.enemy2.y
+);
 if (balaenemy) {
-bala.enableBody(true, enemy2.x, enemy2.y, true, true);
-bala.setScale(0.2);
+  puedeDispararEnemigo = false;
+  
+balaenemy.enableBody(true, this.enemy2.x, this.enemy2.y, true, true);
+balaenemy.setScale(0.12);
+
 let angle = Phaser.Math.Angle.Between(
-enemy2.x,
-enemy2.y,
- player.x,
+this.enemy2.x,
+this.enemy2.y,   
+player.x,
 player.y
 );
-bala.setRotation(angle);
-this.physics.velocityFromRotation(
-angle,
-400,
-balaenemy.body.velocity
-);
-this.time.delayedCall(DELAY_BALA, () => {
-puedeDisparar = true;
+balaenemy.setRotation(angle);
+this.physics.velocityFromRotation(angle, 400, balaenemy.body.velocity);
+this.time.delayedCall(
+DELAY_BALA_ENEMIGO,
+() => {
+puedeDispararEnemigo = true;
 });
 }
 }
+
+recibirDisparo(bala, jugador) {
+  bala.disableBody(true, true);
+  if (hitCooldown) {
+      return;
+  }
+  time -= 3;
+  if (time < 0) {
+      time = 0;
+  }
+  timerText.setText('Time: ' + time);
+  hitCooldown = true;
+  this.tweens.add({
+      targets: jugador,
+      alpha: 0,
+      duration: 100,
+      ease: 'Linear',
+      yoyo: true,
+      repeat: 2
+  });
+  this.time.delayedCall(500, () => {
+      hitCooldown = false;
+  });
+}
+
 
 update(){
 //GUN------------------------------------------------------------------------------------------------------
