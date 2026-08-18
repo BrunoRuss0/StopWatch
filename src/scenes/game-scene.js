@@ -22,10 +22,19 @@ this.load.image('background','assets/background.png')
 this.load.image('player','assets/player.png')
 this.load.image('enemy','assets/enemy.png')
 this.load.image("balas", "assets/bala.jpg")
+this.load.image("cursor", "assets/cursor.png");
+
+
 }
 create(){
 time = 30;
 hitCooldown = false;
+this.input.setDefaultCursor('none');
+this.cursor = this.add.image(0, 0, 'cursor');
+this.cursor.setScale(0.2);
+this.cursor.setDepth(100000000);
+
+
 
 //BACKGROUND-------------------------------------------------------------------------------------------------
 const gameWidth = this.scale.width;
@@ -60,7 +69,7 @@ alpha: 0,
 duration: 100,
 ease: 'Linear',
 yoyo: true,
-repeat: 5,
+repeat: 1,
 });
 
   this.time.delayedCall(500, () => {
@@ -128,6 +137,8 @@ disparar(pointer) {
 
 
 update(){
+  this.cursor.x = this.input.activePointer.x;
+this.cursor.y = this.input.activePointer.y;
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
 this.physics.moveToObject(enemy, player, 150);
 //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
