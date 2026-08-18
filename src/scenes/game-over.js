@@ -10,6 +10,7 @@ export class GameOver extends Phaser.Scene {
    }
    
    create() {
+  this.input.setDefaultCursor('default');
    const gameWidth = this.scale.width;
    const gameHeight = this.scale.height;
    const bg = this.add.image(gameWidth / 2,gameHeight / 2,'game-over');

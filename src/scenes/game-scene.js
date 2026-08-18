@@ -21,9 +21,10 @@ preload(){
 this.load.image('background','assets/background.png')
 this.load.image('player','assets/player.png')
 this.load.image('enemy','assets/enemy.png')
-this.load.image("balas", "assets/bala.jpg")
-this.load.image("cursor", "assets/cursor.png");
-
+this.load.image("cursor", "assets/cursor.png")
+this.load.image("balas", "assets/bala.png")
+this.load.image("player-back", "assets/player-back.png")
+this.load.image("cursor", "assets/cursor.png")
 
 }
 create(){
@@ -148,15 +149,17 @@ player.body.setVelocityX(-VELOCIDAD_JUGADOR);
 player.body.setVelocityX(VELOCIDAD_JUGADOR);
 } else {
 player.body.setVelocityX(0);
+player.setTexture('player');
 }
 //MOVIMIENTO ARR, ABA--------------------------------------------------------------
 if (teclas.up.isDown) {
 player.body.setVelocityY(-VELOCIDAD_JUGADOR);
+player.setTexture('player-back'); 
 } else if (teclas.down.isDown) {
 player.body.setVelocityY(VELOCIDAD_JUGADOR);
 } else {
 player.body.setVelocityY(0);
+player.setTexture('player');
 }
 }
-
 }
