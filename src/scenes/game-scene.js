@@ -57,7 +57,12 @@ player = this.add.image(0,0, 'player')
 player.setPosition(265,190).setScale(0.2);
 this.physics.add.existing(player);
 player.body.setCollideWorldBounds(true);
-teclas = this.input.keyboard.createCursorKeys();
+teclas = this.input.keyboard.addKeys({
+  up: Phaser.Input.Keyboard.KeyCodes.W,
+  down: Phaser.Input.Keyboard.KeyCodes.S,
+  left: Phaser.Input.Keyboard.KeyCodes.A,
+  right: Phaser.Input.Keyboard.KeyCodes.D
+});
 
 //GUN-----------------------------------------------------------------------------------------------------
 gun = this.add.image(player.x, player.y, 'gun');
@@ -173,30 +178,30 @@ nuevaDireccion.y
 //DISPARAR-------------------------------------------------------------------------------------------------
 disparar(pointer){
   if (!puedeDisparar) {
-    return;
-     }
-    let bala = this.balas.get(gun.x, gun.y);
-    if (bala) {
-        puedeDisparar = false;
-          bala.enableBody(true, gun.x, gun.y, true, true);
-          bala.setScale(0.1);
-          let angle = Phaser.Math.Angle.Between(
-              gun.x,
-              gun.y,
-              pointer.x,
-              pointer.y
-          );
-          bala.setRotation(angle);
-          this.physics.velocityFromRotation(
-              angle,
-              400,
-              bala.body.velocity
-          );
-          this.time.delayedCall(DELAY_BALA, () => {
-            puedeDisparar = true;
-        });
-      }
-    }
+  return;
+   }
+  let bala = this.balas.get(gun.x, gun.y);
+   if (bala) {
+    puedeDisparar = false;
+     bala.enableBody(true, gun.x, gun.y, true, true);
+    bala.setScale(0.1);
+    let angle = Phaser.Math.Angle.Between(
+    gun.x,
+    gun.y,
+    pointer.x,
+    pointer.y
+    );
+    bala.setRotation(angle);
+    this.physics.velocityFromRotation(
+    angle,
+    700 ,
+    bala.body.velocity
+  );
+   this.time.delayedCall(DELAY_BALA, () => {
+    puedeDisparar = true;
+    });
+  }
+}
 // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
 dispararenemy() {
   if (!enemy2.active) {
@@ -236,7 +241,7 @@ dispararenemy() {
 
       this.physics.velocityFromRotation(
           angle,
-          400,
+          500,
           balaenemy.body.velocity
       );
 
@@ -289,7 +294,7 @@ gun.rotation = angle;
 this.cursor.x = this.input.activePointer.x;
 this.cursor.y = this.input.activePointer.y;
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
-this.physics.moveToObject(enemy, player, 150);
+this.physics.moveToObject(enemy, player, 175);
 
 //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
 if (teclas.left.isDown) {
