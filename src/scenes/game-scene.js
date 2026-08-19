@@ -31,6 +31,7 @@ this.load.image("balas", "assets/bala.png")
 this.load.image("player-back", "assets/player-back.png")
 this.load.image("cursor", "assets/cursor.png")
 this.load.image('gun', 'assets/gun.png')
+this.load.image('bala-enemigo', 'assets/bala-enemigo.png')
 
 }
 create(){
@@ -89,7 +90,7 @@ repeat: 1,
       hitCooldown = false;
   });
 });
-//enemy 2
+//ENEMY
 this.enemy2 = this.physics.add.image(500, 400, 'enemy2');
 this.enemy2.setScale(0.05);
 this.enemy2.setCollideWorldBounds(true);
@@ -127,7 +128,7 @@ this.input.on('pointerdown', (pointer) => {
 this.disparar(pointer);   
 });
 // BALAS DEL ENEMIGO
-this.balasEnemy = this.physics.add.group({defaultKey: 'balas', maxSize: 100});
+this.balasEnemy = this.physics.add.group({defaultKey: 'bala-enemigo', maxSize: 100});
 this.time.addEvent({
   delay: DELAY_BALA_ENEMIGO,
   callback: () => {this.dispararenemy();
@@ -149,21 +150,20 @@ this.physics.add.overlap(
 //FIN CREATE-------------------------------------------------------------------------------------------------
 
 moverenemigoAleatorio() {
-  const velocidad = 300;
-
-  const direcciones = [
+const velocidad = 300;
+const direcciones = [
     
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad }
+   { x: velocidad, y: 0 },
+   { x: -velocidad, y: 0 },
+   { x: 0, y: velocidad },
+   { x: 0, y: -velocidad }
   ];
 
-  const nuevaDireccion = Phaser.Math.RND.pick(direcciones);
+const nuevaDireccion = Phaser.Math.RND.pick(direcciones);
 
-  this.enemy2.setVelocity(
-      nuevaDireccion.x,
-      nuevaDireccion.y
+this.enemy2.setVelocity(
+nuevaDireccion.x,
+nuevaDireccion.y
   );
 }
 
@@ -194,7 +194,7 @@ disparar(pointer){
         });
       }
     }
-//balas enemigo
+// BALAS ENEMIGO--------------------------------------------------------------------------------------------------
 dispararenemy() {
   if (!puedeDispararEnemigo) {
       return;
@@ -235,30 +235,29 @@ DELAY_BALA_ENEMIGO,
 }
 
 
-recibirDisparo(bala, jugador) {
-
+recibirDisparo(jugador,bala,) {
+  bala.disableBody(true,true);
   if (hitCooldown) {
-      return;
+   return;
   }
   time -= 3;
   if (time < 0) {
-      time = 0;
+     time = 0;
   }
   timerText.setText('Time: ' + time);
   hitCooldown = true;
   this.tweens.add({
-      targets: player,
-      alpha: 0,
-      duration: 100,
-      ease: 'Linear',
-      yoyo: true,
-      repeat: 2
+    targets: player,
+    alpha: 0,
+    duration: 100,
+    ease: 'Linear',
+    yoyo: true,
+    repeat: 2
   });
   this.time.delayedCall(500, () => {
-      hitCooldown = false;
+   hitCooldown = false;
   });
 }
-
 
 update(){
 //GUN------------------------------------------------------------------------------------------------------
@@ -299,3 +298,4 @@ player.setTexture('player');
 }
 }
 }
+//303 lineas de pura dinamita
