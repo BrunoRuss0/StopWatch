@@ -36,7 +36,6 @@ this.load.image('bala-enemigo', 'assets/bala-enemigo.png')
 
 }
 create(){
-puedeDispararEnemigo = true;
 puedeDisparar = true;
 time = 30;
 hitCooldown = false;
@@ -201,50 +200,53 @@ disparar(pointer){
 // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
 dispararenemy() {
   if (!enemy2.active) {
- return;
+      return;
   }
-if (!this.puedeDispararEnemigo) {
-   return;
+
+  if (! puedeDispararEnemigo) {
+      return;
   }
 
   let balaenemy = this.balasEnemy.get(
-   enemy2.x,
-   enemy2.y
+      enemy2.x,
+      enemy2.y
   );
 
   if (balaenemy) {
-  this.puedeDispararEnemigo = false;
+      puedeDispararEnemigo = false;
 
-  balaenemy.enableBody(
-  true, 
-  enemy2.x,
-  enemy2.y,
-  true,
-  true
-);
+      balaenemy.enableBody(
+          true,
+          enemy2.x,
+          enemy2.y,
+          true,
+          true
+      );
 
-balaenemy.setScale(0.12);
+      balaenemy.setScale(0.12);
 
-const angle = Phaser.Math.Angle.Between(
-  enemy2.x,
-  enemy2.y,
-  player.x,
-  player.y
-);
+      const angle = Phaser.Math.Angle.Between(
+          enemy2.x,
+          enemy2.y,
+          player.x,
+          player.y
+      );
 
-balaenemy.setRotation(angle);
+      balaenemy.setRotation(angle);
 
-this.physics.velocityFromRotation(
-angle,
-400,
-balaenemy.body.velocity
-);
+      this.physics.velocityFromRotation(
+          angle,
+          400,
+          balaenemy.body.velocity
+      );
 
-this.time.delayedCall(DELAY_BALA_ENEMIGO, () => {
-this.puedeDispararEnemigo = true;
-});
+      this.time.delayedCall(DELAY_BALA_ENEMIGO, () => {
+          puedeDispararEnemigo = true;
+      });
+  }
 }
-}
+
+
 
 
 recibirDisparo(jugador,bala,) {
