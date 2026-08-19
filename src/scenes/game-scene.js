@@ -142,18 +142,6 @@ this.physics.add.overlap(
   null,
   this
 );
-      timerText.setText('Time: ' + time);
-      hitCooldown = true;
-      this.tweens.add({
-          targets: player,
-          alpha: 0,
-          duration: 100,
-          ease: 'Linear',
-          yoyo: true,
-          repeat: 1
-      });
-      this.time.delayedCall(500, () => {hitCooldown = false;
-      });
   }
 
 
@@ -208,37 +196,47 @@ disparar(pointer){
     }
 //balas enemigo
 dispararenemy() {
-if (!puedeDispararEnemigo) {
-return;
-}
-let balaenemy = this.balasEnemy.get(
-this.enemy2.x,
-this.enemy2.y
-);
-if (balaenemy) {
-  puedeDispararEnemigo = false;
-  
-balaenemy.enableBody(true, this.enemy2.x, this.enemy2.y, true, true);
-balaenemy.setScale(0.12);
+  if (!puedeDispararEnemigo) {
+      return;
+  }
 
-let angle = Phaser.Math.Angle.Between(
-this.enemy2.x,
-this.enemy2.y,   
-player.x,
-player.y
-);
+  let balaenemy = this.balasEnemy.get(
+      this.enemy2.x,
+      this.enemy2.y
+  );
+
+  if (balaenemy) {
+      puedeDispararEnemigo = false;
+      balaenemy.enableBody(
+          true,
+          this.enemy2.x,
+          this.enemy2.y,
+          true,
+          true
+      );
+      balaenemy.setScale(0.12);
+      let angle = Phaser.Math.Angle.Between(
+          this.enemy2.x,
+          this.enemy2.y,
+          player.x,
+          player.y
+      );
 balaenemy.setRotation(angle);
-this.physics.velocityFromRotation(angle, 400, balaenemy.body.velocity);
+this.physics.velocityFromRotation(
+angle,
+400,
+balaenemy.body.velocity
+      );
 this.time.delayedCall(
 DELAY_BALA_ENEMIGO,
-() => {
-puedeDispararEnemigo = true;
-});
-}
+() => {puedeDispararEnemigo = true;}
+      );
+  }
 }
 
+
 recibirDisparo(bala, jugador) {
-  bala.disableBody(true, true);
+
   if (hitCooldown) {
       return;
   }
@@ -249,7 +247,7 @@ recibirDisparo(bala, jugador) {
   timerText.setText('Time: ' + time);
   hitCooldown = true;
   this.tweens.add({
-      targets: jugador,
+      targets: player,
       alpha: 0,
       duration: 100,
       ease: 'Linear',
