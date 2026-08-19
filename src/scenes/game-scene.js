@@ -7,11 +7,12 @@ let timerText;
 let hitCooldown = false;
 let puedeDisparar = true;
 let gun;
+let puedeDispararEnemigo = true;
+let enemy2;
 let enemyHealth = 3;
 let enemyMuerto = false;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
-let puedeDispararEnemigo = true;
 const DELAY_BALA_ENEMIGO = 1200;
 
 
@@ -59,7 +60,12 @@ player = this.add.image(0,0, 'player')
 player.setPosition(265,190).setScale(0.2);
 this.physics.add.existing(player);
 player.body.setCollideWorldBounds(true);
-teclas = this.input.keyboard.createCursorKeys();
+teclas = this.input.keyboard.addKeys({
+  up: Phaser.Input.Keyboard.KeyCodes.W,
+  down: Phaser.Input.Keyboard.KeyCodes.S,
+  left: Phaser.Input.Keyboard.KeyCodes.A,
+  right: Phaser.Input.Keyboard.KeyCodes.D
+});
 
 //GUN-----------------------------------------------------------------------------------------------------
 gun = this.add.image(player.x, player.y, 'gun');
@@ -95,10 +101,10 @@ repeat: 1,
       hitCooldown = false;
   });
 });
-//ENEMY2
-this.enemy2 = this.physics.add.image(500, 400, 'enemy2');
-this.enemy2.setScale(0.05);
-this.enemy2.setCollideWorldBounds(true);
+//ENEMY 2-------------------------------------------------------------------------------------------------------
+enemy2 = this.physics.add.image(500, 400, 'enemy2');
+enemy2.setScale(0.05);
+enemy2.setCollideWorldBounds(true);
 this.time.addEvent({
   delay: 500,
   callback: this.moverenemigoAleatorio,
@@ -127,6 +133,7 @@ else
 //BALAS-------------------------------------------------------------------------------------------------
 this.balas = this.physics.add.group({defaultKey: 'balas',maxSize: 1000000,});
   
+this.physics.add.overlap(this.balas, enemy2, (bala, enemy2) => {bala.disableBody(true, true);enemy2.disableBody(true, true);});
 this.physics.add.overlap(this.balas, enemy, (bala, enemyObj) => {
   if (!bala.active) return; 
 
@@ -178,7 +185,7 @@ const direcciones = [
 
 const nuevaDireccion = Phaser.Math.RND.pick(direcciones);
 
-this.enemy2.setVelocity(
+enemy2.setVelocity(
 nuevaDireccion.x,
 nuevaDireccion.y
   );
@@ -187,69 +194,80 @@ nuevaDireccion.y
 //DISPARAR-------------------------------------------------------------------------------------------------
 disparar(pointer){
   if (!puedeDisparar) {
-    return;
-     }
-    let bala = this.balas.get(gun.x, gun.y);
-    if (bala) {
-        puedeDisparar = false;
-          bala.enableBody(true, gun.x, gun.y, true, true);
-          bala.setScale(0.1);
-          let angle = Phaser.Math.Angle.Between(
-              gun.x,
-              gun.y,
-              pointer.x,
-              pointer.y
-          );
-          bala.setRotation(angle);
-          this.physics.velocityFromRotation(
-              angle,
-              400,
-              bala.body.velocity
-          );
-          this.time.delayedCall(DELAY_BALA, () => {
-            puedeDisparar = true;
-        });
-      }
-    }
+  return;
+   }
+  let bala = this.balas.get(gun.x, gun.y);
+   if (bala) {
+    puedeDisparar = false;
+     bala.enableBody(true, gun.x, gun.y, true, true);
+    bala.setScale(0.1);
+    let angle = Phaser.Math.Angle.Between(
+    gun.x,
+    gun.y,
+    pointer.x,
+    pointer.y
+    );
+    bala.setRotation(angle);
+    this.physics.velocityFromRotation(
+    angle,
+    700 ,
+    bala.body.velocity
+  );
+   this.time.delayedCall(DELAY_BALA, () => {
+    puedeDisparar = true;
+    });
+  }
+}
 // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
 dispararenemy() {
-  if (!puedeDispararEnemigo) {
+  if (!enemy2.active) {
+      return;
+  }
+
+  if (! puedeDispararEnemigo) {
       return;
   }
 
   let balaenemy = this.balasEnemy.get(
-      this.enemy2.x,
-      this.enemy2.y
+      enemy2.x,
+      enemy2.y
   );
 
   if (balaenemy) {
       puedeDispararEnemigo = false;
+
       balaenemy.enableBody(
           true,
-          this.enemy2.x,
-          this.enemy2.y,
+          enemy2.x,
+          enemy2.y,
           true,
           true
       );
+
       balaenemy.setScale(0.12);
-      let angle = Phaser.Math.Angle.Between(
-          this.enemy2.x,
-          this.enemy2.y,
+
+      const angle = Phaser.Math.Angle.Between(
+          enemy2.x,
+          enemy2.y,
           player.x,
           player.y
       );
-balaenemy.setRotation(angle);
-this.physics.velocityFromRotation(
-angle,
-400,
-balaenemy.body.velocity
+
+      balaenemy.setRotation(angle);
+
+      this.physics.velocityFromRotation(
+          angle,
+          500,
+          balaenemy.body.velocity
       );
-this.time.delayedCall(
-DELAY_BALA_ENEMIGO,
-() => {puedeDispararEnemigo = true;}
-      );
+
+      this.time.delayedCall(DELAY_BALA_ENEMIGO, () => {
+          puedeDispararEnemigo = true;
+      });
   }
 }
+
+
 
 
 recibirDisparo(jugador,bala,) {
@@ -292,7 +310,7 @@ gun.rotation = angle;
 this.cursor.x = this.input.activePointer.x;
 this.cursor.y = this.input.activePointer.y;
 //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
-this.physics.moveToObject(enemy, player, 150);
+this.physics.moveToObject(enemy, player, 175);
 
 //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
 if (teclas.left.isDown) {
