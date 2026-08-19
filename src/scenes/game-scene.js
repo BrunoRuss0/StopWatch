@@ -7,10 +7,13 @@ let timerText;
 let hitCooldown = false;
 let puedeDisparar = true;
 let gun;
+let enemyHealth = 3;
+let enemyMuerto = false;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
 let puedeDispararEnemigo = true;
 const DELAY_BALA_ENEMIGO = 1200;
+
 
 
 export class GameScene extends Phaser.Scene {
@@ -69,6 +72,8 @@ enemy = this.physics.add.image(1050, 190, 'enemy');
 enemy.setScale(0.7);
 enemy.setImmovable(true);
 enemy.body.setCollideWorldBounds(true);
+enemyHealth = 3;
+enemyMuerto = false;
 this.physics.add.collider(player, enemy, () => {
 if (hitCooldown) return;
 time -= 3;
@@ -90,7 +95,7 @@ repeat: 1,
       hitCooldown = false;
   });
 });
-//ENEMY
+//ENEMY2
 this.enemy2 = this.physics.add.image(500, 400, 'enemy2');
 this.enemy2.setScale(0.05);
 this.enemy2.setCollideWorldBounds(true);
@@ -122,8 +127,20 @@ else
 //BALAS-------------------------------------------------------------------------------------------------
 this.balas = this.physics.add.group({defaultKey: 'balas',maxSize: 1000000,});
   
-this.physics.add.overlap(this.balas, enemy, (bala, enemy) => {bala.disableBody(true, true);enemy.disableBody(true, true);});
+this.physics.add.overlap(this.balas, enemy, (bala, enemyObj) => {
+  if (!bala.active) return; 
 
+  enemyHealth -= 1;
+  console.log('enemy hit, health now:', enemyHealth);
+
+  if (enemyHealth <= 0) {
+    console.log('ENEMY MUERTO');
+    enemyMuerto = true;
+    enemy.setVelocity(0, 0);
+    enemy.body.enable = false;
+    enemy.setVisible(false);
+}
+});
 this.input.on('pointerdown', (pointer) => {
 this.disparar(pointer);   
 });
