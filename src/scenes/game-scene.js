@@ -1,14 +1,14 @@
 let player;
 let teclas;
 let enemy;
-let time = 100;
-let timerText;
-let hitCooldown = false;
-let puedeDisparar = true;
-let gun;
-let puedeDispararEnemigo = true;
 let enemy2;
 let currentRoom = 1;
+let time = 100;
+let timerText;
+let gun;
+let hitCooldown = false;
+let puedeDisparar = true;
+let puedeDispararEnemigo = true;
 let parryActivo = false;
 let puedeParry = true;
 const COOLDOWN_parry = 3000;
@@ -82,13 +82,10 @@ export class GameScene extends Phaser.Scene {
       if (!puedeParry) {
         return;
       }
-
       puedeParry = false;
       parryActivo = true;
-
       this.time.delayedCall(DURACION_parry, () => {
         parryActivo = false;
-
         this.time.delayedCall(COOLDOWN_parry, () => {
           puedeParry = true;
         });
@@ -117,7 +114,6 @@ export class GameScene extends Phaser.Scene {
     gun.setScale(0.03);
     gun.setOrigin(0.1, 0.5);
     gun.setDepth(player.depth + 1);
-
     //ENEMY-------------------------------------------------------------------------------------------------
     enemy = this.physics.add.image(1050, 190, "enemy");
     enemy.setScale(0.35);
@@ -147,13 +143,34 @@ export class GameScene extends Phaser.Scene {
     enemy2 = this.physics.add.image(1050, 400, "enemy2");
     enemy2.setScale(0.04);
     enemy2.setCollideWorldBounds(true);
+
+    // GRUPO ENEMY 2------------------------------------------------------------------------------------------------------
+    this.enemies2 = this.physics.add.group();
+    for (let i = 0; i < 3; i++) {
+      const clone = this.enemies2.create(
+        Phaser.Math.Between(700, 1050),
+        Phaser.Math.Between(100, 500),
+        "enemy2"
+      );
+      clone.setScale(0.04);
+      clone.setCollideWorldBounds(true);
+    }
+    this.physics.add.collider(player, this.enemies2, (player, clone) => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
     this.time.addEvent({
       delay: 500,
       callback: this.moverenemigoAleatorio,
       callbackScope: this,
       loop: true,
     });
-
     //TIMES-------------------------------------------------------------------------------------------------
     timerText = this.add.text(580, 10, "Time: " + time, {
       fontSize: "32px",
@@ -193,11 +210,13 @@ export class GameScene extends Phaser.Scene {
       bala.disableBody(true, true);
       enemy2.disableBody(true, true);
     });
-
+    this.physics.add.overlap(this.balas, this.enemies2, (bala, clone) => {
+      bala.disableBody(true, true);
+      clone.disableBody(true, true);
+    });
     this.input.on("pointerdown", (pointer) => {
       this.disparar(pointer);
     });
-
     //BALAS ENEMIGO----------------------------------------------------------------------------------------------------
     this.balasEnemy = this.physics.add.group({
       defaultKey: "bala-enemigo",
@@ -221,11 +240,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
-
   obtenerSpawnAleatorio() {
     let x;
     let y;
-
     do {
       x = Phaser.Math.Between(700, 1050);
       y = Phaser.Math.Between(100, 500);
@@ -233,10 +250,8 @@ export class GameScene extends Phaser.Scene {
       Phaser.Math.Distance.Between(x, y, player.x, player.y) < 250 ||
       Phaser.Math.Distance.Between(x, y, this.door.x, this.door.y) < 150
     );
-
     return { x, y };
   }
-
   cambiarHabitacion() {
     if (currentRoom === 1) {
       currentRoom = 2;
@@ -246,7 +261,6 @@ export class GameScene extends Phaser.Scene {
       this.cargarHabitacion();
     }
   }
-
   cargarHabitacion() {
     const spawn1 = this.obtenerSpawnAleatorio();
     const spawn2 = this.obtenerSpawnAleatorio();
@@ -266,6 +280,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  //MOVIMIENTO RANDOM ------------------------------------------------------------------------------------------------
   moverenemigoAleatorio() {
     const velocidad = 200;
     const direcciones = [
@@ -275,8 +290,14 @@ export class GameScene extends Phaser.Scene {
       { x: 0, y: -velocidad },
     ];
 
-    const nuevaDireccion = Phaser.Math.RND.pick(direcciones);
-    enemy2.setVelocity(nuevaDireccion.x, nuevaDireccion.y);
+    let dir = Phaser.Math.RND.pick(direcciones);
+    enemy2.setVelocity(dir.x, dir.y);
+
+    this.enemies2.children.each((clone) => {
+      let dirClone = Phaser.Math.RND.pick(direcciones);
+
+      clone.setVelocity(dirClone.x, dirClone.y);
+    });
   }
 
   //DISPARAR-------------------------------------------------------------------------------------------------
@@ -301,34 +322,24 @@ export class GameScene extends Phaser.Scene {
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
   dispararenemy() {
-    if (!enemy2.active) {
-      return;
-    }
-
-    if (!puedeDispararEnemigo) {
-      return;
-    }
-
-    let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
-
-    if (balaenemy) {
-      puedeDispararEnemigo = false;
-      balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
-      balaenemy.setScale(0.12);
-      this.bala_enemigo.play();
-      const angle = Phaser.Math.Angle.Between(
-        enemy2.x,
-        enemy2.y,
-        player.x,
-        player.y
-      );
-
-      balaenemy.setRotation(angle);
-      this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
-      this.time.delayedCall(DELAY_BALA_ENEMIGO, () => {
-        puedeDispararEnemigo = true;
-      });
-    }
+    this.enemies2.children.each((enemy) => {
+      if (!enemy.active) {
+        return;
+      }
+      let balaenemy = this.balasEnemy.get(enemy.x, enemy.y);
+      if (balaenemy) {
+        balaenemy.enableBody(true, enemy.x, enemy.y, true, true);
+        balaenemy.setScale(0.12);
+        const angle = Phaser.Math.Angle.Between(
+          enemy.x,
+          enemy.y,
+          player.x,
+          player.y
+        );
+        balaenemy.setRotation(angle);
+        this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
+      }
+    });
   }
 
   //PARRY Y RECIBIR DISPARO-----------------------------------------------------------------------------------------
@@ -364,9 +375,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     timerText.setText("Time: " + time);
-
     hitCooldown = true;
-
     this.tweens.add({
       targets: player,
       alpha: 0,
@@ -425,3 +434,4 @@ export class GameScene extends Phaser.Scene {
     }
   }
 }
+//  4XX lineas de pura dinamita
