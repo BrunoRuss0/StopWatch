@@ -11,11 +11,11 @@ let puedeDisparar = true;
 let puedeDispararEnemigo = true;
 let parryActivo = false;
 let puedeParry = true;
+const DELAY_BALA_ENEMIGO = 1200;
 const COOLDOWN_parry = 3000;
 const DURACION_parry = 300;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
-const DELAY_BALA_ENEMIGO = 1200;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -292,10 +292,8 @@ export class GameScene extends Phaser.Scene {
 
     let dir = Phaser.Math.RND.pick(direcciones);
     enemy2.setVelocity(dir.x, dir.y);
-
     this.enemies2.children.each((clone) => {
       let dirClone = Phaser.Math.RND.pick(direcciones);
-
       clone.setVelocity(dirClone.x, dirClone.y);
     });
   }
@@ -322,51 +320,41 @@ export class GameScene extends Phaser.Scene {
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
   dispararenemy() {
-    // ENEMY NORMAL
     if (enemy2.active) {
       let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
 
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
-
         balaenemy.setScale(0.12);
-
         const angle = Phaser.Math.Angle.Between(
           enemy2.x,
           enemy2.y,
           player.x,
           player.y
         );
-
         balaenemy.setRotation(angle);
-
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
+        this.bala_enemigo.play();
       }
     }
 
-    // TODOS LOS ENEMY2
     this.enemies2.children.each((enemy2) => {
       if (!enemy2.active) {
         return;
       }
-
       let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
-
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
-
         balaenemy.setScale(0.12);
-
         const angle = Phaser.Math.Angle.Between(
           enemy2.x,
           enemy2.y,
           player.x,
           player.y
         );
-
         balaenemy.setRotation(angle);
-
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
+        this.bala_enemigo.play();
       }
     });
   }
