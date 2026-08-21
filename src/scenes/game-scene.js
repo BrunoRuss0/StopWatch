@@ -261,7 +261,7 @@ export class GameScene extends Phaser.Scene {
       let spawn1 = this.obtenerSpawnAleatorio();
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
 
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
         enemy2.setScale(0.04);
@@ -271,7 +271,7 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(100, 300);
       let spawn1 = this.obtenerSpawnAleatorio();
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
         enemy2.setScale(0.04);
@@ -323,17 +323,17 @@ export class GameScene extends Phaser.Scene {
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
   dispararenemy() {
     // ENEMY NORMAL
-    if (enemy.active) {
-      let balaenemy = this.balasEnemy.get(enemy.x, enemy.y);
+    if (enemy2.active) {
+      let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
 
       if (balaenemy) {
-        balaenemy.enableBody(true, enemy.x, enemy.y, true, true);
+        balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
 
         balaenemy.setScale(0.12);
 
         const angle = Phaser.Math.Angle.Between(
-          enemy.x,
-          enemy.y,
+          enemy2.x,
+          enemy2.y,
           player.x,
           player.y
         );
