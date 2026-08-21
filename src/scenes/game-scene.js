@@ -133,7 +133,7 @@ export class GameScene extends Phaser.Scene {
         duration: 100,
         ease: "Linear",
         yoyo: true,
-        repeat: 0.5,
+        repeat: 0.1,
       });
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -143,6 +143,22 @@ export class GameScene extends Phaser.Scene {
     enemy2 = this.physics.add.image(1050, 400, "enemy2");
     enemy2.setScale(0.04);
     enemy2.setCollideWorldBounds(true);
+    this.physics.add.collider(player, enemy2, () => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+    this.time.addEvent({
+      delay: 500,
+      callback: this.moverenemigoAleatorio,
+      callbackScope: this,
+      loop: true,
+    });
 
     // GRUPO ENEMY 2------------------------------------------------------------------------------------------------------
     this.enemies2 = this.physics.add.group();
