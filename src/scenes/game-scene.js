@@ -146,15 +146,6 @@ export class GameScene extends Phaser.Scene {
 
     // GRUPO ENEMY 2------------------------------------------------------------------------------------------------------
     this.enemies2 = this.physics.add.group();
-    for (let i = 0; i < 3; i++) {
-      const clone = this.enemies2.create(
-        Phaser.Math.Between(700, 1050),
-        Phaser.Math.Between(100, 500),
-        "enemy2"
-      );
-      clone.setScale(0.04);
-      clone.setCollideWorldBounds(true);
-    }
     this.physics.add.collider(player, this.enemies2, (player, clone) => {
       if (hitCooldown) return;
       time -= 3;
@@ -262,21 +253,30 @@ export class GameScene extends Phaser.Scene {
     }
   }
   cargarHabitacion() {
-    const spawn1 = this.obtenerSpawnAleatorio();
-    const spawn2 = this.obtenerSpawnAleatorio();
-
+    this.enemies2.children.each((enemy) => {
+      enemy.disableBody(true, true);
+    });
     if (currentRoom === 1) {
       player.setPosition(100, 300);
-
+      let spawn1 = this.obtenerSpawnAleatorio();
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
 
-      enemy2.enableBody(true, spawn2.x, spawn2.y, true, true);
+      for (let i = 0; i < 3; i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
+        enemy2.setScale(0.04);
+        enemy2.setCollideWorldBounds(true);
+      }
     } else if (currentRoom === 2) {
       player.setPosition(100, 300);
-
+      let spawn1 = this.obtenerSpawnAleatorio();
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-
-      enemy2.enableBody(true, spawn2.x, spawn2.y, true, true);
+      for (let i = 0; i < 2; i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
+        enemy2.setScale(0.04);
+        enemy2.setCollideWorldBounds(true);
+      }
     }
   }
 
@@ -322,27 +322,55 @@ export class GameScene extends Phaser.Scene {
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
   dispararenemy() {
-    this.enemies2.children.each((enemy) => {
-      if (!enemy.active) {
-        return;
-      }
+    // ENEMY NORMAL
+    if (enemy.active) {
       let balaenemy = this.balasEnemy.get(enemy.x, enemy.y);
+
       if (balaenemy) {
         balaenemy.enableBody(true, enemy.x, enemy.y, true, true);
+
         balaenemy.setScale(0.12);
+
         const angle = Phaser.Math.Angle.Between(
           enemy.x,
           enemy.y,
           player.x,
           player.y
         );
+
         balaenemy.setRotation(angle);
+
+        this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
+      }
+    }
+
+    // TODOS LOS ENEMY2
+    this.enemies2.children.each((enemy2) => {
+      if (!enemy2.active) {
+        return;
+      }
+
+      let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
+
+      if (balaenemy) {
+        balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
+
+        balaenemy.setScale(0.12);
+
+        const angle = Phaser.Math.Angle.Between(
+          enemy2.x,
+          enemy2.y,
+          player.x,
+          player.y
+        );
+
+        balaenemy.setRotation(angle);
+
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
       }
     });
   }
-
-  //PARRY Y RECIBIR DISPARO-----------------------------------------------------------------------------------------
+  //PARRY--------------------------------------------------------------------------------------------
   recibirDisparo(jugador, bala) {
     bala.disableBody(true, true);
 
