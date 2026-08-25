@@ -18,9 +18,9 @@ const COOLDOWN_parry = 3000;
 const DURACION_parry = 300;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
-const VIDA_ENEMY = 3;
-const VIDA_ENEMY2 = 5;
-const VIDA_ENEMY3 = 10;
+const VIDA_ENEMY = 2;
+const VIDA_ENEMY2 = 3;
+const VIDA_ENEMY3 = 5;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -41,8 +41,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("gun", "assets/gun.png");
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
     this.load.image("parry", "assets/parry.JPG");
-    this.load.image("puede-parry", "assets/puedeparry.jpg")
-    this.load.image("enemy3", "assets/enemy3.jpg")
+    this.load.image("puede-parry", "assets/puedeparry.jpg");
+    this.load.image("enemy3", "assets/enemy3.jpg");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
@@ -110,7 +110,6 @@ export class GameScene extends Phaser.Scene {
         });
       });
     });
-
 
     //DOOR-------------------------------------------------------------------------------------------------
     this.door = this.physics.add.staticImage(1200, 300, "bruno");
@@ -186,12 +185,12 @@ export class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
-    //ENEMY 3
+    //ENEMY 3-------------------------------------------------------------------------------------------------------
     enemy3 = this.physics.add.image(1050, 600, "enemy3");
-    enemy3.setScale(0.1 );
+    enemy3.setScale(0.1);
     enemy3.setImmovable(true);
     enemy3.body.setCollideWorldBounds(true);
-    enemy3.vida = VIDA_ENEMY;
+    enemy3.vida = VIDA_ENEMY3;
 
     this.physics.add.collider(player, enemy3, () => {
       if (hitCooldown) return;
@@ -231,6 +230,22 @@ export class GameScene extends Phaser.Scene {
       callback: this.moverenemigoAleatorio,
       callbackScope: this,
       loop: true,
+    });
+
+    // GRUPO ENEMY 3------------------------------------------------------------------------------------------------------
+    // NUEVO: antes se usaba this.enemies3 en varios lugares (countActive,
+    // children.each, create) pero el grupo nunca se creaba, así que
+    // this.enemies3 era undefined y el juego crasheaba al tocar la puerta.
+    this.enemies3 = this.physics.add.group();
+    this.physics.add.collider(player, this.enemies3, (player, clone) => {
+      if (hitCooldown) return;
+      time -= 10;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
     });
 
     //TIMES-------------------------------------------------------------------------------------------------
@@ -297,6 +312,16 @@ export class GameScene extends Phaser.Scene {
       this
     );
 
+    // NUEVO: overlap de balas con el grupo enemies3 (faltaba, por eso los
+    // clones de enemy3 eran inmunes a los disparos aunque tuvieran vida).
+    this.physics.add.overlap(
+      this.balas,
+      this.enemies3,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+
     this.input.on("pointerdown", (pointer) => {
       this.disparar(pointer);
     });
@@ -339,12 +364,14 @@ export class GameScene extends Phaser.Scene {
   }
 
   cambiarHabitacion() {
-    const enemigosVivos = this.enemies2.countActive() + (enemy.active ? 1 : 0);
-  
+    const enemigosVivos =
+      this.enemies2.countActive() +
+      (enemy.active ? 1 : 0) +
+      this.enemies3.countActive();
     if (enemigosVivos > 0) {
       return;
     }
-  
+
     if (currentRoom === 1) {
       currentRoom = 2;
       this.cargarHabitacion();
@@ -353,10 +380,11 @@ export class GameScene extends Phaser.Scene {
       this.cargarHabitacion();
     }
   }
-  
+
   cargarHabitacion() {
-    this.enemies2.children.each((enemy) => {
-      enemy.disableBody(true, true);
+    enemy3.disableBody(true, true);
+    this.enemies3.children.each((clone) => {
+      clone.disableBody(true, true);
     });
 
     if (currentRoom === 1) {
@@ -365,10 +393,11 @@ export class GameScene extends Phaser.Scene {
       let spawn1 = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-
       enemy.vida = VIDA_ENEMY;
+      enemy3.enableBody(true, spawn1.x, spawn1.y, true, true);
+      enemy3.vida = VIDA_ENEMY3;
 
-      for (let i = 0; i < Phaser.Math.Between(0, 6); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
 
@@ -376,13 +405,21 @@ export class GameScene extends Phaser.Scene {
         enemy2.setCollideWorldBounds(true);
         enemy2.vida = VIDA_ENEMY2;
       }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemy3Clone = this.enemies3.create(spawn.x, spawn.y, "enemy3");
+        enemy3Clone.setScale(0.1);
+        enemy3Clone.setCollideWorldBounds(true);
+        enemy3Clone.vida = VIDA_ENEMY3;
+      }
     } else if (currentRoom === 2) {
       player.setPosition(100, 300);
 
       let spawn1 = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-
+      enemy3.enableBody(true, spawn1.x, spawn1.y, true, true);
+      enemy3.vida = VIDA_ENEMY3;
       enemy.vida = VIDA_ENEMY;
 
       for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
@@ -444,7 +481,17 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  golpearEnemigo(bala, enemigo) {
+  golpearEnemigo(obj1, obj2) {
+    // --- FIX: no confiar en el orden de los parámetros ---
+    // Phaser puede invocar este callback con los argumentos invertidos
+    // cuando el segundo objeto pasado a overlap() es un cuerpo físico
+    // inmóvil (setImmovable(true)), como pasa con "enemy" y "enemy3".
+    // Por eso preguntamos directamente al grupo de balas cuál de los
+    // dos objetos es realmente la bala, sin asumir la posición.
+    const bala = this.balas.contains(obj1) ? obj1 : obj2;
+    const enemigo = bala === obj1 ? obj2 : obj1;
+    // -------------------------------------------------------
+
     bala.disableBody(true, true);
 
     if (!enemigo.active) {
@@ -518,7 +565,6 @@ export class GameScene extends Phaser.Scene {
       }
     });
   }
-  
 
   //PARRY--------------------------------------------------------------------------------------------
   recibirDisparo(jugador, bala) {
@@ -615,17 +661,16 @@ export class GameScene extends Phaser.Scene {
     }
 
     //PARRY------------------------------------------------------------------------------------------------
-if (parryActivo) {
-  player.setTexture("parry");
-  player.setScale(0.04);
-} else if (mostrandoPuedeParry) {
-  player.setTexture("puede-parry");
-  player.setScale(0.1);
-} else {
-  player.setTexture("player");
-  player.setScale(0.2);
-}
+    if (parryActivo) {
+      player.setTexture("parry");
+      player.setScale(0.04);
+    } else if (mostrandoPuedeParry) {
+      player.setTexture("puede-parry");
+      player.setScale(0.1);
+    } else {
+      player.setTexture("player");
+      player.setScale(0.2);
+    }
   }
-
 }
-//585 lineas de pura dinamita
+//6XX lineas de pura dinamita
