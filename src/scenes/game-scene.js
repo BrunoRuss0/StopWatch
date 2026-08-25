@@ -11,6 +11,7 @@ let puedeDisparar = true;
 let puedeDispararEnemigo = true;
 let parryActivo = false;
 let puedeParry = true;
+let mostrandoPuedeParry = false;
 const DELAY_BALA_ENEMIGO = 1200;
 const COOLDOWN_parry = 3000;
 const DURACION_parry = 300;
@@ -38,6 +39,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("gun", "assets/gun.png");
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
     this.load.image("parry", "assets/parry.JPG");
+    this.load.image("puede-parry", "assets/puedeparry.jpg")
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
@@ -86,13 +88,26 @@ export class GameScene extends Phaser.Scene {
       }
       puedeParry = false;
       parryActivo = true;
+      player.setTexture("parry");
+      player.setScale(0.04);
       this.time.delayedCall(DURACION_parry, () => {
         parryActivo = false;
+        player.setTexture("player");
+        player.setScale(0.2);
         this.time.delayedCall(COOLDOWN_parry, () => {
           puedeParry = true;
+          mostrandoPuedeParry = true;
+          player.setTexture("puede-parry");
+          player.setScale(0.1);
+          this.time.delayedCall(100, () => {
+            mostrandoPuedeParry = false;
+            player.setTexture("player");
+            player.setScale(0.2);
+          });
         });
       });
     });
+
 
     //DOOR-------------------------------------------------------------------------------------------------
     this.door = this.physics.add.staticImage(1200, 300, "bruno");
@@ -286,6 +301,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   cambiarHabitacion() {
+    const enemigosVivos = this.enemies2.countActive() + (enemy.active ? 1 : 0);
+  
+    if (enemigosVivos > 0) {
+      return;
+    }
+  
     if (currentRoom === 1) {
       currentRoom = 2;
       this.cargarHabitacion();
@@ -294,7 +315,7 @@ export class GameScene extends Phaser.Scene {
       this.cargarHabitacion();
     }
   }
-
+  
   cargarHabitacion() {
     this.enemies2.children.each((enemy) => {
       enemy.disableBody(true, true);
@@ -554,11 +575,17 @@ export class GameScene extends Phaser.Scene {
     }
 
     //PARRY------------------------------------------------------------------------------------------------
-    if (parryActivo) {
-      player.setTexture("parry");
-      player.setScale(0.04);
-    } else {
-      player.setScale(0.2);
-    }
-  }
+if (parryActivo) {
+  player.setTexture("parry");
+  player.setScale(0.04);
+} else if (mostrandoPuedeParry) {
+  player.setTexture("puede-parry");
+  player.setScale(0.1);
+} else {
+  player.setTexture("player");
+  player.setScale(0.2);
 }
+  }
+
+}
+//585 lineas de pura dinamita
