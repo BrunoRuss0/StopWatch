@@ -2,6 +2,7 @@ let player;
 let teclas;
 let enemy;
 let enemy2;
+let enemy3;
 let currentRoom = 1;
 let time = 100;
 let timerText;
@@ -19,6 +20,7 @@ const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
 const VIDA_ENEMY = 3;
 const VIDA_ENEMY2 = 5;
+const VIDA_ENEMY3 = 10;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -40,6 +42,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
     this.load.image("parry", "assets/parry.JPG");
     this.load.image("puede-parry", "assets/puedeparry.jpg")
+    this.load.image("enemy3", "assets/enemy3.jpg")
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
@@ -183,6 +186,33 @@ export class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
+    //ENEMY 3
+    enemy3 = this.physics.add.image(1050, 600, "enemy3");
+    enemy3.setScale(0.1 );
+    enemy3.setImmovable(true);
+    enemy3.body.setCollideWorldBounds(true);
+    enemy3.vida = VIDA_ENEMY;
+
+    this.physics.add.collider(player, enemy3, () => {
+      if (hitCooldown) return;
+      time -= 10;
+      if (time < 0) {
+        time = 0;
+      }
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.tweens.add({
+        targets: player,
+        alpha: 0,
+        duration: 100,
+        ease: "Linear",
+        yoyo: true,
+        repeat: 0.1,
+      });
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
 
     // GRUPO ENEMY 2------------------------------------------------------------------------------------------------------
     this.enemies2 = this.physics.add.group();
@@ -238,6 +268,14 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.balas,
       enemy,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.balas,
+      enemy3,
       this.golpearEnemigo,
       null,
       this
@@ -330,7 +368,7 @@ export class GameScene extends Phaser.Scene {
 
       enemy.vida = VIDA_ENEMY;
 
-      for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
+      for (let i = 0; i < Phaser.Math.Between(0, 6); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
 
@@ -480,6 +518,7 @@ export class GameScene extends Phaser.Scene {
       }
     });
   }
+  
 
   //PARRY--------------------------------------------------------------------------------------------
   recibirDisparo(jugador, bala) {
@@ -552,6 +591,7 @@ export class GameScene extends Phaser.Scene {
 
     //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
     this.physics.moveToObject(enemy, player, 233);
+    this.physics.moveToObject(enemy3, player, 100);
 
     //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
