@@ -142,6 +142,7 @@ export class GameScene extends Phaser.Scene {
     enemy.setImmovable(true);
     enemy.body.setCollideWorldBounds(true);
     enemy.vida = VIDA_ENEMY;
+    enemy.disableBody(true, true);
 
     this.physics.add.collider(player, enemy, () => {
       if (hitCooldown) return;
@@ -169,6 +170,7 @@ export class GameScene extends Phaser.Scene {
     enemy2.setScale(0.04);
     enemy2.setCollideWorldBounds(true);
     enemy2.vida = VIDA_ENEMY2;
+    enemy2.disableBody(true, true);
 
     this.physics.add.collider(player, enemy2, () => {
       if (hitCooldown) return;
@@ -192,6 +194,7 @@ export class GameScene extends Phaser.Scene {
     enemy3.setImmovable(true);
     enemy3.body.setCollideWorldBounds(true);
     enemy3.vida = VIDA_ENEMY3;
+    enemy3.disableBody(true, true);
 
     this.physics.add.collider(player, enemy3, () => {
       if (hitCooldown) return;
@@ -362,7 +365,6 @@ export class GameScene extends Phaser.Scene {
       this
     );
   }
-
   //FIN CREATE-------------------------------------------------------------------------------------------------
 
   obtenerSpawnAleatorio() {
@@ -421,7 +423,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
-
         enemy2Clone.setScale(0.04);
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = VIDA_ENEMY2;
@@ -429,7 +430,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
-
         enemy3Clone.setScale(0.1);
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = VIDA_ENEMY3;
@@ -437,7 +437,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
-
         enemyClone.setScale(0.35);
         enemyClone.setCollideWorldBounds(true);
         enemyClone.vida = VIDA_ENEMY;
@@ -454,7 +453,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
-
         enemyClone.setScale(0.35);
         enemyClone.setCollideWorldBounds(true);
         enemyClone.vida = VIDA_ENEMY;
@@ -462,7 +460,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
-
         enemy2Clone.setScale(0.04);
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = VIDA_ENEMY2;
@@ -470,7 +467,6 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
-
         enemy3Clone.setScale(0.1);
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = VIDA_ENEMY3;
@@ -490,7 +486,6 @@ export class GameScene extends Phaser.Scene {
 
     let dir = Phaser.Math.RND.pick(direcciones);
     enemy2.setVelocity(dir.x, dir.y);
-
     enemies2.children.each((clone) => {
       let dirClone = Phaser.Math.RND.pick(direcciones);
       clone.setVelocity(dirClone.x, dirClone.y);
@@ -502,24 +497,16 @@ export class GameScene extends Phaser.Scene {
     if (!puedeDisparar) {
       return;
     }
-
     let bala = this.balas.get(gun.x, gun.y);
 
     if (bala) {
       puedeDisparar = false;
-
       bala.enableBody(true, gun.x, gun.y, true, true);
-
       bala.setScale(0.1);
-
       let angle = Phaser.Math.Angle.Between(gun.x, gun.y, pointer.x, pointer.y);
-
       bala.setRotation(angle);
-
       this.physics.velocityFromRotation(angle, 700, bala.body.velocity);
-
       this.bala.play();
-
       this.time.delayedCall(DELAY_BALA, () => {
         puedeDisparar = true;
       });
@@ -532,13 +519,11 @@ export class GameScene extends Phaser.Scene {
     // -------------------------------------------------------
 
     bala.disableBody(true, true);
-
     if (!enemigo.active) {
       return;
     }
 
     enemigo.vida -= 1;
-
     if (enemigo.vida <= 0) {
       enemigo.disableBody(true, true);
     }
@@ -551,9 +536,7 @@ export class GameScene extends Phaser.Scene {
 
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
-
         balaenemy.setScale(0.12);
-
         const angle = Phaser.Math.Angle.Between(
           enemy2.x,
           enemy2.y,
@@ -562,9 +545,7 @@ export class GameScene extends Phaser.Scene {
         );
 
         balaenemy.setRotation(angle);
-
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
-
         this.bala_enemigo.play();
       }
     }
@@ -575,10 +556,8 @@ export class GameScene extends Phaser.Scene {
       }
 
       let balaenemy = this.balasEnemy.get(enemy2Clone.x, enemy2Clone.y);
-
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2Clone.x, enemy2Clone.y, true, true);
-
         balaenemy.setScale(0.12);
 
         const angle = Phaser.Math.Angle.Between(
@@ -589,9 +568,7 @@ export class GameScene extends Phaser.Scene {
         );
 
         balaenemy.setRotation(angle);
-
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
-
         this.bala_enemigo.play();
       }
     });
@@ -656,11 +633,9 @@ export class GameScene extends Phaser.Scene {
     );
 
     const distancia = 35;
-
     gun.x = player.x + Math.cos(angle) * distancia;
     gun.y = player.y + Math.sin(angle) * distancia;
     gun.rotation = angle;
-
     this.cursor.x = this.input.activePointer.x;
     this.cursor.y = this.input.activePointer.y;
 
@@ -711,4 +686,4 @@ export class GameScene extends Phaser.Scene {
     }
   }
 }
-//6XX lineas de pura dinamita
+//6XX LINEAS DE PURA DINAMITA
