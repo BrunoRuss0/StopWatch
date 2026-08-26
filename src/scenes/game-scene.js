@@ -3,6 +3,8 @@ let teclas;
 let enemy;
 let enemy2;
 let enemy3;
+let enemies2;
+let enemies3;
 let currentRoom = 1;
 let time = 100;
 let timerText;
@@ -214,8 +216,8 @@ export class GameScene extends Phaser.Scene {
     });
 
     // GRUPO ENEMY 2------------------------------------------------------------------------------------------------------
-    this.enemies2 = this.physics.add.group();
-    this.physics.add.collider(player, this.enemies2, (player, clone) => {
+    enemies2 = this.physics.add.group();
+    this.physics.add.collider(player, enemies2, (player, clone) => {
       if (hitCooldown) return;
       time -= 3;
       if (time < 0) time = 0;
@@ -233,11 +235,8 @@ export class GameScene extends Phaser.Scene {
     });
 
     // GRUPO ENEMY 3------------------------------------------------------------------------------------------------------
-    // NUEVO: antes se usaba this.enemies3 en varios lugares (countActive,
-    // children.each, create) pero el grupo nunca se creaba, así que
-    // this.enemies3 era undefined y el juego crasheaba al tocar la puerta.
-    this.enemies3 = this.physics.add.group();
-    this.physics.add.collider(player, this.enemies3, (player, clone) => {
+    enemies3 = this.physics.add.group();
+    this.physics.add.collider(player, enemies3, (player, clone) => {
       if (hitCooldown) return;
       time -= 10;
       if (time < 0) time = 0;
@@ -306,17 +305,15 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.overlap(
       this.balas,
-      this.enemies2,
+      enemies2,
       this.golpearEnemigo,
       null,
       this
     );
 
-    // NUEVO: overlap de balas con el grupo enemies3 (faltaba, por eso los
-    // clones de enemy3 eran inmunes a los disparos aunque tuvieran vida).
     this.physics.add.overlap(
       this.balas,
-      this.enemies3,
+      enemies3,
       this.golpearEnemigo,
       null,
       this
@@ -362,12 +359,13 @@ export class GameScene extends Phaser.Scene {
     );
     return { x, y };
   }
-
+  //CAMBIAR HABITACION-------------------------------------------------------------------------------------------------
   cambiarHabitacion() {
     const enemigosVivos =
-      this.enemies2.countActive() +
+      enemies2.countActive() +
       (enemy.active ? 1 : 0) +
-      this.enemies3.countActive();
+      enemies3.countActive() +
+      enemies3.countActive();
     if (enemigosVivos > 0) {
       return;
     }
@@ -380,55 +378,55 @@ export class GameScene extends Phaser.Scene {
       this.cargarHabitacion();
     }
   }
-
+  //CARGAR HABITACION-------------------------------------------------------------------------------------------------
   cargarHabitacion() {
     enemy3.disableBody(true, true);
-    this.enemies3.children.each((clone) => {
+    enemies3.children.each((clone) => {
       clone.disableBody(true, true);
     });
 
     if (currentRoom === 1) {
       player.setPosition(100, 300);
-
+      let spawn3 = this.obtenerSpawnAleatorio();
       let spawn1 = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
       enemy.vida = VIDA_ENEMY;
-      enemy3.enableBody(true, spawn1.x, spawn1.y, true, true);
+      enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
 
-      for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
-        let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
+        let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
 
-        enemy2.setScale(0.04);
-        enemy2.setCollideWorldBounds(true);
-        enemy2.vida = VIDA_ENEMY2;
+        enemy2Clone.setScale(0.04);
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = VIDA_ENEMY2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
-        let enemy3Clone = this.enemies3.create(spawn.x, spawn.y, "enemy3");
+        let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
         enemy3Clone.setScale(0.1);
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = VIDA_ENEMY3;
       }
     } else if (currentRoom === 2) {
       player.setPosition(100, 300);
-
+      let spawn3 = this.obtenerSpawnAleatorio();
       let spawn1 = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-      enemy3.enableBody(true, spawn1.x, spawn1.y, true, true);
+      enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
       enemy.vida = VIDA_ENEMY;
 
       for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
         let spawn = this.obtenerSpawnAleatorio();
-        let enemy2 = this.enemies2.create(spawn.x, spawn.y, "enemy2");
+        let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
 
-        enemy2.setScale(0.04);
-        enemy2.setCollideWorldBounds(true);
-        enemy2.vida = VIDA_ENEMY2;
+        enemy2Clone.setScale(0.04);
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = VIDA_ENEMY2;
       }
     }
   }
@@ -446,7 +444,7 @@ export class GameScene extends Phaser.Scene {
     let dir = Phaser.Math.RND.pick(direcciones);
     enemy2.setVelocity(dir.x, dir.y);
 
-    this.enemies2.children.each((clone) => {
+    enemies2.children.each((clone) => {
       let dirClone = Phaser.Math.RND.pick(direcciones);
       clone.setVelocity(dirClone.x, dirClone.y);
     });
@@ -482,12 +480,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   golpearEnemigo(obj1, obj2) {
-    // --- FIX: no confiar en el orden de los parámetros ---
-    // Phaser puede invocar este callback con los argumentos invertidos
-    // cuando el segundo objeto pasado a overlap() es un cuerpo físico
-    // inmóvil (setImmovable(true)), como pasa con "enemy" y "enemy3".
-    // Por eso preguntamos directamente al grupo de balas cuál de los
-    // dos objetos es realmente la bala, sin asumir la posición.
     const bala = this.balas.contains(obj1) ? obj1 : obj2;
     const enemigo = bala === obj1 ? obj2 : obj1;
     // -------------------------------------------------------
@@ -499,14 +491,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     enemigo.vida -= 1;
-
-    enemigo.setTint(0xffffff);
-
-    this.time.delayedCall(80, () => {
-      if (enemigo.active) {
-        enemigo.clearTint();
-      }
-    });
 
     if (enemigo.vida <= 0) {
       enemigo.disableBody(true, true);
@@ -538,21 +522,21 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    this.enemies2.children.each((enemy2) => {
-      if (!enemy2.active) {
+    enemies2.children.each((enemy2Clone) => {
+      if (!enemy2Clone.active) {
         return;
       }
 
-      let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
+      let balaenemy = this.balasEnemy.get(enemy2Clone.x, enemy2Clone.y);
 
       if (balaenemy) {
-        balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
+        balaenemy.enableBody(true, enemy2Clone.x, enemy2Clone.y, true, true);
 
         balaenemy.setScale(0.12);
 
         const angle = Phaser.Math.Angle.Between(
-          enemy2.x,
-          enemy2.y,
+          enemy2Clone.x,
+          enemy2Clone.y,
           player.x,
           player.y
         );
@@ -593,9 +577,7 @@ export class GameScene extends Phaser.Scene {
 
       return;
     }
-
     time -= 5;
-
     if (time < 0) {
       time = 0;
     }
@@ -609,7 +591,7 @@ export class GameScene extends Phaser.Scene {
       duration: 100,
       ease: "Linear",
       yoyo: true,
-      repeat: 2,
+      repeat: 0.1,
     });
 
     this.time.delayedCall(500, () => {
@@ -638,7 +620,11 @@ export class GameScene extends Phaser.Scene {
     //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
     this.physics.moveToObject(enemy, player, 233);
     this.physics.moveToObject(enemy3, player, 100);
-
+    enemies3.children.each((enemy) => {
+      if (enemy.active) {
+        this.physics.moveToObject(enemy, player, 100);
+      }
+    });
     //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
       player.body.setVelocityX(-VELOCIDAD_JUGADOR);
