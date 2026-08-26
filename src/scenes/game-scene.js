@@ -3,6 +3,7 @@ let teclas;
 let enemy;
 let enemy2;
 let enemy3;
+let enemy4;
 let enemies;
 let enemies2;
 let enemies3;
@@ -23,6 +24,7 @@ const VELOCIDAD_JUGADOR = 300;
 const VIDA_ENEMY = 2;
 const VIDA_ENEMY2 = 3;
 const VIDA_ENEMY3 = 5;
+const VIDA_ENEMY4 = 3;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -45,6 +47,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("parry", "assets/parry.JPG");
     this.load.image("puede-parry", "assets/puedeparry.jpg");
     this.load.image("enemy3", "assets/enemy3.jpg");
+    this.load.image("enemy4", "assets/enemy4.jpg")
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
@@ -216,6 +219,29 @@ export class GameScene extends Phaser.Scene {
         hitCooldown = false;
       });
     });
+    //enemy 4
+    enemy4 = this.physics.add.image(1050, 400, "enemy4");
+    enemy4.setScale(0.5);
+    enemy4.setCollideWorldBounds(true);
+    enemy4.vida = VIDA_ENEMY4;
+    enemy4.disableBody(true, true);
+
+    this.physics.add.collider(player, enemy4, () => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+    this.time.addEvent({
+      delay: 500,
+      callback: this.moverenemigo4Aleatorio,
+      callbackScope: this,
+      loop: true,
+    });
     // GRUPO ENEMY 3------------------------------------------------------------------------------------------------------
     enemies = this.physics.add.group();
     this.physics.add.collider(player, enemies, (player, clone) => {
@@ -307,6 +333,13 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
+    this.physics.add.overlap(
+      this.balas,
+      enemy4,
+      this.golpearEnemigo,
+      null,
+      this
+    );
 
     this.physics.add.overlap(
       this.balas,
@@ -364,6 +397,8 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
+
+
   }
   //FIN CREATE-------------------------------------------------------------------------------------------------
 
@@ -409,7 +444,9 @@ export class GameScene extends Phaser.Scene {
     enemies.children.each((clone) => {
       clone.disableBody(true, true);
     });
-
+    let spawn4 = this.obtenerSpawnAleatorio();
+enemy4.enableBody(true, spawn4.x, spawn4.y, true, true);
+enemy4.vida = VIDA_ENEMY4;
     if (currentRoom === 1) {
       player.setPosition(100, 300);
       let spawn3 = this.obtenerSpawnAleatorio();
@@ -483,13 +520,23 @@ export class GameScene extends Phaser.Scene {
       { x: 0, y: velocidad },
       { x: 0, y: -velocidad },
     ];
-
     let dir = Phaser.Math.RND.pick(direcciones);
     enemy2.setVelocity(dir.x, dir.y);
     enemies2.children.each((clone) => {
       let dirClone = Phaser.Math.RND.pick(direcciones);
       clone.setVelocity(dirClone.x, dirClone.y);
     });
+  }
+  moverenemigo4Aleatorio() {
+    const velocidad = 100;
+    const direcciones = [
+      { x: velocidad, y: 0 },
+      { x: -velocidad, y: 0 },
+      { x: 0, y: velocidad },
+      { x: 0, y: -velocidad },
+    ];
+    let dir = Phaser.Math.RND.pick(direcciones);
+    enemy4.setVelocity(dir.x, dir.y);
   }
 
   //DISPARAR-------------------------------------------------------------------------------------------------
@@ -531,9 +578,9 @@ export class GameScene extends Phaser.Scene {
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
   dispararenemy() {
+
     if (enemy2.active) {
       let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
-
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2.x, enemy2.y, true, true);
         balaenemy.setScale(0.12);
@@ -543,36 +590,69 @@ export class GameScene extends Phaser.Scene {
           player.x,
           player.y
         );
-
         balaenemy.setRotation(angle);
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
         this.bala_enemigo.play();
       }
     }
+    if (enemy4.active) {
+      const baseAngle = Phaser.Math.Angle.Between(
+        enemy4.x,
+        enemy4.y,
+        player.x,
+        player.y
+      );
+  
+      const cantidadBalas = 4;
+      const separacion = 0.2;
 
-    enemies2.children.each((enemy2Clone) => {
-      if (!enemy2Clone.active) {
-        return;
+      for (let i = 0; i < cantidadBalas; i++) {
+        let balaenemy = this.balasEnemy.get(enemy4.x, enemy4.y);
+
+        if (balaenemy) {
+          balaenemy.enableBody(true, enemy4.x, enemy4.y, true, true);
+          balaenemy.setScale(0.12);
+  
+          let angle =
+            baseAngle +
+            (i - (cantidadBalas - 1) / 2) * separacion;
+  
+          balaenemy.setRotation(angle);
+          this.physics.velocityFromRotation(
+            angle,
+            250,
+            balaenemy.body.velocity
+          );
+        }
       }
-
+  
+      this.bala_enemigo.play();
+    }
+    enemies2.children.each((enemy2Clone) => {
+      if (!enemy2Clone.active) return;
+  
       let balaenemy = this.balasEnemy.get(enemy2Clone.x, enemy2Clone.y);
+  
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2Clone.x, enemy2Clone.y, true, true);
         balaenemy.setScale(0.12);
-
+  
         const angle = Phaser.Math.Angle.Between(
           enemy2Clone.x,
           enemy2Clone.y,
           player.x,
           player.y
         );
-
+  
         balaenemy.setRotation(angle);
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
         this.bala_enemigo.play();
       }
     });
   }
+   
+
+
 
   //PARRY--------------------------------------------------------------------------------------------
   recibirDisparo(jugador, bala) {
