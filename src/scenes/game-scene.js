@@ -3,6 +3,7 @@ let teclas;
 let enemy;
 let enemy2;
 let enemy3;
+let enemies;
 let enemies2;
 let enemies3;
 let currentRoom = 1;
@@ -11,7 +12,6 @@ let timerText;
 let gun;
 let hitCooldown = false;
 let puedeDisparar = true;
-let puedeDispararEnemigo = true;
 let parryActivo = false;
 let puedeParry = true;
 let mostrandoPuedeParry = false;
@@ -53,7 +53,6 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 1;
     puedeDisparar = true;
     puedeParry = true;
-    puedeDispararEnemigo = true;
     time = 100;
     hitCooldown = false;
     this.input.setDefaultCursor("none");
@@ -214,7 +213,18 @@ export class GameScene extends Phaser.Scene {
         hitCooldown = false;
       });
     });
-
+    // GRUPO ENEMY 3------------------------------------------------------------------------------------------------------
+    enemies = this.physics.add.group();
+    this.physics.add.collider(player, enemies, (player, clone) => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
     // GRUPO ENEMY 2------------------------------------------------------------------------------------------------------
     enemies2 = this.physics.add.group();
     this.physics.add.collider(player, enemies2, (player, clone) => {
@@ -319,6 +329,14 @@ export class GameScene extends Phaser.Scene {
       this
     );
 
+    this.physics.add.overlap(
+      this.balas,
+      enemies,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+
     this.input.on("pointerdown", (pointer) => {
       this.disparar(pointer);
     });
@@ -364,6 +382,7 @@ export class GameScene extends Phaser.Scene {
     const enemigosVivos =
       enemies2.countActive() +
       (enemy.active ? 1 : 0) +
+      enemies.countActive() +
       enemies3.countActive() +
       enemies3.countActive();
     if (enemigosVivos > 0) {
@@ -382,6 +401,10 @@ export class GameScene extends Phaser.Scene {
   cargarHabitacion() {
     enemy3.disableBody(true, true);
     enemies3.children.each((clone) => {
+      clone.disableBody(true, true);
+    });
+    enemy.disableBody(true, true);
+    enemies.children.each((clone) => {
       clone.disableBody(true, true);
     });
 
@@ -406,9 +429,18 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
+
         enemy3Clone.setScale(0.1);
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = VIDA_ENEMY3;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
+
+        enemyClone.setScale(0.35);
+        enemyClone.setCollideWorldBounds(true);
+        enemyClone.vida = VIDA_ENEMY;
       }
     } else if (currentRoom === 2) {
       player.setPosition(100, 300);
@@ -419,14 +451,29 @@ export class GameScene extends Phaser.Scene {
       enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
       enemy.vida = VIDA_ENEMY;
-
       for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
+
+        enemyClone.setScale(0.35);
+        enemyClone.setCollideWorldBounds(true);
+        enemyClone.vida = VIDA_ENEMY;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
 
         enemy2Clone.setScale(0.04);
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = VIDA_ENEMY2;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
+
+        enemy3Clone.setScale(0.1);
+        enemy3Clone.setCollideWorldBounds(true);
+        enemy3Clone.vida = VIDA_ENEMY3;
       }
     }
   }
@@ -619,6 +666,11 @@ export class GameScene extends Phaser.Scene {
 
     //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
     this.physics.moveToObject(enemy, player, 233);
+    enemies.children.each((enemy) => {
+      if (enemy.active) {
+        this.physics.moveToObject(enemy, player, 233);
+      }
+    });
     this.physics.moveToObject(enemy3, player, 100);
     enemies3.children.each((enemy) => {
       if (enemy.active) {
