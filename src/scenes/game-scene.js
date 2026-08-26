@@ -7,6 +7,7 @@ let enemy4;
 let enemies;
 let enemies2;
 let enemies3;
+let enemies4;
 let currentRoom = 1;
 let time = 100;
 let timerText;
@@ -16,7 +17,9 @@ let puedeDisparar = true;
 let parryActivo = false;
 let puedeParry = true;
 let mostrandoPuedeParry = false;
+let puedeDispararEnemy4 = true;
 const DELAY_BALA_ENEMIGO = 1200;
+const DELAY_BALA_ENEMY4 = 3000;
 const COOLDOWN_parry = 3000;
 const DURACION_parry = 300;
 const DELAY_BALA = 300;
@@ -220,13 +223,14 @@ export class GameScene extends Phaser.Scene {
       });
     });
     //enemy 4
+    enemies4 = this.physics.add.group();
     enemy4 = this.physics.add.image(1050, 400, "enemy4");
     enemy4.setScale(0.5);
     enemy4.setCollideWorldBounds(true);
     enemy4.vida = VIDA_ENEMY4;
     enemy4.disableBody(true, true);
 
-    this.physics.add.collider(player, enemy4, () => {
+    this.physics.add.collider(player, enemies4, (player, clone) => {
       if (hitCooldown) return;
       time -= 3;
       if (time < 0) time = 0;
@@ -372,7 +376,13 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
+    this.physics.add.overlap(
+      this.balas,
+      enemies4,
+      this.golpearEnemigo,
+      null,
+      this
+    );
     this.input.on("pointerdown", (pointer) => {
       this.disparar(pointer);
     });
@@ -416,12 +426,14 @@ export class GameScene extends Phaser.Scene {
   }
   //CAMBIAR HABITACION-------------------------------------------------------------------------------------------------
   cambiarHabitacion() {
-    const enemigosVivos =
-      enemies2.countActive() +
-      (enemy.active ? 1 : 0) +
-      enemies.countActive() +
-      enemies3.countActive() +
-      enemies3.countActive();
+    const enemigosVivos = 
+    enemies2.countActive() +
+    enemies.countActive() +
+    enemies3.countActive() +
+    enemies4.countActive() +
+    (enemy.active ? 1 : 0) +
+    (enemy3.active ? 1 : 0) +
+    (enemy4.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
     }
@@ -445,7 +457,14 @@ export class GameScene extends Phaser.Scene {
       clone.disableBody(true, true);
     });
     let spawn4 = this.obtenerSpawnAleatorio();
-enemy4.enableBody(true, spawn4.x, spawn4.y, true, true);
+    for (let i = 0; i < Phaser.Math.Between(1, 4); i++) {
+      let spawn = this.obtenerSpawnAleatorio();
+      let enemy4Clone = enemies4.create(spawn.x, spawn.y, "enemy4");
+    
+      enemy4Clone.setScale(0.5);
+      enemy4Clone.setCollideWorldBounds(true);
+      enemy4Clone.vida = VIDA_ENEMY4;
+    }
 enemy4.vida = VIDA_ENEMY4;
     if (currentRoom === 1) {
       player.setPosition(100, 300);
@@ -595,39 +614,42 @@ enemy4.vida = VIDA_ENEMY4;
         this.bala_enemigo.play();
       }
     }
-    if (enemy4.active) {
+    enemies4.children.each((enemy4Clone) => {
+      if (!enemy4Clone.active || !puedeDispararEnemy4) return;
+    
+      puedeDispararEnemy4 = false;
+    
       const baseAngle = Phaser.Math.Angle.Between(
-        enemy4.x,
-        enemy4.y,
+        enemy4Clone.x,
+        enemy4Clone.y,
         player.x,
         player.y
       );
-  
+    
       const cantidadBalas = 4;
       const separacion = 0.2;
-
+    
       for (let i = 0; i < cantidadBalas; i++) {
-        let balaenemy = this.balasEnemy.get(enemy4.x, enemy4.y);
-
+        let balaenemy = this.balasEnemy.get(enemy4Clone.x, enemy4Clone.y);
+    
         if (balaenemy) {
-          balaenemy.enableBody(true, enemy4.x, enemy4.y, true, true);
+          balaenemy.enableBody(true, enemy4Clone.x, enemy4Clone.y, true, true);
           balaenemy.setScale(0.12);
-  
+    
           let angle =
-            baseAngle +
-            (i - (cantidadBalas - 1) / 2) * separacion;
-  
+            baseAngle + (i - (cantidadBalas - 1) / 2) * separacion;
+    
           balaenemy.setRotation(angle);
-          this.physics.velocityFromRotation(
-            angle,
-            250,
-            balaenemy.body.velocity
-          );
+          this.physics.velocityFromRotation(angle, 250, balaenemy.body.velocity);
         }
       }
-  
+    
       this.bala_enemigo.play();
-    }
+    
+      this.time.delayedCall(DELAY_BALA_ENEMY4, () => {
+        puedeDispararEnemy4 = true;
+      });
+    });
     enemies2.children.each((enemy2Clone) => {
       if (!enemy2Clone.active) return;
   
@@ -766,4 +788,4 @@ enemy4.vida = VIDA_ENEMY4;
     }
   }
 }
-//6XX LINEAS DE PURA DINAMITA
+//795 lineas de pura dinamita
