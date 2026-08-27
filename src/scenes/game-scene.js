@@ -51,6 +51,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("puede-parry", "assets/puedeparry.jpg");
     this.load.image("enemy3", "assets/enemy3.jpg");
     this.load.image("enemy4", "assets/enemy4.jpg")
+    this.load.image("jefe", "assets/jefe.png")
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
@@ -177,6 +178,7 @@ mostrandoPuedeParry = false;
     //ENEMY 2-------------------------------------------------------------------------------------------------------
     enemy2 = this.physics.add.image(1050, 400, "enemy2");
     enemy2.setScale(0.04);
+    enemy2.setImmovable(true);
     enemy2.setCollideWorldBounds(true);
     enemy2.vida = VIDA_ENEMY2;
     enemy2.disableBody(true, true);
@@ -229,6 +231,7 @@ mostrandoPuedeParry = false;
     enemies4 = this.physics.add.group();
     enemy4 = this.physics.add.image(1050, 400, "enemy4");
     enemy4.setScale(0.5);
+    enemy4.setImmovable(true);
     enemy4.setCollideWorldBounds(true);
     enemy4.vida = VIDA_ENEMY4;
     enemy4.disableBody(true, true);
