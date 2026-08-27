@@ -61,6 +61,9 @@ export class GameScene extends Phaser.Scene {
     puedeParry = true;
     time = 100;
     hitCooldown = false;
+    puedeDispararEnemy4 = true;
+parryActivo = false;
+mostrandoPuedeParry = false;
     this.input.setDefaultCursor("none");
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(0.1);
@@ -390,7 +393,7 @@ export class GameScene extends Phaser.Scene {
     //BALAS ENEMIGO----------------------------------------------------------------------------------------------------
     this.balasEnemy = this.physics.add.group({
       defaultKey: "bala-enemigo",
-      maxSize: 100,
+      maxSize: 100000000000000,
     });
     this.time.addEvent({
       delay: DELAY_BALA_ENEMIGO,
@@ -547,16 +550,24 @@ enemy4.vida = VIDA_ENEMY4;
     });
   }
   moverenemigo4Aleatorio() {
-    const velocidad = 100;
+    const velocidad = 100; 
     const direcciones = [
       { x: velocidad, y: 0 },
       { x: -velocidad, y: 0 },
       { x: 0, y: velocidad },
       { x: 0, y: -velocidad },
     ];
-    let dir = Phaser.Math.RND.pick(direcciones);
-    enemy4.setVelocity(dir.x, dir.y);
+    if (enemy4.active) {
+      const dir = Phaser.Math.RND.pick(direcciones);
+      enemy4.setVelocity(dir.x, dir.y);
+    }
+    enemies4.children.each((clone) => {
+      if (!clone.active) return;
+      const dirClone = Phaser.Math.RND.pick(direcciones);
+      clone.setVelocity(dirClone.x, dirClone.y);
+    });
   }
+  
 
   //DISPARAR-------------------------------------------------------------------------------------------------
   disparar(pointer) {
@@ -614,42 +625,26 @@ enemy4.vida = VIDA_ENEMY4;
         this.bala_enemigo.play();
       }
     }
-    enemies4.children.each((enemy4Clone) => {
-      if (!enemy4Clone.active || !puedeDispararEnemy4) return;
-    
+    if (puedeDispararEnemy4) {
       puedeDispararEnemy4 = false;
     
-      const baseAngle = Phaser.Math.Angle.Between(
-        enemy4Clone.x,
-        enemy4Clone.y,
-        player.x,
-        player.y
-      );
-    
-      const cantidadBalas = 4;
-      const separacion = 0.2;
-    
-      for (let i = 0; i < cantidadBalas; i++) {
-        let balaenemy = this.balasEnemy.get(enemy4Clone.x, enemy4Clone.y);
-    
-        if (balaenemy) {
-          balaenemy.enableBody(true, enemy4Clone.x, enemy4Clone.y, true, true);
-          balaenemy.setScale(0.12);
-    
-          let angle =
-            baseAngle + (i - (cantidadBalas - 1) / 2) * separacion;
-    
-          balaenemy.setRotation(angle);
-          this.physics.velocityFromRotation(angle, 250, balaenemy.body.velocity);
-        }
+      // Enemy4 original
+      if (enemy4.active) {
+        this.dispararConEscopeta(enemy4);
       }
     
-      this.bala_enemigo.play();
+      // Clones
+      enemies4.children.each((enemy4Clone) => {
+        if (!enemy4Clone.active) return;
+    
+        this.dispararConEscopeta(enemy4Clone);
+      });
     
       this.time.delayedCall(DELAY_BALA_ENEMY4, () => {
         puedeDispararEnemy4 = true;
       });
-    });
+    }
+    
     enemies2.children.each((enemy2Clone) => {
       if (!enemy2Clone.active) return;
   
@@ -724,7 +719,53 @@ enemy4.vida = VIDA_ENEMY4;
       hitCooldown = false;
     });
   }
-
+  dispararConEscopeta(enemy4Actual) {
+    const baseAngle = Phaser.Math.Angle.Between(
+      enemy4Actual.x,
+      enemy4Actual.y,
+      player.x,
+      player.y
+    );
+  
+    const cantidadBalas = 4;
+    const separacion = 0.2;
+  
+    for (let i = 0; i < cantidadBalas; i++) {
+      const balaenemy = this.balasEnemy.get(
+        enemy4Actual.x,
+        enemy4Actual.y
+      );
+  
+      if (!balaenemy) {
+        return;
+      }
+  
+      balaenemy.enableBody(
+        true,
+        enemy4Actual.x,
+        enemy4Actual.y,
+        true,
+        true
+      );
+  
+      balaenemy.setScale(0.12);
+  
+      const angle =
+        baseAngle +
+        (i - (cantidadBalas - 1) / 2) * separacion;
+  
+      balaenemy.setRotation(angle);
+  
+      this.physics.velocityFromRotation(
+        angle,
+        250,
+        balaenemy.body.velocity
+      );
+    }
+  
+    this.bala_enemigo.play();
+  }
+  
   update() {
     //GUN------------------------------------------------------------------------------------------------------
     const angle = Phaser.Math.Angle.Between(
