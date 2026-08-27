@@ -26,11 +26,11 @@ const COOLDOWN_parry = 3000;
 const DURACION_parry = 300;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
-const VIDA_ENEMY = 2;
-const VIDA_ENEMY2 = 3;
-const VIDA_ENEMY3 = 5;
-const VIDA_ENEMY4 = 3;
-const VIDA_JEFE = 15;
+const VIDA_ENEMY = 1;
+const VIDA_ENEMY2 = 1;
+const VIDA_ENEMY3 = 1;
+const VIDA_ENEMY4 = 1;
+const VIDA_JEFE = 1;
 const DELAY_PATRON_JEFE = 4000;
 const VELOCIDAD_MOVIMIENTO_JEFE = 60;
 const CANTIDAD_BALAS_RADIAL_JEFE = 12;
@@ -60,8 +60,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("parry", "assets/parry.JPG");
     this.load.image("puede-parry", "assets/puedeparry.jpg");
     this.load.image("enemy3", "assets/enemy3.jpg");
-    this.load.image("enemy4", "assets/enemy4.jpg")
-    this.load.image("jefe", "assets/jefe.png")
+    this.load.image("enemy4", "assets/enemy4.jpg");
+    this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
@@ -73,8 +73,8 @@ export class GameScene extends Phaser.Scene {
     time = 100;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
-parryActivo = false;
-mostrandoPuedeParry = false;
+    parryActivo = false;
+    mostrandoPuedeParry = false;
     jefePatron = 1;
     this.input.setDefaultCursor("none");
     this.cursor = this.add.image(0, 0, "cursor");
@@ -405,13 +405,7 @@ mostrandoPuedeParry = false;
       this
     );
 
-    this.physics.add.overlap(
-      this.balas,
-      jefe,
-      this.golpearEnemigo,
-      null,
-      this
-    );
+    this.physics.add.overlap(this.balas, jefe, this.golpearEnemigo, null, this);
 
     this.physics.add.overlap(
       this.balas,
@@ -467,8 +461,6 @@ mostrandoPuedeParry = false;
       null,
       this
     );
-
-
   }
   //FIN CREATE-------------------------------------------------------------------------------------------------
 
@@ -484,70 +476,70 @@ mostrandoPuedeParry = false;
     );
     return { x, y };
   }
+
   //CAMBIAR HABITACION-------------------------------------------------------------------------------------------------
   cambiarHabitacion() {
-    const enemigosVivos = 
-    enemies2.countActive() +
-    enemies.countActive() +
-    enemies3.countActive() +
-    enemies4.countActive() +
-    (enemy.active ? 1 : 0) +
-    (enemy3.active ? 1 : 0) +
-    (enemy4.active ? 1 : 0) +
-    (jefe.active ? 1 : 0);
+    const enemigosVivos =
+      enemies2.countActive() +
+      enemies.countActive() +
+      enemies3.countActive() +
+      enemies4.countActive() +
+      (enemy2.active ? 1 : 0) +
+      (jefe.active ? 1 : 0) +
+      (enemy.active ? 1 : 0) +
+      (enemy3.active ? 1 : 0) +
+      (enemy4.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
     }
-
     if (currentRoom === 1) {
       currentRoom = 2;
       this.cargarHabitacion();
     } else if (currentRoom === 2) {
+      currentRoom = 3;
+      this.cargarHabitacion();
+    } else if (currentRoom === 3) {
+      currentRoom = 4;
+      this.cargarHabitacion();
+    } else if (currentRoom === 4) {
+      currentRoom = 5;
+      this.cargarHabitacion();
+    } else if (currentRoom === 5) {
       currentRoom = 1;
       this.cargarHabitacion();
     }
   }
   //CARGAR HABITACION-------------------------------------------------------------------------------------------------
   cargarHabitacion() {
-    enemy3.disableBody(true, true);
-    enemies3.children.each((clone) => {
-      clone.disableBody(true, true);
-    });
     enemy.disableBody(true, true);
+    enemy2.disableBody(true, true);
+    enemy3.disableBody(true, true);
+    enemy4.disableBody(true, true);
+    jefe.disableBody(true, true);
     enemies.children.each((clone) => {
       clone.disableBody(true, true);
     });
-    let spawn4 = this.obtenerSpawnAleatorio();
-    for (let i = 0; i < Phaser.Math.Between(1, 4); i++) {
-      let spawn = this.obtenerSpawnAleatorio();
-      let enemy4Clone = enemies4.create(spawn.x, spawn.y, "enemy4");
-    
-      enemy4Clone.setScale(0.5);
-      enemy4Clone.setCollideWorldBounds(true);
-      enemy4Clone.vida = VIDA_ENEMY4;
-    }
-enemy4.vida = VIDA_ENEMY4;
-    jefe.disableBody(true, true);
-    jefe.vida = VIDA_JEFE;
-    jefePatron = 1;
+    enemies2.children.each((clone) => {
+      clone.disableBody(true, true);
+    });
+    enemies3.children.each((clone) => {
+      clone.disableBody(true, true);
+    });
+    enemies4.children.each((clone) => {
+      clone.disableBody(true, true);
+    });
 
+    enemy4.vida = VIDA_ENEMY4;
     if (currentRoom === 1) {
       player.setPosition(100, 300);
       let spawn3 = this.obtenerSpawnAleatorio();
       let spawn1 = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-      enemy.vida = VIDA_ENEMY;
       enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
+      enemy.vida = VIDA_ENEMY;
 
-      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
-        let spawn = this.obtenerSpawnAleatorio();
-        let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
-        enemy2Clone.setScale(0.04);
-        enemy2Clone.setCollideWorldBounds(true);
-        enemy2Clone.vida = VIDA_ENEMY2;
-      }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
@@ -564,26 +556,15 @@ enemy4.vida = VIDA_ENEMY4;
       }
     } else if (currentRoom === 2) {
       player.setPosition(100, 300);
-      let spawn3 = this.obtenerSpawnAleatorio();
-      let spawn1 = this.obtenerSpawnAleatorio();
-      let spawnJefe = this.obtenerSpawnAleatorio();
 
-      enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
-      enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
-      enemy3.vida = VIDA_ENEMY3;
-      enemy.vida = VIDA_ENEMY;
+      let spawn = this.obtenerSpawnAleatorio();
+      let spawn4 = this.obtenerSpawnAleatorio();
 
-      // el jefe aparece en la habitacion 2
-      jefe.enableBody(true, spawnJefe.x, spawnJefe.y, true, true);
-      jefe.vida = VIDA_JEFE;
+      enemy2.enableBody(true, spawn.x, spawn.y, true, true);
+      enemy4.enableBody(true, spawn4.x, spawn4.y, true, true);
+      enemy2.vida = VIDA_ENEMY2;
+      enemy4.vida = VIDA_ENEMY4;
 
-      for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
-        let spawn = this.obtenerSpawnAleatorio();
-        let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
-        enemyClone.setScale(0.35);
-        enemyClone.setCollideWorldBounds(true);
-        enemyClone.vida = VIDA_ENEMY;
-      }
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
@@ -591,13 +572,69 @@ enemy4.vida = VIDA_ENEMY4;
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = VIDA_ENEMY2;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+
+      for (let i = 0; i < Phaser.Math.Between(1, 4); i++) {
+        let spawn4 = this.obtenerSpawnAleatorio();
+        let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
+        enemy4Clone.setScale(0.5);
+        enemy4Clone.setCollideWorldBounds(true);
+        enemy4Clone.vida = VIDA_ENEMY4;
+      }
+    } else if (currentRoom === 3) {
+      player.setPosition(100, 300);
+      let spawn1 = this.obtenerSpawnAleatorio();
+      let spawn = this.obtenerSpawnAleatorio();
+
+      enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
+      enemy.vida = VIDA_ENEMY;
+
+      enemy2.enableBody(true, spawn.x, spawn.y, true, true);
+      enemy2.vida = VIDA_ENEMY2;
+
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
+        enemyClone.setScale(0.35);
+        enemyClone.setCollideWorldBounds(true);
+        enemyClone.vida = VIDA_ENEMY;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemy2Clone = enemies2.create(spawn.x, spawn.y, "enemy2");
+        enemy2Clone.setScale(0.04);
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = VIDA_ENEMY2;
+      }
+    } else if (currentRoom === 4) {
+      player.setPosition(100, 300);
+      let spawn3 = this.obtenerSpawnAleatorio();
+      let spawn1 = this.obtenerSpawnAleatorio();
+      let spawn = this.obtenerSpawnAleatorio();
+      let spawn4 = this.obtenerSpawnAleatorio();
+
+      enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
+      enemy3.vida = VIDA_ENEMY3;
+
+      enemy4.enableBody(true, spawn4.x, spawn4.y, true, true);
+      enemy4.vida = VIDA_ENEMY4;
+
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
         enemy3Clone.setScale(0.1);
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = VIDA_ENEMY3;
       }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn4 = this.obtenerSpawnAleatorio();
+        let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
+        enemy4Clone.setScale(0.5);
+        enemy4Clone.setCollideWorldBounds(true);
+        enemy4Clone.vida = VIDA_ENEMY4;
+      }
+    } else if (currentRoom === 5) {
+      player.setPosition(100, 300);
+      jefe.enableBody(true, 900, 100, true, true);
     }
   }
 
@@ -618,7 +655,7 @@ enemy4.vida = VIDA_ENEMY4;
     });
   }
   moverenemigo4Aleatorio() {
-    const velocidad = 100; 
+    const velocidad = 100;
     const direcciones = [
       { x: velocidad, y: 0 },
       { x: -velocidad, y: 0 },
@@ -649,7 +686,6 @@ enemy4.vida = VIDA_ENEMY4;
     }
   }
 
-  // PATRON 1: dispara balas en todas las direcciones
   dispararRadialJefe() {
     if (!jefe.active) return;
 
@@ -671,7 +707,6 @@ enemy4.vida = VIDA_ENEMY4;
     this.bala_enemigo.play();
   }
 
-  // PATRON 2: escopetazo hacia el jugador, igual que enemy4 pero con mas balas
   dispararEscopetaJefe() {
     if (!jefe.active) return;
 
@@ -682,7 +717,6 @@ enemy4.vida = VIDA_ENEMY4;
       VELOCIDAD_BALA_ESCOPETA_JEFE
     );
   }
-
 
   //DISPARAR-------------------------------------------------------------------------------------------------
   disparar(pointer) {
@@ -723,7 +757,6 @@ enemy4.vida = VIDA_ENEMY4;
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
   dispararenemy() {
-
     if (enemy2.active) {
       let balaenemy = this.balasEnemy.get(enemy2.x, enemy2.y);
       if (balaenemy) {
@@ -742,49 +775,46 @@ enemy4.vida = VIDA_ENEMY4;
     }
     if (puedeDispararEnemy4) {
       puedeDispararEnemy4 = false;
-    
+
       // Enemy4 original
       if (enemy4.active) {
         this.dispararConEscopeta(enemy4);
       }
-    
+
       // Clones
       enemies4.children.each((enemy4Clone) => {
         if (!enemy4Clone.active) return;
-    
+
         this.dispararConEscopeta(enemy4Clone);
       });
-    
+
       this.time.delayedCall(DELAY_BALA_ENEMY4, () => {
         puedeDispararEnemy4 = true;
       });
     }
-    
+
     enemies2.children.each((enemy2Clone) => {
       if (!enemy2Clone.active) return;
-  
+
       let balaenemy = this.balasEnemy.get(enemy2Clone.x, enemy2Clone.y);
-  
+
       if (balaenemy) {
         balaenemy.enableBody(true, enemy2Clone.x, enemy2Clone.y, true, true);
         balaenemy.setScale(0.12);
-  
+
         const angle = Phaser.Math.Angle.Between(
           enemy2Clone.x,
           enemy2Clone.y,
           player.x,
           player.y
         );
-  
+
         balaenemy.setRotation(angle);
         this.physics.velocityFromRotation(angle, 500, balaenemy.body.velocity);
         this.bala_enemigo.play();
       }
     });
   }
-   
-
-
 
   //PARRY--------------------------------------------------------------------------------------------
   recibirDisparo(jugador, bala) {
@@ -834,7 +864,12 @@ enemy4.vida = VIDA_ENEMY4;
       hitCooldown = false;
     });
   }
-  dispararConEscopeta(enemy4Actual, cantidadBalas = 4, separacion = 0.2, velocidad = 250) {
+  dispararConEscopeta(
+    enemy4Actual,
+    cantidadBalas = 4,
+    separacion = 0.2,
+    velocidad = 250
+  ) {
     const baseAngle = Phaser.Math.Angle.Between(
       enemy4Actual.x,
       enemy4Actual.y,
@@ -843,41 +878,30 @@ enemy4.vida = VIDA_ENEMY4;
     );
 
     for (let i = 0; i < cantidadBalas; i++) {
-      const balaenemy = this.balasEnemy.get(
-        enemy4Actual.x,
-        enemy4Actual.y
-      );
-  
+      const balaenemy = this.balasEnemy.get(enemy4Actual.x, enemy4Actual.y);
+
       if (!balaenemy) {
         return;
       }
-  
-      balaenemy.enableBody(
-        true,
-        enemy4Actual.x,
-        enemy4Actual.y,
-        true,
-        true
-      );
-  
+
+      balaenemy.enableBody(true, enemy4Actual.x, enemy4Actual.y, true, true);
+
       balaenemy.setScale(0.12);
-  
-      const angle =
-        baseAngle +
-        (i - (cantidadBalas - 1) / 2) * separacion;
-  
+
+      const angle = baseAngle + (i - (cantidadBalas - 1) / 2) * separacion;
+
       balaenemy.setRotation(angle);
-  
+
       this.physics.velocityFromRotation(
         angle,
         velocidad,
         balaenemy.body.velocity
       );
     }
-  
+
     this.bala_enemigo.play();
   }
-  
+
   update() {
     //GUN------------------------------------------------------------------------------------------------------
     const angle = Phaser.Math.Angle.Between(
@@ -938,9 +962,6 @@ enemy4.vida = VIDA_ENEMY4;
     } else if (mostrandoPuedeParry) {
       player.setTexture("puede-parry");
       player.setScale(0.1);
-    } else {
-      player.setTexture("player");
-      player.setScale(0.2);
     }
   }
 }
