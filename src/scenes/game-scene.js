@@ -4,6 +4,7 @@ let enemy;
 let enemy2;
 let enemy3;
 let enemy4;
+let jefe;
 let enemies;
 let enemies2;
 let enemies3;
@@ -18,6 +19,7 @@ let parryActivo = false;
 let puedeParry = true;
 let mostrandoPuedeParry = false;
 let puedeDispararEnemy4 = true;
+let jefePatron = 1;
 const DELAY_BALA_ENEMIGO = 1200;
 const DELAY_BALA_ENEMY4 = 3000;
 const COOLDOWN_parry = 3000;
@@ -28,6 +30,14 @@ const VIDA_ENEMY = 2;
 const VIDA_ENEMY2 = 3;
 const VIDA_ENEMY3 = 5;
 const VIDA_ENEMY4 = 3;
+const VIDA_JEFE = 15;
+const DELAY_PATRON_JEFE = 4000;
+const VELOCIDAD_MOVIMIENTO_JEFE = 60;
+const CANTIDAD_BALAS_RADIAL_JEFE = 12;
+const VELOCIDAD_BALA_RADIAL_JEFE = 350;
+const CANTIDAD_BALAS_ESCOPETA_JEFE = 10;
+const SEPARACION_ESCOPETA_JEFE = 0.15;
+const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -65,6 +75,7 @@ export class GameScene extends Phaser.Scene {
     puedeDispararEnemy4 = true;
 parryActivo = false;
 mostrandoPuedeParry = false;
+    jefePatron = 1;
     this.input.setDefaultCursor("none");
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(0.1);
@@ -252,6 +263,41 @@ mostrandoPuedeParry = false;
       callbackScope: this,
       loop: true,
     });
+
+    //JEFE-------------------------------------------------------------------------------------------------------
+    jefe = this.physics.add.image(1050, 300, "jefe");
+    jefe.setScale(1);
+    jefe.setImmovable(true);
+    jefe.body.setCollideWorldBounds(true);
+    jefe.vida = VIDA_JEFE;
+    jefe.disableBody(true, true);
+
+    this.physics.add.collider(player, jefe, () => {
+      if (hitCooldown) return;
+      time -= 12;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.tweens.add({
+        targets: player,
+        alpha: 0,
+        duration: 100,
+        ease: "Linear",
+        yoyo: true,
+        repeat: 0.1,
+      });
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+
+    this.time.addEvent({
+      delay: DELAY_PATRON_JEFE,
+      callback: this.ejecutarPatronJefe,
+      callbackScope: this,
+      loop: true,
+    });
+
     // GRUPO ENEMY 3------------------------------------------------------------------------------------------------------
     enemies = this.physics.add.group();
     this.physics.add.collider(player, enemies, (player, clone) => {
@@ -361,6 +407,14 @@ mostrandoPuedeParry = false;
 
     this.physics.add.overlap(
       this.balas,
+      jefe,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.balas,
       enemies2,
       this.golpearEnemigo,
       null,
@@ -439,7 +493,8 @@ mostrandoPuedeParry = false;
     enemies4.countActive() +
     (enemy.active ? 1 : 0) +
     (enemy3.active ? 1 : 0) +
-    (enemy4.active ? 1 : 0);
+    (enemy4.active ? 1 : 0) +
+    (jefe.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
     }
@@ -472,6 +527,10 @@ mostrandoPuedeParry = false;
       enemy4Clone.vida = VIDA_ENEMY4;
     }
 enemy4.vida = VIDA_ENEMY4;
+    jefe.disableBody(true, true);
+    jefe.vida = VIDA_JEFE;
+    jefePatron = 1;
+
     if (currentRoom === 1) {
       player.setPosition(100, 300);
       let spawn3 = this.obtenerSpawnAleatorio();
@@ -507,11 +566,17 @@ enemy4.vida = VIDA_ENEMY4;
       player.setPosition(100, 300);
       let spawn3 = this.obtenerSpawnAleatorio();
       let spawn1 = this.obtenerSpawnAleatorio();
+      let spawnJefe = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
       enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
       enemy.vida = VIDA_ENEMY;
+
+      // el jefe aparece en la habitacion 2
+      jefe.enableBody(true, spawnJefe.x, spawnJefe.y, true, true);
+      jefe.vida = VIDA_JEFE;
+
       for (let i = 0; i < Phaser.Math.Between(1, 5); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
@@ -570,7 +635,54 @@ enemy4.vida = VIDA_ENEMY4;
       clone.setVelocity(dirClone.x, dirClone.y);
     });
   }
-  
+
+  //PATRONES DEL JEFE ------------------------------------------------------------------------------------------------
+  ejecutarPatronJefe() {
+    if (!jefe.active) return;
+
+    if (jefePatron === 1) {
+      this.dispararRadialJefe();
+      jefePatron = 2;
+    } else {
+      this.dispararEscopetaJefe();
+      jefePatron = 1;
+    }
+  }
+
+  // PATRON 1: dispara balas en todas las direcciones
+  dispararRadialJefe() {
+    if (!jefe.active) return;
+
+    for (let i = 0; i < CANTIDAD_BALAS_RADIAL_JEFE; i++) {
+      const balaenemy = this.balasEnemy.get(jefe.x, jefe.y);
+      if (!balaenemy) return;
+
+      balaenemy.enableBody(true, jefe.x, jefe.y, true, true);
+      balaenemy.setScale(0.12);
+
+      const angle = (Math.PI * 2 * i) / CANTIDAD_BALAS_RADIAL_JEFE;
+      balaenemy.setRotation(angle);
+      this.physics.velocityFromRotation(
+        angle,
+        VELOCIDAD_BALA_RADIAL_JEFE,
+        balaenemy.body.velocity
+      );
+    }
+    this.bala_enemigo.play();
+  }
+
+  // PATRON 2: escopetazo hacia el jugador, igual que enemy4 pero con mas balas
+  dispararEscopetaJefe() {
+    if (!jefe.active) return;
+
+    this.dispararConEscopeta(
+      jefe,
+      CANTIDAD_BALAS_ESCOPETA_JEFE,
+      SEPARACION_ESCOPETA_JEFE,
+      VELOCIDAD_BALA_ESCOPETA_JEFE
+    );
+  }
+
 
   //DISPARAR-------------------------------------------------------------------------------------------------
   disparar(pointer) {
@@ -722,17 +834,14 @@ enemy4.vida = VIDA_ENEMY4;
       hitCooldown = false;
     });
   }
-  dispararConEscopeta(enemy4Actual) {
+  dispararConEscopeta(enemy4Actual, cantidadBalas = 4, separacion = 0.2, velocidad = 250) {
     const baseAngle = Phaser.Math.Angle.Between(
       enemy4Actual.x,
       enemy4Actual.y,
       player.x,
       player.y
     );
-  
-    const cantidadBalas = 4;
-    const separacion = 0.2;
-  
+
     for (let i = 0; i < cantidadBalas; i++) {
       const balaenemy = this.balasEnemy.get(
         enemy4Actual.x,
@@ -761,7 +870,7 @@ enemy4.vida = VIDA_ENEMY4;
   
       this.physics.velocityFromRotation(
         angle,
-        250,
+        velocidad,
         balaenemy.body.velocity
       );
     }
@@ -798,6 +907,9 @@ enemy4.vida = VIDA_ENEMY4;
         this.physics.moveToObject(enemy, player, 100);
       }
     });
+    if (jefe.active) {
+      this.physics.moveToObject(jefe, player, VELOCIDAD_MOVIMIENTO_JEFE);
+    }
     //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
       player.body.setVelocityX(-VELOCIDAD_JUGADOR);
@@ -832,4 +944,4 @@ enemy4.vida = VIDA_ENEMY4;
     }
   }
 }
-//795 lineas de pura dinamita
+//947 lineas de pura dinamita
