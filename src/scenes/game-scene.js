@@ -28,10 +28,10 @@ const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
 const VIDA_ENEMY = 2;
 const VIDA_ENEMY2 = 4;
-const VIDA_ENEMY3 = 4;
-const VIDA_ENEMY4 = 6;
+const VIDA_ENEMY3 = 7;
+const VIDA_ENEMY4 = 4;
 const VIDA_JEFE = 15;
-const DELAY_PATRON_JEFE = 4000;
+const DELAY_PATRON_JEFE = 3500;
 const VELOCIDAD_MOVIMIENTO_JEFE = 60;
 const CANTIDAD_BALAS_RADIAL_JEFE = 12;
 const VELOCIDAD_BALA_RADIAL_JEFE = 350;
@@ -496,8 +496,7 @@ export class GameScene extends Phaser.Scene {
     if (currentRoom === 0) {
       currentRoom = 1;
       this.cargarHabitacion();
-    }
-    if (currentRoom === 1) {
+    } else if (currentRoom === 1) {
       currentRoom = 2;
       this.cargarHabitacion();
     } else if (currentRoom === 2) {
@@ -941,12 +940,12 @@ export class GameScene extends Phaser.Scene {
         this.physics.moveToObject(enemy, player, 233);
       }
     });
-    if (enemy.active) {
-      this.physics.moveToObject(enemy3, player, 233);
+    if (enemy3.active) {
+      this.physics.moveToObject(enemy3, player, 100);
     }
-    enemies3.children.each((enemy) => {
-      if (enemy.active) {
-        this.physics.moveToObject(enemy, player, 100);
+    enemies3.children.each((enemy3) => {
+      if (enemy3.active) {
+        this.physics.moveToObject(enemy3, player, 100);
       }
     });
     if (jefe.active) {
