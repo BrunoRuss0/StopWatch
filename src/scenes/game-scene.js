@@ -10,7 +10,7 @@ let enemies2;
 let enemies3;
 let enemies4;
 let currentRoom = 0;
-let time = 100;
+let time = 300;
 let timerText;
 let gun;
 let hitCooldown = false;
@@ -27,10 +27,10 @@ const DURACION_parry = 300;
 const DELAY_BALA = 300;
 const VELOCIDAD_JUGADOR = 300;
 const VIDA_ENEMY = 2;
-const VIDA_ENEMY2 = 4;
-const VIDA_ENEMY3 = 7;
+const VIDA_ENEMY2 = 3;
+const VIDA_ENEMY3 = 6;
 const VIDA_ENEMY4 = 4;
-const VIDA_JEFE = 15;
+const VIDA_JEFE = 25;
 const DELAY_PATRON_JEFE = 3500;
 const VELOCIDAD_MOVIMIENTO_JEFE = 60;
 const CANTIDAD_BALAS_RADIAL_JEFE = 12;
@@ -49,14 +49,17 @@ export class GameScene extends Phaser.Scene {
   preload() {
     this.load.image("background", "assets/background.png");
     this.load.image("player", "assets/player.png");
+    this.load.image("player-left", "assets/player-left.png");
+    this.load.image("player-right", "assets/player-right.png");
+    this.load.image("player-back", "assets/player-back.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("enemy2", "assets/agustin.jpg");
-    this.load.image("bruno", "assets/bruno.JPG");
-    this.load.image("balas", "assets/bala.png");
-    this.load.image("player-back", "assets/player-back.png");
+    this.load.image("puerta", "assets/puerta.JPG");
     this.load.image("cursor", "assets/cursor.png");
     this.load.image("gun", "assets/gun.png");
+    this.load.image("balas", "assets/bala.png");
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
+    this.load.image("bala-jefe", "assets/bala-jefe.png");
     this.load.image("parry", "assets/parry.JPG");
     this.load.image("puede-parry", "assets/puedeparry.jpg");
     this.load.image("enemy3", "assets/enemy3.jpg");
@@ -70,7 +73,7 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 0;
     puedeDisparar = true;
     puedeParry = true;
-    time = 100;
+    time = 300;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
     parryActivo = false;
@@ -134,7 +137,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     //DOOR-------------------------------------------------------------------------------------------------
-    this.door = this.physics.add.staticImage(1200, 300, "bruno");
+    this.door = this.physics.add.staticImage(1200, 300, "puerta");
     this.door.setScale(0.15);
 
     this.door.body.setSize(
@@ -446,6 +449,7 @@ export class GameScene extends Phaser.Scene {
       defaultKey: "bala-enemigo",
       maxSize: 100000000000000,
     });
+
     this.time.addEvent({
       delay: DELAY_BALA_ENEMIGO,
       callback: () => {
@@ -456,6 +460,18 @@ export class GameScene extends Phaser.Scene {
     });
     this.physics.add.overlap(
       this.balasEnemy,
+      player,
+      this.recibirDisparo,
+      null,
+      this
+    );
+    this.balasJefe = this.physics.add.group({
+      defaultKey: "bala-jefe",
+      maxSize: 100000,
+    });
+
+    this.physics.add.overlap(
+      this.balasJefe,
       player,
       this.recibirDisparo,
       null,
@@ -703,7 +719,7 @@ export class GameScene extends Phaser.Scene {
     if (!jefe.active) return;
 
     for (let i = 0; i < CANTIDAD_BALAS_RADIAL_JEFE; i++) {
-      const balaenemy = this.balasEnemy.get(jefe.x, jefe.y);
+      const balaenemy = this.balasJefe.get(jefe.x, jefe.y);
       if (!balaenemy) return;
 
       balaenemy.enableBody(true, jefe.x, jefe.y, true, true);
@@ -727,7 +743,8 @@ export class GameScene extends Phaser.Scene {
       jefe,
       CANTIDAD_BALAS_ESCOPETA_JEFE,
       SEPARACION_ESCOPETA_JEFE,
-      VELOCIDAD_BALA_ESCOPETA_JEFE
+      VELOCIDAD_BALA_ESCOPETA_JEFE,
+      this.balasJefe
     );
   }
 
@@ -789,12 +806,12 @@ export class GameScene extends Phaser.Scene {
     if (puedeDispararEnemy4) {
       puedeDispararEnemy4 = false;
 
-      // Enemy4 original
+      // ENEMY4-------------------------------------------------------------------------------------------------------------------------------------------
       if (enemy4.active) {
         this.dispararConEscopeta(enemy4);
       }
 
-      // Clones
+      // ENEMY4 CLON------------------------------------------------------------------------------------------------------------------------------------
       enemies4.children.each((enemy4Clone) => {
         if (!enemy4Clone.active) return;
 
@@ -842,8 +859,8 @@ export class GameScene extends Phaser.Scene {
       this.parry.play();
       this.physics.pause();
 
-      if (time > 100) {
-        time = 100;
+      if (time > 300) {
+        time = 300;
       }
 
       timerText.setText("Time: " + time);
@@ -878,40 +895,32 @@ export class GameScene extends Phaser.Scene {
     });
   }
   dispararConEscopeta(
-    enemy4Actual,
+    enemyActual,
     cantidadBalas = 4,
     separacion = 0.2,
-    velocidad = 250
+    velocidad = 250,
+    grupoBalas = this.balasEnemy
   ) {
     const baseAngle = Phaser.Math.Angle.Between(
-      enemy4Actual.x,
-      enemy4Actual.y,
+      enemyActual.x,
+      enemyActual.y,
       player.x,
       player.y
     );
 
     for (let i = 0; i < cantidadBalas; i++) {
-      const balaenemy = this.balasEnemy.get(enemy4Actual.x, enemy4Actual.y);
+      const bala = grupoBalas.get(enemyActual.x, enemyActual.y);
 
-      if (!balaenemy) {
+      if (!bala) {
         return;
       }
 
-      balaenemy.enableBody(true, enemy4Actual.x, enemy4Actual.y, true, true);
-
-      balaenemy.setScale(0.12);
-
+      bala.enableBody(true, enemyActual.x, enemyActual.y, true, true);
+      bala.setScale(0.12);
       const angle = baseAngle + (i - (cantidadBalas - 1) / 2) * separacion;
-
-      balaenemy.setRotation(angle);
-
-      this.physics.velocityFromRotation(
-        angle,
-        velocidad,
-        balaenemy.body.velocity
-      );
+      bala.setRotation(angle);
+      this.physics.velocityFromRotation(angle, velocidad, bala.body.velocity);
     }
-
     this.bala_enemigo.play();
   }
 
@@ -951,35 +960,47 @@ export class GameScene extends Phaser.Scene {
     if (jefe.active) {
       this.physics.moveToObject(jefe, player, VELOCIDAD_MOVIMIENTO_JEFE);
     }
-    //MOVIMIENTO IZQ, DER----------------------------------------------------------------------------------------
+    // MOVIMIENTO DEL JUGADOR
+    let velocidadX = 0;
+    let velocidadY = 0;
+
+    // HORIZONTAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
-      player.body.setVelocityX(-VELOCIDAD_JUGADOR);
+      velocidadX = -VELOCIDAD_JUGADOR;
     } else if (teclas.right.isDown) {
-      player.body.setVelocityX(VELOCIDAD_JUGADOR);
-    } else {
-      player.body.setVelocityX(0);
-      player.setTexture("player");
+      velocidadX = VELOCIDAD_JUGADOR;
     }
 
-    //MOVIMIENTO ARR, ABA----------------------------------------------------------------------------------------------
+    // VERTICAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.up.isDown) {
-      player.body.setVelocityY(-VELOCIDAD_JUGADOR);
-      player.setTexture("player-back");
+      velocidadY = -VELOCIDAD_JUGADOR;
     } else if (teclas.down.isDown) {
-      player.body.setVelocityY(VELOCIDAD_JUGADOR);
-    } else {
-      player.body.setVelocityY(0);
-      player.setTexture("player");
+      velocidadY = VELOCIDAD_JUGADOR;
     }
 
-    //PARRY------------------------------------------------------------------------------------------------
+    player.body.setVelocityX(velocidadX);
+    player.body.setVelocityY(velocidadY);
+
+    // SPRITES--------------------------------------------------------------------------------------------------------------------------------------
     if (parryActivo) {
       player.setTexture("parry");
       player.setScale(0.04);
     } else if (mostrandoPuedeParry) {
       player.setTexture("puede-parry");
       player.setScale(0.1);
+    } else {
+      player.setScale(0.2);
+
+      if (velocidadX < 0) {
+        player.setTexture("player-left");
+      } else if (velocidadX > 0) {
+        player.setTexture("player-right");
+      } else if (velocidadY < 0) {
+        player.setTexture("player-back");
+      } else {
+        player.setTexture("player");
+      }
     }
   }
 }
-//947 lineas de pura dinamita
+//99X lineas de pura dinamita
