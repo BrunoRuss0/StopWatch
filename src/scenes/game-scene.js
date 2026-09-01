@@ -4,11 +4,13 @@ let enemy;
 let enemy2;
 let enemy3;
 let enemy4;
+let enemy5;
 let jefe;
 let enemies;
 let enemies2;
 let enemies3;
 let enemies4;
+let enemies5;
 let currentRoom = 0;
 let time = 300;
 let timerText;
@@ -20,6 +22,7 @@ let puedeParry = true;
 let mostrandoPuedeParry = false;
 let puedeDispararEnemy4 = true;
 let jefePatron = 1;
+let enemy5Dasheando = false;
 const DELAY_BALA_ENEMIGO = 1200;
 const DELAY_BALA_ENEMY4 = 3000;
 const COOLDOWN_parry = 3000;
@@ -30,6 +33,7 @@ const VIDA_ENEMY = 2;
 const VIDA_ENEMY2 = 3;
 const VIDA_ENEMY3 = 6;
 const VIDA_ENEMY4 = 4;
+const VIDA_ENEMY5 = 4;
 const VIDA_JEFE = 25;
 const DELAY_PATRON_JEFE = 3500;
 const VELOCIDAD_MOVIMIENTO_JEFE = 60;
@@ -38,6 +42,11 @@ const VELOCIDAD_BALA_RADIAL_JEFE = 350;
 const CANTIDAD_BALAS_ESCOPETA_JEFE = 10;
 const SEPARACION_ESCOPETA_JEFE = 0.15;
 const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
+const VELOCIDAD_ENEMY5 = 130;
+const VELOCIDAD_DASH_ENEMY5 = 550;
+const DURACION_DASH_ENEMY5 = 250;
+const DASH_MIN_ENEMY5 = 2000;
+const DASH_MAX_ENEMY5 = 5000;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -64,6 +73,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("puede-parry", "assets/puedeparry.jpg");
     this.load.image("enemy3", "assets/enemy3.jpg");
     this.load.image("enemy4", "assets/enemy4.jpg");
+    this.load.image("enemy5", "assets/enemy5.jpg");
     this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("bala", "assets/bala.wav");
@@ -79,6 +89,7 @@ export class GameScene extends Phaser.Scene {
     parryActivo = false;
     mostrandoPuedeParry = false;
     jefePatron = 1;
+    enemy5Dasheando = false;
     this.input.setDefaultCursor("none");
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(0.1);
@@ -122,6 +133,11 @@ export class GameScene extends Phaser.Scene {
         parryActivo = false;
         player.setTexture("player");
         player.setScale(0.2);
+        hitCooldown = true;
+        this.time.delayedCall(500, () => {
+          hitCooldown = false;
+        });
+
         this.time.delayedCall(COOLDOWN_parry, () => {
           puedeParry = true;
           mostrandoPuedeParry = true;
@@ -266,6 +282,48 @@ export class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
+    //enemy5-------------------------------------------------------------------------------------------------------
+    enemies5 = this.physics.add.group();
+    enemy5 = this.physics.add.image(1050, 600, "enemy5");
+    enemy5.setScale(0.1);
+    enemy5.setImmovable(false);
+    enemy5.body.setCollideWorldBounds(true);
+    enemy5.vida = VIDA_ENEMY5;
+    enemy5.disableBody(true, true);
+
+    this.physics.add.collider(player, enemy5, () => {
+      if (hitCooldown) return;
+      time -= 10;
+      if (time < 0) {
+        time = 0;
+      }
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.tweens.add({
+        targets: player,
+        alpha: 0,
+        duration: 100,
+        ease: "Linear",
+        yoyo: true,
+        repeat: 0.1,
+      });
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+
+    this.physics.add.collider(player, enemies5, (player, clone) => {
+      if (hitCooldown) return;
+      time -= 10;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+
+    this.programarDashEnemy5();
 
     //JEFE-------------------------------------------------------------------------------------------------------
     jefe = this.physics.add.image(1050, 300, "jefe");
@@ -408,6 +466,14 @@ export class GameScene extends Phaser.Scene {
       this
     );
 
+    this.physics.add.overlap(
+      this.balas,
+      enemy5,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+
     this.physics.add.overlap(this.balas, jefe, this.golpearEnemigo, null, this);
 
     this.physics.add.overlap(
@@ -436,6 +502,13 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.balas,
       enemies4,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+    this.physics.add.overlap(
+      this.balas,
+      enemies5,
       this.golpearEnemigo,
       null,
       this
@@ -500,10 +573,12 @@ export class GameScene extends Phaser.Scene {
       enemies.countActive() +
       enemies3.countActive() +
       enemies4.countActive() +
+      enemies5.countActive() +
       (enemy2.active ? 1 : 0) +
       (jefe.active ? 1 : 0) +
       (enemy.active ? 1 : 0) +
       (enemy3.active ? 1 : 0) +
+      (enemy5.active ? 1 : 0) +
       (enemy4.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
@@ -535,6 +610,7 @@ export class GameScene extends Phaser.Scene {
     enemy2.disableBody(true, true);
     enemy3.disableBody(true, true);
     enemy4.disableBody(true, true);
+    enemy5.disableBody(true, true);
     jefe.disableBody(true, true);
     enemies.children.each((clone) => {
       clone.disableBody(true, true);
@@ -548,29 +624,40 @@ export class GameScene extends Phaser.Scene {
     enemies4.children.each((clone) => {
       clone.disableBody(true, true);
     });
+    enemies5.children.each((clone) => {
+      clone.disableBody(true, true);
+    });
 
     enemy4.vida = VIDA_ENEMY4;
     if (currentRoom === 0) {
-      console.log("0");
       enemy.disableBody(true, true);
       enemy2.disableBody(true, true);
       enemy3.disableBody(true, true);
       enemy4.disableBody(true, true);
+      enemy5.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(100, 300);
     }
     if (currentRoom === 1) {
       player.setPosition(100, 300);
-      console.log("1");
 
       let spawn3 = this.obtenerSpawnAleatorio();
       let spawn1 = this.obtenerSpawnAleatorio();
 
       enemy.enableBody(true, spawn1.x, spawn1.y, true, true);
+      enemy.vida = VIDA_ENEMY;
       enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
-      enemy.vida = VIDA_ENEMY;
+      enemy5.enableBody(true, spawn3.x, spawn3.y, true, true);
+      enemy5.vida = VIDA_ENEMY5;
 
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn = this.obtenerSpawnAleatorio();
+        let enemy5Clone = enemies5.create(spawn.x, spawn.y, "enemy5");
+        enemy5Clone.setScale(0.1);
+        enemy5Clone.setCollideWorldBounds(true);
+        enemy5Clone.vida = VIDA_ENEMY5;
+      }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn.x, spawn.y, "enemy3");
@@ -640,12 +727,16 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(100, 300);
       let spawn3 = this.obtenerSpawnAleatorio();
       let spawn4 = this.obtenerSpawnAleatorio();
+      let spawn5 = this.obtenerSpawnAleatorio();
 
       enemy3.enableBody(true, spawn3.x, spawn3.y, true, true);
       enemy3.vida = VIDA_ENEMY3;
 
       enemy4.enableBody(true, spawn4.x, spawn4.y, true, true);
       enemy4.vida = VIDA_ENEMY4;
+
+      enemy5.enableBody(true, spawn5.x, spawn5.y, true, true);
+      enemy5.vida = VIDA_ENEMY5;
 
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
@@ -699,6 +790,53 @@ export class GameScene extends Phaser.Scene {
       if (!clone.active) return;
       const dirClone = Phaser.Math.RND.pick(direcciones);
       clone.setVelocity(dirClone.x, dirClone.y);
+    });
+  }
+
+  //ENEMY5 ------------------------------------------------------------------------------------------------
+  programarDashEnemy5() {
+    const delay = Phaser.Math.Between(DASH_MIN_ENEMY5, DASH_MAX_ENEMY5);
+
+    this.time.delayedCall(delay, () => {
+      // Enemy5 original
+      if (enemy5.active) {
+        this.dashEnemy5(enemy5);
+      }
+
+      // Clones
+      enemies5.children.each((clone) => {
+        if (!clone.active) return;
+
+        this.dashEnemy5(clone);
+      });
+
+      this.programarDashEnemy5();
+    });
+  }
+
+  dashEnemy5(enemy5Actual) {
+    if (!enemy5Actual.active) return;
+
+    const angle = Phaser.Math.Angle.Between(
+      enemy5Actual.x,
+      enemy5Actual.y,
+      player.x,
+      player.y
+    );
+
+    enemy5Actual.dasheando = true;
+
+    this.physics.velocityFromRotation(
+      angle,
+      VELOCIDAD_DASH_ENEMY5,
+      enemy5Actual.body.velocity
+    );
+
+    this.time.delayedCall(DURACION_DASH_ENEMY5, () => {
+      if (enemy5Actual.active) {
+        enemy5Actual.setVelocity(0, 0);
+        enemy5Actual.dasheando = false;
+      }
     });
   }
 
@@ -772,7 +910,6 @@ export class GameScene extends Phaser.Scene {
   golpearEnemigo(obj1, obj2) {
     const bala = this.balas.contains(obj1) ? obj1 : obj2;
     const enemigo = bala === obj1 ? obj2 : obj1;
-    // -------------------------------------------------------
 
     bala.disableBody(true, true);
     if (!enemigo.active) {
@@ -850,22 +987,18 @@ export class GameScene extends Phaser.Scene {
   recibirDisparo(jugador, bala) {
     bala.disableBody(true, true);
 
-    if (hitCooldown) {
-      return;
-    }
-
     if (parryActivo) {
-      time += 5;
-      this.parry.play();
-      this.physics.pause();
+      if (hitCooldown) return;
 
+      time += 5;
       if (time > 300) {
         time = 300;
       }
-
       timerText.setText("Time: " + time);
+      this.parry.play();
       hitCooldown = true;
 
+      this.physics.pause();
       this.time.delayedCall(500, () => {
         hitCooldown = false;
         this.physics.resume();
@@ -957,6 +1090,18 @@ export class GameScene extends Phaser.Scene {
         this.physics.moveToObject(enemy3, player, 100);
       }
     });
+    if (enemy5.active && !enemy5.dasheando) {
+      this.physics.moveToObject(enemy5, player, VELOCIDAD_ENEMY5);
+    }
+
+    enemies5.children.each((enemy5Clone) => {
+      if (!enemy5Clone.active) return;
+
+      if (!enemy5Clone.dasheando) {
+        this.physics.moveToObject(enemy5Clone, player, VELOCIDAD_ENEMY5);
+      }
+    });
+
     if (jefe.active) {
       this.physics.moveToObject(jefe, player, VELOCIDAD_MOVIMIENTO_JEFE);
     }
@@ -1003,4 +1148,3 @@ export class GameScene extends Phaser.Scene {
     }
   }
 }
-//99X lineas de pura dinamita
