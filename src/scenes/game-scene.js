@@ -43,8 +43,8 @@ const CANTIDAD_BALAS_ESCOPETA_JEFE = 10;
 const SEPARACION_ESCOPETA_JEFE = 0.15;
 const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
 const VELOCIDAD_ENEMY5 = 130;
-const VELOCIDAD_DASH_ENEMY5 = 550;
-const DURACION_DASH_ENEMY5 = 250;
+const VELOCIDAD_DASH_ENEMY5 = 1000;
+const DURACION_DASH_ENEMY5 = 700;
 const DASH_MIN_ENEMY5 = 2000;
 const DASH_MAX_ENEMY5 = 5000;
 
@@ -285,7 +285,7 @@ export class GameScene extends Phaser.Scene {
     //enemy5-------------------------------------------------------------------------------------------------------
     enemies5 = this.physics.add.group();
     enemy5 = this.physics.add.image(1050, 600, "enemy5");
-    enemy5.setScale(0.1);
+    enemy5.setScale(0.02);
     enemy5.setImmovable(false);
     enemy5.body.setCollideWorldBounds(true);
     enemy5.vida = VIDA_ENEMY5;
@@ -654,7 +654,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn.x, spawn.y, "enemy5");
-        enemy5Clone.setScale(0.1);
+        enemy5Clone.setScale(0.02);
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = VIDA_ENEMY5;
       }
@@ -798,12 +798,10 @@ export class GameScene extends Phaser.Scene {
     const delay = Phaser.Math.Between(DASH_MIN_ENEMY5, DASH_MAX_ENEMY5);
 
     this.time.delayedCall(delay, () => {
-      // Enemy5 original
       if (enemy5.active) {
         this.dashEnemy5(enemy5);
       }
 
-      // Clones
       enemies5.children.each((clone) => {
         if (!clone.active) return;
 
@@ -948,7 +946,6 @@ export class GameScene extends Phaser.Scene {
         this.dispararConEscopeta(enemy4);
       }
 
-      // ENEMY4 CLON------------------------------------------------------------------------------------------------------------------------------------
       enemies4.children.each((enemy4Clone) => {
         if (!enemy4Clone.active) return;
 
@@ -986,43 +983,44 @@ export class GameScene extends Phaser.Scene {
   //PARRY--------------------------------------------------------------------------------------------
   recibirDisparo(jugador, bala) {
     bala.disableBody(true, true);
-
+  
+    if (hitCooldown) return;
+  
     if (parryActivo) {
-      if (hitCooldown) return;
-
       time += 5;
-      if (time > 300) {
-        time = 300;
-      }
+      if (time > 300) time = 300;
       timerText.setText("Time: " + time);
       this.parry.play();
       hitCooldown = true;
-
+  
       this.physics.pause();
       this.time.delayedCall(500, () => {
         hitCooldown = false;
         this.physics.resume();
       });
-
       return;
     }
+  
     time -= 5;
-    if (time < 0) {
-      time = 0;
-    }
-
+    if (time < 0) time = 0;
     timerText.setText("Time: " + time);
     hitCooldown = true;
-
+  
+    this.tweens.killTweensOf(player); 
+    player.setAlpha(1);
+  
     this.tweens.add({
       targets: player,
       alpha: 0,
       duration: 100,
       ease: "Linear",
       yoyo: true,
-      repeat: 0.1,
+      repeat: 0,
+      onComplete: () => {
+        player.setAlpha(1); 
+      },
     });
-
+  
     this.time.delayedCall(500, () => {
       hitCooldown = false;
     });
@@ -1148,3 +1146,4 @@ export class GameScene extends Phaser.Scene {
     }
   }
 }
+//1148 lineas de pura dinamita
