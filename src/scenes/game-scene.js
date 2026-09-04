@@ -1,4 +1,4 @@
-import enemy from "src/entities/Enemy.js";
+import Enemy from "../entities/Enemy.js";
 let player;
 let teclas;
 let enemy2;
@@ -70,7 +70,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("balas", "assets/bala.png");
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
     this.load.image("bala-jefe", "assets/bala-jefe.png");
-    this.load.image("parry", "assets/parry.JPG");
+    this.load.image("parry", "assets/parry.png");
     this.load.image("puede-parry", "assets/puedeparry.jpg");
     this.load.image("enemy3", "assets/enemy3.jpg");
     this.load.image("enemy4", "assets/enemy4.jpg");
@@ -90,7 +90,6 @@ export class GameScene extends Phaser.Scene {
     parryActivo = false;
     mostrandoPuedeParry = false;
     jefePatron = 1;
-    enemy5Dasheando = false;
     this.input.setDefaultCursor("none");
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(0.1);
@@ -129,7 +128,6 @@ export class GameScene extends Phaser.Scene {
       puedeParry = false;
       parryActivo = true;
       player.setTexture("parry");
-      player.setScale(0.04);
       this.time.delayedCall(DURACION_parry, () => {
         parryActivo = false;
         player.setTexture("player");
@@ -143,7 +141,6 @@ export class GameScene extends Phaser.Scene {
           puedeParry = true;
           mostrandoPuedeParry = true;
           player.setTexture("puede-parry");
-          player.setScale(0.1);
           this.time.delayedCall(100, () => {
             mostrandoPuedeParry = false;
             player.setTexture("player");
@@ -676,7 +673,7 @@ export class GameScene extends Phaser.Scene {
 
     enemy4.vida = VIDA_ENEMY4;
     if (currentRoom === 0) {
-      enemy.disableBody(true, true);
+      this.enemy.disableBody(true, true);
       enemy2.disableBody(true, true);
       enemy3.disableBody(true, true);
       enemy4.disableBody(true, true);
@@ -943,8 +940,8 @@ export class GameScene extends Phaser.Scene {
     if (!enemigo.active) {
       return;
     }
-    if (typeof enemigo.recibirDanio === "function") {
-      enemigo.recibirDanio();
+    if (typeof enemigo.recibirDaño === "function") {
+      enemigo.recibirDaño();
     } else {
       enemigo.vida -= 1;
       if (enemigo.vida <= 0) {
@@ -1158,12 +1155,8 @@ export class GameScene extends Phaser.Scene {
     // SPRITES--------------------------------------------------------------------------------------------------------------------------------------
     if (parryActivo) {
       player.setTexture("parry");
-      player.setScale(0.04);
     } else if (mostrandoPuedeParry) {
       player.setTexture("puede-parry");
-      player.setScale(0.1);
-    } else {
-      player.setScale(0.2);
 
       if (velocidadY < 0 && velocidadX < 0) {
         player.setTexture("player-back-left");

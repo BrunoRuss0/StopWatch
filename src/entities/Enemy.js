@@ -13,7 +13,7 @@ export default class Enemy extends Phaser.Physics.Arcade.Image {
     if (!this.active) return;
     this.scene.physics.moveToObject(this, player, 233);
   }
-  recibirDanio() {
+  recibirDaño() {
     if (!this.active) return;
     this.vida -= 1;
     if (this.vida <= 0) {
