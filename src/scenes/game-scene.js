@@ -1,5 +1,6 @@
 import Enemy from "../entities/Enemy.js";
 import Enemy2 from "../entities/Enemy2.js";
+import Enemy3 from "../entities/Enemy3.js";
 let player;
 let teclas;
 let enemy;
@@ -218,12 +219,7 @@ export class GameScene extends Phaser.Scene {
       loop: true,
     });
     //ENEMY 3-------------------------------------------------------------------------------------------------------
-    enemy3 = this.physics.add.image(1050, 600, "enemy3");
-    enemy3.setScale(0.1);
-    enemy3.setImmovable(true);
-    enemy3.body.setCollideWorldBounds(true);
-    enemy3.vida = VIDA_ENEMY3;
-    enemy3.disableBody(true, true);
+    enemy3 = new Enemy3(this, 1050, 400);
 
     this.physics.add.collider(player, enemy3, () => {
       if (hitCooldown) return;
