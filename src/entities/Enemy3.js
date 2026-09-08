@@ -1,4 +1,4 @@
-export default class Enemy extends Phaser.Physics.Arcade.Image {
+export default class Enemy3 extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy3");
 
@@ -10,25 +10,12 @@ export default class Enemy extends Phaser.Physics.Arcade.Image {
     this.body.setCollideWorldBounds(true);
 
     this.vida = 6;
-
     this.disableBody(true, true);
   }
 
-  moverAleatorio() {
+  actualizar(player, velocidad = 100) {
     if (!this.active) return;
-
-    const velocidad = 233;
-
-    const direcciones = [
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad },
-    ];
-
-    const dir = Phaser.Math.RND.pick(direcciones);
-
-    this.setVelocity(dir.x, dir.y);
+    this.scene.physics.moveToObject(this, player, velocidad);
   }
 
   recibirDaño() {
