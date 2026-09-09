@@ -6,7 +6,7 @@ export default class Enemy2 extends Phaser.Physics.Arcade.Image {
     this.setScale(0.04);
     this.setImmovable(true);
     this.body.setCollideWorldBounds(true);
-    this.vida = 3;
+    this.vida = 4;
     this.disableBody(true, true);
   }
   moverAleatorio() {
@@ -29,6 +29,6 @@ export default class Enemy2 extends Phaser.Physics.Arcade.Image {
     }
   }
   reiniciarVida() {
-    this.vida = 3;
+    this.vida = 4;
   }
 }

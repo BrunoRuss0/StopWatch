@@ -1,6 +1,9 @@
 import Enemy from "../entities/Enemy.js";
 import Enemy2 from "../entities/Enemy2.js";
 import Enemy3 from "../entities/Enemy3.js";
+import Enemy4 from "../entities/Enemy4.js";
+import Enemy5 from "../entities/Enemy5.js";
+import Enemy6 from "../entities/Enemy6.js";
 
 let player;
 let teclas;
@@ -39,7 +42,7 @@ const VELOCIDAD_JUGADOR = 300;
 const VIDA_ENEMY4 = 4;
 const VIDA_ENEMY5 = 4;
 const VIDA_JEFE = 25;
-const VIDA_ENEMY6 = 5;
+const VIDA_ENEMY6 = 2;
 const DELAY_PATRON_JEFE = 3500;
 const VELOCIDAD_MOVIMIENTO_JEFE = 60;
 const CANTIDAD_BALAS_RADIAL_JEFE = 12;
@@ -66,6 +69,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("player-left", "assets/player-left.png");
     this.load.image("player-right", "assets/player-right.png");
     this.load.image("player-back", "assets/player-back.png");
+    this.load.image("player-back-right", "assets/player-back-right.png");
+    this.load.image("player-back-left", "assets/player-back-left.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("enemy2", "assets/agustin.jpg");
     this.load.image("puerta", "assets/puerta.jPG");
@@ -262,15 +267,11 @@ export class GameScene extends Phaser.Scene {
         hitCooldown = false;
       });
     });
-    //enemy 4
+    //ENEMY 4----------------------------------------------------------------------------------------------------
     enemies4 = this.physics.add.group();
     const posEnemy4 = this.pos(1050, 400);
-    enemy4 = this.physics.add.image(posEnemy4.x, posEnemy4.y, "enemy4");
+    enemy4 = new Enemy4(this, posEnemy4.x, posEnemy4.y);
     enemy4.setScale(this.esc(0.5));
-    enemy4.setImmovable(true);
-    enemy4.setCollideWorldBounds(true);
-    enemy4.vida = VIDA_ENEMY4;
-    enemy4.disableBody(true, true);
 
     this.physics.add.collider(player, enemies4, (player, clone) => {
       if (hitCooldown) return;
@@ -288,15 +289,11 @@ export class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
-    //enemy5-------------------------------------------------------------------------------------------------------
+    //ENEMY 5-------------------------------------------------------------------------------------------------------
     enemies5 = this.physics.add.group();
     const posEnemy5 = this.pos(1050, 600);
-    enemy5 = this.physics.add.image(posEnemy5.x, posEnemy5.y, "enemy5");
+    enemy5 = new Enemy5(this, posEnemy5.x, posEnemy5.y);
     enemy5.setScale(this.esc(0.02));
-    enemy5.setImmovable(false);
-    enemy5.body.setCollideWorldBounds(true);
-    enemy5.vida = VIDA_ENEMY5;
-    enemy5.disableBody(true, true);
 
     this.physics.add.collider(player, enemy5, () => {
       if (hitCooldown) return;
@@ -325,14 +322,11 @@ export class GameScene extends Phaser.Scene {
 
     this.programarDashEnemy5();
 
-    //enemy6
+    //ENEMY 6------------------------------------------------------------------------------------------------------
     enemies6 = this.physics.add.group();
     const posEnemy6 = this.pos(1060, 400);
-    enemy6 = this.physics.add.image(posEnemy6.x, posEnemy6.y, "enemy6");
-    enemy6.setScale(this.esc(0.02));
-    enemy6.setImmovable(false);
-    enemy6.body.setCollideWorldBounds(true);
-    enemy6.vida = VIDA_ENEMY6;
+    enemy6 = new Enemy6(this, posEnemy6.x, posEnemy6.y);
+    enemy6.setScale(this.esc(0.25));
 
     this.physics.add.collider(player, enemy6, () => {
       if (hitCooldown) return;
@@ -652,17 +646,27 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(enemies5, enemies5);
   }
 
-  dispararRadialDesde(x, y, cantidad = CANTIDAD_BALAS_RADIAL_JEFE, velocidad = VELOCIDAD_BALA_RADIAL_JEFE, grupoBalas = this.balasEnemy) {
+  dispararRadialDesde(
+    x,
+    y,
+    cantidad = CANTIDAD_BALAS_RADIAL_JEFE,
+    velocidad = VELOCIDAD_BALA_RADIAL_JEFE,
+    grupoBalas = this.balasEnemy
+  ) {
     for (let i = 0; i < cantidad; i++) {
       const bala = grupoBalas.get(x, y);
       if (!bala) return;
-  
+
       bala.enableBody(true, x, y, true, true);
       bala.setScale(this.esc(0.12));
-  
+
       const angle = (Math.PI * 2 * i) / cantidad;
       bala.setRotation(angle);
-      this.physics.velocityFromRotation(angle, this.v(velocidad), bala.body.velocity);
+      this.physics.velocityFromRotation(
+        angle,
+        this.v(velocidad),
+        bala.body.velocity
+      );
     }
     this.bala_enemigo.play();
   }
@@ -1069,7 +1073,6 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    
     if (typeof enemigo.recibirDaño === "function") {
       enemigo.recibirDaño();
     } else {
@@ -1257,7 +1260,7 @@ export class GameScene extends Phaser.Scene {
       }
     });
     if (enemy5.active && !enemy5.dasheando) {
-      this.physics.moveToObject(enemy5, player, this.v(VELOCIDAD_ENEMY5));
+      this.physics.moveToObject(enemy5, player, VELOCIDAD_ENEMY5);
     }
 
     enemies5.children.each((enemy5Clone) => {
@@ -1308,18 +1311,18 @@ export class GameScene extends Phaser.Scene {
       player.setTexture("parry");
     } else if (mostrandoPuedeParry) {
       player.setTexture("puede-parry");
+    } else if (velocidadY < 0 && velocidadX < 0) {
+      player.setTexture("player-back-left");
+    } else if (velocidadY < 0 && velocidadX > 0) {
+      player.setTexture("player-back-right");
+    } else if (velocidadX < 0) {
+      player.setTexture("player-left");
+    } else if (velocidadX > 0) {
+      player.setTexture("player-right");
+    } else if (velocidadY < 0) {
+      player.setTexture("player-back");
     } else {
-      player.setScale(this.esc(0.2));
-
-      if (velocidadX < 0) {
-        player.setTexture("player-left");
-      } else if (velocidadX > 0) {
-        player.setTexture("player-right");
-      } else if (velocidadY < 0) {
-        player.setTexture("player-back");
-      } else {
-        player.setTexture("player");
-      }
+      player.setTexture("player");
     }
   }
 }

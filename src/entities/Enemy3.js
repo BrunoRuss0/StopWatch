@@ -29,6 +29,6 @@ export default class Enemy3 extends Phaser.Physics.Arcade.Image {
   }
 
   reiniciarVida() {
-    this.vida = 3;
+    this.vida = 6;
   }
 }
