@@ -1,6 +1,6 @@
 export default class Enemy7 extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y) {
-    super(scene, x, y, "enemyY");
+    super(scene, x, y, "enemy7");
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.setScale(1);
@@ -17,7 +17,6 @@ export default class Enemy7 extends Phaser.Physics.Arcade.Image {
     if (!this.active) return;
     this.vida -= 1;
     if (this.vida <= 0) {
-      this.scene.dispararRadialDesde(this.x, this.y);
       this.disableBody(true, true);
     }
   }

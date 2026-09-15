@@ -55,6 +55,11 @@ const VELOCIDAD_DASH_ENEMY5 = 1000;
 const DURACION_DASH_ENEMY5 = 700;
 const DASH_MIN_ENEMY5 = 2000;
 const DASH_MAX_ENEMY5 = 5000;
+const DELAY_TELEGRAPH_LASER_ENEMY7 = 800;
+const DURACION_LASER_ENEMY7 = 180;
+const DELAY_LASER_ENEMY7 = 4000;
+const ANCHO_LASER_ENEMY7 = 10;
+const DAÑO_LASER_ENEMY7 = 8;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -384,6 +389,21 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
+    this.time.addEvent({
+      delay: 500,
+      callback: this.moverenemigo7Aleatorio,
+      callbackScope: this,
+      loop: true,
+    });
+
+    // LASER DE ENEMY7 -----------------------------------------------------------------------------------------
+    this.time.addEvent({
+      delay: DELAY_LASER_ENEMY7,
+      callback: this.intentarDispararLaserEnemy7,
+      callbackScope: this,
+      loop: true,
+    });
+
     //JEFE-------------------------------------------------------------------------------------------------------
     const posJefe = this.pos(1050, 300);
     jefe = new Jefe(this, posJefe.x, posJefe.y);
@@ -444,18 +464,6 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(player, enemies3, (player, clone) => {
       if (hitCooldown) return;
       time -= 10;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
-      hitCooldown = true;
-      this.time.delayedCall(500, () => {
-        hitCooldown = false;
-      });
-    });
-
-    // grupo enemy 7
-    this.physics.add.collider(player, enemies7, (player, clone) => {
-      if (hitCooldown) return;
-      time -= 5;
       if (time < 0) time = 0;
       timerText.setText("Time: " + time);
       hitCooldown = true;
@@ -1100,6 +1108,108 @@ export class GameScene extends Phaser.Scene {
         enemy5Actual.setVelocity(0, 0);
         enemy5Actual.dasheando = false;
       }
+    });
+  }
+
+  //LASER ENEMY7 ------------------------------------------------------------------------------------------------
+  intentarDispararLaserEnemy7() {
+    if (enemy7.active) {
+      this.dispararLaserEnemy7(enemy7);
+    }
+    enemies7.children.each((clone) => {
+      if (clone.active) {
+        this.dispararLaserEnemy7(clone);
+      }
+    });
+  }
+
+  dispararLaserEnemy7(origen) {
+    if (!origen.active) return;
+
+    const angulo = Phaser.Math.Angle.Between(
+      origen.x,
+      origen.y,
+      player.x,
+      player.y
+    );
+
+    const largoTotal =
+      Math.sqrt(this.gameWidth ** 2 + this.gameHeight ** 2) * 2;
+    const finX = origen.x + Math.cos(angulo) * largoTotal;
+    const finY = origen.y + Math.sin(angulo) * largoTotal;
+
+    const aviso = this.add.graphics();
+    aviso.lineStyle(this.v(2), 0xff0000, 0.5);
+    aviso.beginPath();
+    aviso.moveTo(origen.x, origen.y);
+    aviso.lineTo(finX, finY);
+    aviso.strokePath();
+    aviso.setDepth(99999);
+
+    this.time.delayedCall(DELAY_TELEGRAPH_LASER_ENEMY7, () => {
+      aviso.destroy();
+      if (!origen.active) return;
+
+      const anchoLaser = this.v(ANCHO_LASER_ENEMY7);
+
+      const rayo = this.add.graphics();
+      rayo.lineStyle(anchoLaser, 0xff2222, 0.9);
+      rayo.beginPath();
+      rayo.moveTo(origen.x, origen.y);
+      rayo.lineTo(finX, finY);
+      rayo.strokePath();
+      rayo.setDepth(99999);
+
+      this.golpearJugadorConLaser(origen.x, origen.y, finX, finY, anchoLaser);
+
+      // Desaparece rapido, es finito
+      this.time.delayedCall(DURACION_LASER_ENEMY7, () => {
+        rayo.destroy();
+      });
+    });
+  }
+
+  distanciaPuntoALinea(px, py, x1, y1, x2, y2) {
+    const A = px - x1;
+    const B = py - y1;
+    const C = x2 - x1;
+    const D = y2 - y1;
+    const lenSq = C * C + D * D;
+    let param = lenSq !== 0 ? (A * C + B * D) / lenSq : -1;
+    param = Phaser.Math.Clamp(param, 0, 1);
+    const xx = x1 + param * C;
+    const yy = y1 + param * D;
+    return Phaser.Math.Distance.Between(px, py, xx, yy);
+  }
+
+  golpearJugadorConLaser(x1, y1, x2, y2, ancho) {
+    if (hitCooldown) return;
+
+    const distancia = this.distanciaPuntoALinea(
+      player.x,
+      player.y,
+      x1,
+      y1,
+      x2,
+      y2
+    );
+
+    if (distancia > ancho / 2 + this.v(15)) return;
+
+    if (parryActivo) {
+      time += 5;
+      if (time > 300) time = 300;
+      this.parry.play();
+    } else {
+      time -= DAÑO_LASER_ENEMY7;
+      if (time < 0) time = 0;
+      this.flashPlayer();
+    }
+
+    timerText.setText("Time: " + time);
+    hitCooldown = true;
+    this.time.delayedCall(500, () => {
+      hitCooldown = false;
     });
   }
 
