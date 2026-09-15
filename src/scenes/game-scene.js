@@ -5,7 +5,6 @@ import Enemy4 from "../entities/Enemy4.js";
 import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
-
 import Jefe from "../entities/Jefe.js";
 let player;
 let teclas;
@@ -502,7 +501,7 @@ export class GameScene extends Phaser.Scene {
     //BALAS-------------------------------------------------------------------------------------------------
     this.balas = this.physics.add.group({
       defaultKey: "balas",
-      maxSize: 1000000,
+      maxSize: -1,
     });
 
     this.physics.add.overlap(
@@ -637,7 +636,7 @@ export class GameScene extends Phaser.Scene {
     );
     this.balasJefe = this.physics.add.group({
       defaultKey: "bala-jefe",
-      maxSize: 100000,
+      maxSize: -1,
     });
 
     this.physics.add.overlap(
@@ -780,26 +779,9 @@ export class GameScene extends Phaser.Scene {
     if (enemigosVivos > 0) {
       return;
     }
+    currentRoom++;
 
-    if (currentRoom === 0) {
-      currentRoom = 1;
-      this.cargarHabitacion();
-    } else if (currentRoom === 1) {
-      currentRoom = 2;
-      this.cargarHabitacion();
-    } else if (currentRoom === 2) {
-      currentRoom = 3;
-      this.cargarHabitacion();
-    } else if (currentRoom === 3) {
-      currentRoom = 4;
-      this.cargarHabitacion();
-    } else if (currentRoom === 4) {
-      currentRoom = 5;
-      this.cargarHabitacion();
-    } else if (currentRoom === 5) {
-      currentRoom = 0;
-      this.cargarHabitacion();
-    }
+    this.cargarHabitacion();
   }
   //CARGAR HABITACION-------------------------------------------------------------------------------------------------
   cargarHabitacion() {
@@ -832,7 +814,6 @@ export class GameScene extends Phaser.Scene {
     enemies7.children.each((clone) => {
       clone.disableBody(true, true);
     });
-    enemy4.reiniciarVida();
 
     const posInicio = this.pos(100, 300);
 
@@ -905,14 +886,14 @@ export class GameScene extends Phaser.Scene {
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
         enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
-        enemy4Clone.reiniciarVida();
+        enemy4Clone.vida = 4;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
         let enemy6Clone = enemies6.create(spawn.x, spawn.y, "enemy6");
         enemy6Clone.setScale(this.esc(0.25));
         enemy6Clone.setCollideWorldBounds(true);
-        enemy6Clone.reiniciarVida();
+        enemy6Clone.vida = 2;
       }
     } else if (currentRoom === 3) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -946,7 +927,7 @@ export class GameScene extends Phaser.Scene {
         let enemy5Clone = enemies5.create(spawn.x, spawn.y, "enemy5");
         enemy5Clone.setScale(this.esc(0.02));
         enemy5Clone.setCollideWorldBounds(true);
-        enemy5Clone.reiniciarVida();
+        enemy5Clone.vida = 3;
       }
     } else if (currentRoom === 4) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -975,7 +956,7 @@ export class GameScene extends Phaser.Scene {
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
         enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
-        enemy4Clone.reiniciarVida();
+        enemy4Clone.vida = 4;
       }
     } else if (currentRoom === 5) {
       player.setPosition(posInicio.x, posInicio.y);
