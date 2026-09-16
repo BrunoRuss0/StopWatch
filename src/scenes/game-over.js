@@ -48,6 +48,23 @@ export class GameOver extends Phaser.Scene {
     restartboton.on("pointerout", () => {
       restartboton.setStyle({ backgroundColor: "#ff3636" });
     });
+
+    const leaderboardButton = this.add.text(545, 560, "LEADERBOARD", {
+      fontSize: "28px",
+      color: "#000000",
+      backgroundColor: "#ff3636",
+      padding: { left: 30, right: 30, top: 15, bottom: 15 },
+    });
+    leaderboardButton.setInteractive({ useHandCursor: true });
+    leaderboardButton.on("pointerdown", () => {
+      this.scene.start("leaderboard2");
+    });
+    leaderboardButton.on("pointerover", () => {
+      leaderboardButton.setStyle({ backgroundColor: "#f7ebeb" });
+    });
+    leaderboardButton.on("pointerout", () => {
+      leaderboardButton.setStyle({ backgroundColor: "#ff3636" });
+    });
   }
 
   update() {}
