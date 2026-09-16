@@ -6,6 +6,7 @@ import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
 import Jefe from "../entities/Jefe.js";
+import { addScore } from "../utils/leaderboard.js";
 let player;
 let teclas;
 let enemy;
@@ -123,6 +124,7 @@ export class GameScene extends Phaser.Scene {
     parryActivo = false;
     mostrandoPuedeParry = false;
     jefePatron = 1;
+    this.jefeDerrotadoFlag = false;
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
     this.gameHeight = this.scale.height;
@@ -1143,7 +1145,6 @@ export class GameScene extends Phaser.Scene {
 
       this.golpearJugadorConLaser(origen.x, origen.y, finX, finY, anchoLaser);
 
-      // Desaparece rapido, es finito
       this.time.delayedCall(DURACION_LASER_ENEMY7, () => {
         rayo.destroy();
       });
@@ -1281,6 +1282,22 @@ export class GameScene extends Phaser.Scene {
         enemigo.disableBody(true, true);
       }
     }
+
+    // JEFE DERROTADO------------------------------------------------------------------------------------
+    if (enemigo === jefe && !jefe.active) {
+      this.jefeDerrotado();
+    }
+  }
+
+  jefeDerrotado() {
+    if (this.jefeDerrotadoFlag) return;
+    this.jefeDerrotadoFlag = true;
+
+    addScore(time);
+
+    this.time.delayedCall(300, () => {
+      this.scene.start("leaderboard2", { victory: true, lastTime: time });
+    });
   }
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
