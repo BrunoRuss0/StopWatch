@@ -14,11 +14,18 @@ export function getScores() {
   }
 }
 
-export function addScore(time) {
+/**
+
+  @param {number} time 
+  @param {string} usuario 
+
+ */
+export function addScore(time, usuario = "Invitado") {
   const scores = getScores();
 
   const entry = {
     time,
+    usuario,
     date: new Date().toLocaleDateString(),
   };
 
@@ -35,6 +42,8 @@ export function addScore(time) {
   return trimmed;
 }
 
+
+ 
 export function clearScores() {
   try {
     localStorage.removeItem(STORAGE_KEY);

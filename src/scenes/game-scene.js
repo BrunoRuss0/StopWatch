@@ -7,6 +7,7 @@ import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
+import { getLoggedInUser } from "../utils/auth.js";
 let player;
 let teclas;
 let enemy;
@@ -1284,19 +1285,22 @@ export class GameScene extends Phaser.Scene {
     }
 
     // JEFE DERROTADO------------------------------------------------------------------------------------
+    // Si el enemigo golpeado era el jefe y acaba de quedar inactivo, se guarda el puntaje.
     if (enemigo === jefe && !jefe.active) {
       this.jefeDerrotado();
     }
   }
 
+  // Guarda el tiempo restante en el leaderboard y lleva al jugador a la tabla de clasificación.
   jefeDerrotado() {
     if (this.jefeDerrotadoFlag) return;
     this.jefeDerrotadoFlag = true;
 
-    addScore(time);
+    const usuario = getLoggedInUser() || "Invitado";
+    addScore(time, usuario);
 
     this.time.delayedCall(300, () => {
-      this.scene.start("leaderboard2", { victory: true, lastTime: time });
+      this.scene.start("Leaderboard", { victory: true, lastTime: time });
     });
   }
 
@@ -1539,4 +1543,3 @@ export class GameScene extends Phaser.Scene {
     }
   }
 }
-//1542 lineas de pura dinamita

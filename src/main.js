@@ -1,7 +1,8 @@
 import { GameScene } from "./scenes/game-scene.js";
 import { MainMenu } from "./scenes/main-menu.js";
 import { GameOver } from "./scenes/game-over.js";
-import { leaderboard2 } from "./utils/Leaderboard2.js";
+import { Login } from "./scenes/login.js";
+import { Leaderboard } from "./scenes/leaderboard-scene.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -15,9 +16,12 @@ const config = {
       debug: true,
     },
   },
+  dom: {
+    createContainer: true, 
+  },
 
   scale: { width: "100%", height: "100%", mode: Phaser.Scale.FIT },
-  scene: [MainMenu, GameScene, GameOver, leaderboard2], // Agrega leaderboard2 aquí
+  scene: [Login, MainMenu, GameScene, GameOver, Leaderboard], 
 };
 
 const game = new Phaser.Game(config);

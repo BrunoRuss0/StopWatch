@@ -57,7 +57,7 @@ export class GameOver extends Phaser.Scene {
     });
     leaderboardButton.setInteractive({ useHandCursor: true });
     leaderboardButton.on("pointerdown", () => {
-      this.scene.start("leaderboard2");
+      this.scene.start("leaderboard-scene");
     });
     leaderboardButton.on("pointerover", () => {
       leaderboardButton.setStyle({ backgroundColor: "#f7ebeb" });

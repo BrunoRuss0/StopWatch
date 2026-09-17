@@ -1,14 +1,14 @@
-import { getScores } from "./leaderboard.js";
+import { getScores } from "../utils/leaderboard.js";
 
-export class leaderboard2 extends Phaser.Scene {
+export class Leaderboard extends Phaser.Scene {
   constructor() {
-    super({ key: "leaderboard2" });
+    super({ key: "Leaderboard" });
   }
+
 
   init(data) {
     this.victoria = !!(data && data.victory);
-    this.ultimoTiempo =
-      data && data.lastTime !== undefined ? data.lastTime : null;
+    this.ultimoTiempo = data && data.lastTime !== undefined ? data.lastTime : null;
     this.yaMarcado = false;
   }
 
@@ -65,12 +65,15 @@ export class leaderboard2 extends Phaser.Scene {
     } else {
       scores.forEach((entry, index) => {
         const esElNuevo =
-          this.victoria && !this.yaMarcado && this.ultimoTiempo === entry.time;
+          this.victoria &&
+          !this.yaMarcado &&
+          this.ultimoTiempo === entry.time;
 
         if (esElNuevo) this.yaMarcado = true;
 
         const color = esElNuevo ? "#ffd700" : "#ffffff";
-        const texto = `${index + 1}.  ${entry.time}s   (${entry.date})`;
+        const usuario = entry.usuario || "Invitado";
+        const texto = `${index + 1}.  ${usuario}  —  ${entry.time}s   (${entry.date})`;
 
         this.add
           .text(gameWidth / 2, y, texto, {
@@ -106,7 +109,6 @@ export class leaderboard2 extends Phaser.Scene {
       menuboton.setStyle({ backgroundColor: "#ff3636" });
     });
 
-    // BOTON JUGAR DE NUEVO
     if (this.victoria) {
       const jugarboton = this.add
         .text(gameWidth / 2 + offsetX, y, "JUGAR DE NUEVO", {

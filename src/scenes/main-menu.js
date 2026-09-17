@@ -1,3 +1,5 @@
+import { getLoggedInUser, logout } from "../utils/auth.js";
+
 export class MainMenu extends Phaser.Scene {
   constructor() {
     super({ key: "MainMenu" });
@@ -42,7 +44,7 @@ export class MainMenu extends Phaser.Scene {
     });
     leaderboardButton.setInteractive({ useHandCursor: true });
     leaderboardButton.on("pointerdown", () => {
-      this.scene.start("leaderboard2");
+      this.scene.start("Leaderboard");
     });
     leaderboardButton.on("pointerover", () => {
       leaderboardButton.setStyle({ backgroundColor: "#f7ebeb" });
@@ -50,6 +52,38 @@ export class MainMenu extends Phaser.Scene {
     leaderboardButton.on("pointerout", () => {
       leaderboardButton.setStyle({ backgroundColor: "#ff3636" });
     });
+
+    const usuario = getLoggedInUser();
+
+    this.add.text(
+      gameWidth - 20,
+      20,
+      usuario ? `Sesión: ${usuario}` : "Jugando como invitado",
+      {
+        fontSize: "18px",
+        color: "#ffffff",
+      }
+    ).setOrigin(1, 0);
+
+    if (usuario) {
+      const logoutButton = this.add.text(gameWidth - 20, 46, "CERRAR SESIÓN", {
+        fontSize: "16px",
+        color: "#ffffff",
+        backgroundColor: "#333333",
+        padding: { left: 10, right: 10, top: 6, bottom: 6 },
+      }).setOrigin(1, 0);
+      logoutButton.setInteractive({ useHandCursor: true });
+      logoutButton.on("pointerdown", () => {
+        logout();
+        this.scene.start("Login");
+      });
+      logoutButton.on("pointerover", () => {
+        logoutButton.setStyle({ backgroundColor: "#555555" });
+      });
+      logoutButton.on("pointerout", () => {
+        logoutButton.setStyle({ backgroundColor: "#333333" });
+      });
+    }
   }
 
   update() {}
