@@ -5,10 +5,10 @@ export class Leaderboard extends Phaser.Scene {
     super({ key: "Leaderboard" });
   }
 
-
   init(data) {
     this.victoria = !!(data && data.victory);
-    this.ultimoTiempo = data && data.lastTime !== undefined ? data.lastTime : null;
+    this.ultimoTiempo =
+      data && data.lastTime !== undefined ? data.lastTime : null;
     this.yaMarcado = false;
   }
 
@@ -65,15 +65,15 @@ export class Leaderboard extends Phaser.Scene {
     } else {
       scores.forEach((entry, index) => {
         const esElNuevo =
-          this.victoria &&
-          !this.yaMarcado &&
-          this.ultimoTiempo === entry.time;
+          this.victoria && !this.yaMarcado && this.ultimoTiempo === entry.time;
 
         if (esElNuevo) this.yaMarcado = true;
 
         const color = esElNuevo ? "#ffd700" : "#ffffff";
         const usuario = entry.usuario || "Invitado";
-        const texto = `${index + 1}.  ${usuario}  —  ${entry.time}s   (${entry.date})`;
+        const texto = `${index + 1}.  ${usuario}  —  ${entry.time}s   (${
+          entry.date
+        })`;
 
         this.add
           .text(gameWidth / 2, y, texto, {

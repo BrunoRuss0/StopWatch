@@ -6,6 +6,7 @@ import { Leaderboard } from "./scenes/leaderboard-scene.js";
 
 const config = {
   type: Phaser.AUTO,
+  parent: "game-container",
   width: 1200,
   height: 600,
   backgroundColor: "#f000ff",
@@ -17,11 +18,10 @@ const config = {
     },
   },
   dom: {
-    createContainer: true, 
+    createContainer: true,
   },
-
   scale: { width: "100%", height: "100%", mode: Phaser.Scale.FIT },
-  scene: [Login, MainMenu, GameScene, GameOver, Leaderboard], 
+  scene: [Login, MainMenu, GameScene, GameOver, Leaderboard],
 };
 
 const game = new Phaser.Game(config);

@@ -71,6 +71,7 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.image("background", "assets/background.png");
+    this.load.image("background2", "assets/background2.JPG");
     this.load.image("player", "assets/player.png");
     this.load.image("player-left", "assets/player-left.png");
     this.load.image("player-right", "assets/player-right.png");
@@ -150,6 +151,11 @@ export class GameScene extends Phaser.Scene {
     const bg = this.add.image(300, 300, "background");
     bg.setPosition(this.gameWidth / 2, this.gameHeight / 2);
     bg.setDisplaySize(this.gameWidth, this.gameHeight);
+    //BACKGROUND2-------------------------------------------------------------------------------------------------
+    this.bg = this.add.image(300, 300, "background2");
+    this.bg.setPosition(this.gameWidth / 2, this.gameHeight / 2);
+    this.bg.setDisplaySize(this.gameWidth, this.gameHeight);
+    this.bg.setAlpha(0);
     //PLAYER-------------------------------------------------------------------------------------------------
     player = this.add.image(0, 0, "player");
     const posPlayer = this.pos(265, 190);
@@ -1283,22 +1289,18 @@ export class GameScene extends Phaser.Scene {
         enemigo.disableBody(true, true);
       }
     }
-
-    // JEFE DERROTADO------------------------------------------------------------------------------------
-    // Si el enemigo golpeado era el jefe y acaba de quedar inactivo, se guarda el puntaje.
     if (enemigo === jefe && !jefe.active) {
       this.jefeDerrotado();
     }
   }
 
-  // Guarda el tiempo restante en el leaderboard y lleva al jugador a la tabla de clasificación.
   jefeDerrotado() {
     if (this.jefeDerrotadoFlag) return;
     this.jefeDerrotadoFlag = true;
 
     const usuario = getLoggedInUser() || "Invitado";
     addScore(time, usuario);
-
+    this.bg.setAlpha(1);
     this.time.delayedCall(300, () => {
       this.scene.start("Leaderboard", { victory: true, lastTime: time });
     });
