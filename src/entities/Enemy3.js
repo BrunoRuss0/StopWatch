@@ -13,7 +13,7 @@ export default class Enemy3 extends Phaser.Physics.Arcade.Image {
     this.disableBody(true, true);
   }
 
-  actualizar(player, velocidad = 150) {
+  actualizar(player, velocidad = 175) {
     if (!this.active) return;
     this.scene.physics.moveToObject(this, player, velocidad);
   }
