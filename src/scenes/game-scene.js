@@ -8,6 +8,9 @@ import Enemy7 from "../entities/Enemy7.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
+
+
+
 let player;
 let teclas;
 let enemy;
@@ -1335,13 +1338,17 @@ export class GameScene extends Phaser.Scene {
   jefeDerrotado() {
     if (this.jefeDerrotadoFlag) return;
     this.jefeDerrotadoFlag = true;
-
-    const usuario = getLoggedInUser() || "Invitado";
-    addScore(time, usuario);
-    this.bg.setAlpha(1);
-    this.time.delayedCall(300, () => {
-      this.scene.start("Leaderboard", { victory: true, lastTime: time });
+const usuario = getLoggedInUser() || "Invitado";
+addScore(time, usuario).then(() => {
+  this.bg.setAlpha(1);
+  this.time.delayedCall(300, () => {
+    this.scene.start("Leaderboard", {
+      victory: true,
+      lastTime: time
     });
+  });
+});
+
   }
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------

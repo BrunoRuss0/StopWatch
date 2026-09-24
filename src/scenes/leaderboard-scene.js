@@ -14,7 +14,7 @@ export class Leaderboard extends Phaser.Scene {
 
   preload() {}
 
-  create() {
+ async create() {
     this.input.setDefaultCursor("default");
 
     const gameWidth = this.scale.width;
@@ -52,7 +52,7 @@ export class Leaderboard extends Phaser.Scene {
       .setOrigin(0.5, 0);
     y += 60;
 
-    const scores = getScores();
+ const scores = await getScores();
 
     if (scores.length === 0) {
       this.add
