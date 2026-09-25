@@ -9,8 +9,6 @@ import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
 
-
-
 let player;
 let teclas;
 let enemy;
@@ -98,6 +96,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy7", "assets/enemy7.png");
     this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
+    this.load.audio("verity", "assets/Verity.mp3");
+
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
   }
@@ -130,6 +130,7 @@ export class GameScene extends Phaser.Scene {
     mostrandoPuedeParry = false;
     jefePatron = 1;
     this.jefeDerrotadoFlag = false;
+
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
     this.gameHeight = this.scale.height;
@@ -144,6 +145,7 @@ export class GameScene extends Phaser.Scene {
     this.cursor.setScale(this.esc(0.1));
     this.cursor.setDepth(100000000);
     this.parry = this.sound.add("parry");
+    this.cancion = this.sound.add("verity");
     this.bala_enemigo = this.sound.add("bala_enemigo", {
       volume: 0.5,
     });
@@ -662,7 +664,7 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-    // COLISIONES ENEMIGOS------------------------------------------------------------------------------------------
+    // COLISIONES del amor y falicidad------------------------------------------------------------------------------------------
     this.physics.add.collider(enemy, enemy);
     this.physics.add.collider(enemy, enemy2);
     this.physics.add.collider(enemy, enemy3);
@@ -846,6 +848,7 @@ export class GameScene extends Phaser.Scene {
     }
     if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
+      this.cancion.play();
 
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
@@ -1352,17 +1355,16 @@ export class GameScene extends Phaser.Scene {
   jefeDerrotado() {
     if (this.jefeDerrotadoFlag) return;
     this.jefeDerrotadoFlag = true;
-const usuario = getLoggedInUser() || "Invitado";
-addScore(time, usuario).then(() => {
-  this.bg.setAlpha(1);
-  this.time.delayedCall(300, () => {
-    this.scene.start("Leaderboard", {
-      victory: true,
-      lastTime: time
+    const usuario = getLoggedInUser() || "Invitado";
+    addScore(time, usuario).then(() => {
+      this.bg.setAlpha(1);
+      //  this.time.delayedCall(300, () => {
+      //  this.scene.start("Leaderboard", {
+      //  victory: true,
+      //lastTime: time
+      // });
+      // });
     });
-  });
-});
-
   }
 
   // BALAS ENEMIGO--------------------------------------------------------------------------------------------------
