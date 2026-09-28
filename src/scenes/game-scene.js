@@ -86,6 +86,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("gun", "assets/gun.png");
     this.load.image("balas", "assets/bala.png");
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
+    this.load.image("GameOver", "assets/game-over.png");
     this.load.image("bala-jefe", "assets/bala-jefe.png");
     this.load.image("parry", "assets/parry.png");
     this.load.image("puede-parry", "assets/puedeparry.png");
@@ -97,7 +98,9 @@ export class GameScene extends Phaser.Scene {
     this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("verity", "assets/Verity.mp3");
-
+    this.load.audio("phonk", "assets/Phonk.mp3");
+    this.load.audio("mario", "assets/Mario.mp3");
+    this.load.audio("quagmire", "assets/Quagmire.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
   }
@@ -146,6 +149,12 @@ export class GameScene extends Phaser.Scene {
     this.cursor.setDepth(100000000);
     this.parry = this.sound.add("parry");
     this.cancion = this.sound.add("verity");
+    this.cancion2 = this.sound.add("phonk");
+    this.cancionJ2 = this.sound.add("quagmire");
+
+    this.cancionJ = this.sound.add("mario", {
+      volume: 1.5,
+    });
     this.bala_enemigo = this.sound.add("bala_enemigo", {
       volume: 0.5,
     });
@@ -942,10 +951,14 @@ export class GameScene extends Phaser.Scene {
       enemy5.reiniciarVida();
     } else if (currentRoom === 6) {
       player.setPosition(posInicio.x, posInicio.y);
+      this.cancion.stop();
       const posJefeSala = this.pos(900, 100);
+      this.cancionJ.play();
       jefe.enableBody(true, posJefeSala.x, posJefeSala.y, true, true);
     } else if (currentRoom === 7) {
       player.setPosition(posInicio.x, posInicio.y);
+      this.cancionJ.stop();
+      this.cancion2.play();
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -1029,6 +1042,15 @@ export class GameScene extends Phaser.Scene {
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 3;
       }
+    } else if (currentRoom === 10) {
+      player.setPosition(posInicio.x, posInicio.y);
+
+      this.cancion2.stop();
+      this.cancionJ2.play();
+
+      let spawn = this.obtenerSpawnAleatorio();
+      enemy.enableBody(true, spawn.x, spawn.y, true, true);
+      enemy.reiniciarVida();
     }
   }
 
