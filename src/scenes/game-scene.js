@@ -5,6 +5,7 @@ import Enemy4 from "../entities/Enemy4.js";
 import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
+import Enemy8 from "../entitties/Enemy8.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
@@ -18,6 +19,7 @@ let enemy4;
 let enemy5;
 let enemy6;
 let enemy7;
+let enemy8;
 let jefe;
 let enemies;
 let enemies2;
@@ -26,6 +28,7 @@ let enemies4;
 let enemies5;
 let enemies6;
 let enemies7;
+let enemies8;
 let currentRoom = 0;
 let time = 300;
 let timerText;
@@ -59,7 +62,7 @@ const DASH_MIN_ENEMY5 = 2000;
 const DASH_MAX_ENEMY5 = 5000;
 const DELAY_TELEGRAPH_LASER_ENEMY7 = 800;
 const DURACION_LASER_ENEMY7 = 180;
-const DELAY_LASER_ENEMY7 = 4000;
+const DELAY_LASER_ENEMY7 = 3000;
 const ANCHO_LASER_ENEMY7 = 10;
 const DAÑO_LASER_ENEMY7 = 8;
 
@@ -95,6 +98,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy5", "assets/enemy5.jpg");
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/enemy7.png");
+    this.load.image("enemy8", "assets/enemy8.png");
     this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("verity", "assets/Verity.mp3");
@@ -430,6 +434,25 @@ export class GameScene extends Phaser.Scene {
       loop: true,
     });
 
+    //enemy8
+       const posEnemy8 = this.pos(1050, 190);
+    enemy8 = new Enemy8(this, posEnemy8.x, posEnemy8.y);
+    enemy8.setScale(this.esc(0.1));
+
+    this.physics.add.collider(player, enemy8, () => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) {
+        time = 0;
+      }
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.flashPlayer();
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+
     //JEFE-------------------------------------------------------------------------------------------------------
     const posJefe = this.pos(1050, 300);
     jefe = new Jefe(this, posJefe.x, posJefe.y);
@@ -583,6 +606,13 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
+        this.physics.add.overlap(
+      this.balas,
+      enemy8,
+      this.golpearEnemigo,
+      null,
+      this
+    );
 
     this.physics.add.overlap(this.balas, jefe, this.golpearEnemigo, null, this);
 
@@ -633,6 +663,13 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.balas,
       enemies7,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+        this.physics.add.overlap(
+      this.balas,
+      enemies8,
       this.golpearEnemigo,
       null,
       this
@@ -802,7 +839,8 @@ export class GameScene extends Phaser.Scene {
       (enemy5.active ? 1 : 0) +
       (enemy4.active ? 1 : 0) +
       (enemy6.active ? 1 : 0) +
-      (enemy7.active ? 1 : 0);
+      (enemy7.active ? 1 : 0) +
+      (enemy8.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
     }
@@ -819,6 +857,7 @@ export class GameScene extends Phaser.Scene {
     enemy5.disableBody(true, true);
     enemy6.disableBody(true, true);
     enemy7.disableBody(true, true);
+    enemy8.disableBody(true, true);
     jefe.disableBody(true, true);
     enemies.children.each((clone) => {
       clone.disableBody(true, true);
@@ -841,6 +880,9 @@ export class GameScene extends Phaser.Scene {
     enemies7.children.each((clone) => {
       clone.disableBody(true, true);
     });
+        enemies8.children.each((clone) => {
+      clone.disableBody(true, true);
+    });
 
     const posInicio = this.pos(100, 300);
 
@@ -852,6 +894,7 @@ export class GameScene extends Phaser.Scene {
       enemy5.disableBody(true, true);
       enemy6.disableBody(true, true);
       enemy7.disableBody(true, true);
+      enemy8.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
     }
@@ -1135,6 +1178,7 @@ export class GameScene extends Phaser.Scene {
       clone.setVelocity(dirClone.x, dirClone.y);
     });
   }
+
 
   //ENEMY5 ------------------------------------------------------------------------------------------------
   programarDashEnemy5() {
