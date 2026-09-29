@@ -6,7 +6,6 @@ import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
 import Enemy8 from "../entities/Enemy8.js";
-import Enemy8 from "../entities/Enemy8.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
@@ -787,6 +786,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
+    moverDiagonalHacia(obj, objetivo, velocidad) {
+  const dx = objetivo.x - obj.x;
+  const dy = objetivo.y - obj.y;
+  const margen = this.v(5); 
+  const comp = velocidad / Math.SQRT2; // esto es para que no sea mas rapido en diagonal (se lo pedi a la ia)
+
+  const vx = Math.abs(dx) < margen ? 0 : Math.sign(dx) * comp;
+  const vy = Math.abs(dy) < margen ? 0 : Math.sign(dy) * comp;
+
+  obj.setVelocity(vx, vy);
+}
+
 
   flashPlayer() {
     this.tweens.killTweensOf(player);
@@ -897,7 +908,7 @@ export class GameScene extends Phaser.Scene {
       enemy5.disableBody(true, true);
       enemy6.disableBody(true, true);
       enemy7.disableBody(true, true);
-      enemy8.disableBody(true, true);
+     enemy8.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
     }
@@ -922,6 +933,12 @@ export class GameScene extends Phaser.Scene {
         enemy3Clone.setScale(this.esc(0.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
+      }
+      //este spawn hay que cambiarlo para el cuarto que quieras
+      for (let i = 0; i < Phaser.Math.Between(0, 6); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        enemy8.enableBody(true, spawn8.x, spawn8.y, true, true);
+        enemy8.reiniciarVida?.();
       }
     } else if (currentRoom === 2) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -1637,6 +1654,15 @@ export class GameScene extends Phaser.Scene {
         this.v(VELOCIDAD_MOVIMIENTO_JEFE)
       );
     }
+
+    if (enemy8.active) {
+  this.moverDiagonalHacia(enemy8, player, this.v(450));
+}
+enemies8.children.each((clone) => {
+  if (clone.active) {
+    this.moverDiagonalHacia(clone, player, this.v(450));
+  }
+});
     // MOVIMIENTO DEL JUGADOR
     let velocidadX = 0;
     let velocidadY = 0;
