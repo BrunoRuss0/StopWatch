@@ -5,7 +5,7 @@ import Enemy4 from "../entities/Enemy4.js";
 import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
-import Enemy8 from "../entitties/Enemy8.js";
+import Enemy8 from "../entities/Enemy8.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
@@ -435,6 +435,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     //enemy8
+    enemies8 = this.physics.add.group();
        const posEnemy8 = this.pos(1050, 190);
     enemy8 = new Enemy8(this, posEnemy8.x, posEnemy8.y);
     enemy8.setScale(this.esc(0.1));
@@ -832,6 +833,7 @@ export class GameScene extends Phaser.Scene {
       enemies5.countActive() +
       enemies6.countActive() +
       enemies7.countActive() +
+      enemies8.countActive() +
       (jefe.active ? 1 : 0) +
       (enemy.active ? 1 : 0) +
       (enemy2.active ? 1 : 0) +
