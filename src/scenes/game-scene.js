@@ -908,7 +908,7 @@ export class GameScene extends Phaser.Scene {
       enemy5.disableBody(true, true);
       enemy6.disableBody(true, true);
       enemy7.disableBody(true, true);
-     enemy8.disableBody(true, true);
+      enemy8.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
     }
@@ -1109,7 +1109,6 @@ export class GameScene extends Phaser.Scene {
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 3;
       }
-    } else if (currentRoom === 10) {
       player.setPosition(posInicio.x, posInicio.y);
 
       this.cancion2.stop();
