@@ -6,10 +6,10 @@ export default class Enemy8 extends Phaser.Physics.Arcade.Image {
     this.setScale(1);
     this.setImmovable(true);
     this.body.setCollideWorldBounds(true);
-    this.vida = 2; 
+    this.vida = 2;
     this.disableBody(true, true);
   }
-  actualizar(player, velocidad = 300) {
+  actualizar(player, velocidad = 100) {
     if (!this.active) return;
     this.scene.physics.moveToObject(this, player, velocidad);
   }
@@ -21,6 +21,6 @@ export default class Enemy8 extends Phaser.Physics.Arcade.Image {
     }
   }
   reiniciarVida() {
-    this.vida = 2; 
+    this.vida = 2;
   }
 }
