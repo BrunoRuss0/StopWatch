@@ -5,7 +5,7 @@ import Enemy4 from "../entities/Enemy4.js";
 import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
-import Enemy8 from "../entitties/Enemy8.js";
+import Enemy8 from "../entities/Enemy8.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
@@ -435,7 +435,8 @@ export class GameScene extends Phaser.Scene {
     });
 
     //enemy8
-       const posEnemy8 = this.pos(1050, 190);
+    enemies8 = this.physics.add.group();
+    const posEnemy8 = this.pos(1050, 190);
     enemy8 = new Enemy8(this, posEnemy8.x, posEnemy8.y);
     enemy8.setScale(this.esc(0.1));
 
@@ -606,7 +607,7 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-        this.physics.add.overlap(
+    this.physics.add.overlap(
       this.balas,
       enemy8,
       this.golpearEnemigo,
@@ -667,7 +668,7 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-        this.physics.add.overlap(
+    this.physics.add.overlap(
       this.balas,
       enemies8,
       this.golpearEnemigo,
@@ -880,7 +881,7 @@ export class GameScene extends Phaser.Scene {
     enemies7.children.each((clone) => {
       clone.disableBody(true, true);
     });
-        enemies8.children.each((clone) => {
+    enemies8.children.each((clone) => {
       clone.disableBody(true, true);
     });
 
@@ -901,6 +902,10 @@ export class GameScene extends Phaser.Scene {
     if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
+      let spawn = this.obtenerSpawnAleatorio();
+
+      enemy8.enableBody(true, spawn.x, spawn.y, true, true);
+      enemy8.reiniciarVida();
 
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
@@ -1178,7 +1183,6 @@ export class GameScene extends Phaser.Scene {
       clone.setVelocity(dirClone.x, dirClone.y);
     });
   }
-
 
   //ENEMY5 ------------------------------------------------------------------------------------------------
   programarDashEnemy5() {
