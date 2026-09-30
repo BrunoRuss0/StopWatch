@@ -6,6 +6,7 @@ import Enemy5 from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
 import Enemy8 from "../entities/Enemy8.js";
+import Enemy9 from "../entities/Enemy9.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
@@ -20,6 +21,7 @@ let enemy5;
 let enemy6;
 let enemy7;
 let enemy8;
+let enemy9;
 let jefe;
 let enemies;
 let enemies2;
@@ -29,6 +31,7 @@ let enemies5;
 let enemies6;
 let enemies7;
 let enemies8;
+let enemies9;
 let currentRoom = 0;
 let time = 300;
 let timerText;
@@ -65,6 +68,8 @@ const DURACION_LASER_ENEMY7 = 180;
 const DELAY_LASER_ENEMY7 = 3000;
 const ANCHO_LASER_ENEMY7 = 10;
 const DAÑO_LASER_ENEMY7 = 8;
+const TP_MIN_ENEMY9 = 2000;
+const TP_MAX_ENEMY9 = 4000;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -99,6 +104,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/enemy7.png");
     this.load.image("enemy8", "assets/enemy8.png");
+    this.load.image("enemy9", "assets/enemy9.png")
     this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("verity", "assets/Verity.mp3");
@@ -516,6 +522,37 @@ export class GameScene extends Phaser.Scene {
         });
       });
     });
+    //Enemy 9---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+     enemies9 = this.physics.add.group();
+    const posEnemy9 = this.pos(1060, 600);
+    enemy9 = new Enemy9(this, posEnemy9.x, posEnemy9.y);
+    enemy9.setScale(this.esc(0.5));
+
+    this.physics.add.collider(player, enemy9, () => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) {
+        time = 0;
+      }
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.flashPlayer();
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+
+    this.physics.add.collider(player, enemies9, (player, clone) => {
+      if (hitCooldown) return;
+      time -= 3;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+this.programarTpEnemy9();
 
     //JEFE-------------------------------------------------------------------------------------------------------
     const posJefe = this.pos(1050, 300);
@@ -677,6 +714,13 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
+        this.physics.add.overlap(
+      this.balas,
+      enemy9,
+      this.golpearEnemigo,
+      null,
+      this
+    );
 
     this.physics.add.overlap(this.balas, jefe, this.golpearEnemigo, null, this);
 
@@ -734,6 +778,13 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.balas,
       enemies8,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+       this.physics.add.overlap(
+      this.balas,
+      enemies9,
       this.golpearEnemigo,
       null,
       this
@@ -842,8 +893,10 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(enemies3, enemies3);
     this.physics.add.collider(enemies4, enemies4);
     this.physics.add.collider(enemies5, enemies5);
+    this.physics.add.collider(enemies9, enemies9);
     this.physics.add.collider(enemy6, enemy6);
     this.physics.add.collider(enemy7, enemy7);
+    this.physics.add.collider(enemy9, enemy9);
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
@@ -906,6 +959,7 @@ export class GameScene extends Phaser.Scene {
       enemies6.countActive() +
       enemies7.countActive() +
       enemies8.countActive() +
+      enemies9.countActive() +
       (jefe.active ? 1 : 0) +
       (enemy.active ? 1 : 0) +
       (enemy2.active ? 1 : 0) +
@@ -914,7 +968,8 @@ export class GameScene extends Phaser.Scene {
       (enemy4.active ? 1 : 0) +
       (enemy6.active ? 1 : 0) +
       (enemy7.active ? 1 : 0) +
-      (enemy8.active ? 1 : 0);
+      (enemy8.active ? 1 : 0) +
+      (enemy9.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
     }
@@ -932,6 +987,7 @@ export class GameScene extends Phaser.Scene {
     enemy6.disableBody(true, true);
     enemy7.disableBody(true, true);
     enemy8.disableBody(true, true);
+    enemy9.disableBody(true, true);
     jefe.disableBody(true, true);
     enemies.clear(true, true);
     enemies2.clear(true, true);
@@ -941,6 +997,7 @@ export class GameScene extends Phaser.Scene {
     enemies6.clear(true, true);
     enemies7.clear(true, true);
     enemies8.clear(true, true);
+    enemies9.clear(true, true);
 
     const posInicio = this.pos(100, 300);
 
@@ -953,6 +1010,7 @@ export class GameScene extends Phaser.Scene {
       enemy6.disableBody(true, true);
       enemy7.disableBody(true, true);
       enemy8.disableBody(true, true);
+      enemy9.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
     }
@@ -973,6 +1031,13 @@ export class GameScene extends Phaser.Scene {
         enemy3Clone.setScale(this.esc(0.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
+      }
+            for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
+        let spawn9 = this.obtenerSpawnAleatorio();
+        let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
+        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setCollideWorldBounds(true);
+        enemy9Clone.vida = 3;
       }
     } else if (currentRoom === 2) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -1395,6 +1460,42 @@ export class GameScene extends Phaser.Scene {
       hitCooldown = false;
     });
   }
+  //tp enemy 9
+  avisarYTeletransportarEnemy9(obj) {
+  if (!obj.active) return;
+  this.tweens.add({
+    targets: obj,
+    alpha: 0.2,
+    duration: 150,
+    yoyo: true,
+    repeat: 2,
+  });
+  this.time.delayedCall(350, () => {
+    obj.setAlpha(1);
+    this.teletransportarEnemy9(obj);
+  });
+}
+  programarTpEnemy9() {
+  const delay = Phaser.Math.Between(TP_MIN_ENEMY9, TP_MAX_ENEMY9);
+  this.time.delayedCall(delay, () => {
+    if (enemy9.active) {
+      this.teletransportarEnemy9(enemy9);
+    }
+    enemies9.children.each((clone) => {
+      if (clone.active) {
+        this.teletransportarEnemy9(clone);
+      }
+    });
+    this.programarTpEnemy9();
+  });
+}
+teletransportarEnemy9(obj) {
+  if (!obj.active) return;
+   const x = Phaser.Math.Between(this.v(40), this.gameWidth - this.v(40));
+  const y = Phaser.Math.Between(this.v(40), this.gameHeight - this.v(40));
+  obj.body.reset(x, y);
+
+}
 
   //PATRONES DEL JEFE ------------------------------------------------------------------------------------------------
   ejecutarPatronJefe() {
@@ -1661,6 +1762,7 @@ export class GameScene extends Phaser.Scene {
     //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
     enemy.actualizar(player, this.v(233));
     enemy3.actualizar(player, this.v(100));
+    enemy9.actualizar(player, this.v(200));
     enemies.children.each((enemy) => {
       if (enemy.active) {
         this.physics.moveToObject(enemy, player, this.v(233));
@@ -1674,6 +1776,11 @@ export class GameScene extends Phaser.Scene {
     enemies6.children.each((enemy6) => {
       if (enemy6.active) {
         this.physics.moveToObject(enemy6, player, this.v(300));
+      }
+    });
+    enemies9.children.each((enemy9) => {
+      if (enemy9.active) {
+        this.physics.moveToObject(enemy9, player, this.v(200));
       }
     });
     if (enemy5.active && !enemy5.dasheando) {
