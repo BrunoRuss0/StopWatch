@@ -7,6 +7,7 @@ import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
 import Enemy8 from "../entities/Enemy8.js";
 import Enemy9 from "../entities/Enemy9.js";
+import Enemy10 from "../entities/Enemy10.js";
 import Jefe from "../entities/Jefe.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
@@ -22,6 +23,7 @@ let enemy6;
 let enemy7;
 let enemy8;
 let enemy9;
+let enemy10;
 let jefe;
 let enemies;
 let enemies2;
@@ -32,6 +34,7 @@ let enemies6;
 let enemies7;
 let enemies8;
 let enemies9;
+let enemies10;
 let currentRoom = 0;
 let time = 300;
 let timerText;
@@ -104,7 +107,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/enemy7.png");
     this.load.image("enemy8", "assets/enemy8.png");
-    this.load.image("enemy9", "assets/enemy9.png")
+    this.load.image("enemy9", "assets/enemy9.png");
+    this.load.image("enemy10", "assets/enemy10.png");
     this.load.image("jefe", "assets/jefe.png");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("verity", "assets/Verity.mp3");
@@ -405,7 +409,7 @@ export class GameScene extends Phaser.Scene {
         hitCooldown = false;
       });
     });
-    //enemy7
+    //enemy7---------------------------------------------------------------------------------
     enemies7 = this.physics.add.group();
     const posEnemy7 = this.pos(1070, 400);
     enemy7 = new Enemy7(this, posEnemy7.x, posEnemy7.y);
@@ -552,7 +556,39 @@ export class GameScene extends Phaser.Scene {
         hitCooldown = false;
       });
     });
-this.programarTpEnemy9();
+    this.programarTpEnemy9();
+    
+    //Enemy10------------------------------------------
+     enemies10 = this.physics.add.group();
+    const posEnemy10 = this.pos(1060, 600);
+    enemy10 = new Enemy10(this, posEnemy10.x, posEnemy10.y);
+    enemy10.setScale(this.esc(0.5));
+
+    this.physics.add.collider(player, enemy10, () => {
+      if (hitCooldown) return;
+      time -= 10000;
+      if (time < 0) {
+        time = 0;
+      }
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.flashPlayer();
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+    
+
+    this.physics.add.collider(player, enemies10, (player, clone) => {
+      if (hitCooldown) return;
+      time -= 100000;
+      if (time < 0) time = 0;
+      timerText.setText("Time: " + time);
+      hitCooldown = true;
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
 
     //JEFE-------------------------------------------------------------------------------------------------------
     const posJefe = this.pos(1050, 300);
@@ -721,6 +757,14 @@ this.programarTpEnemy9();
       null,
       this
     );
+            this.physics.add.overlap(
+      this.balas,
+      enemy10,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+
 
     this.physics.add.overlap(this.balas, jefe, this.golpearEnemigo, null, this);
 
@@ -785,6 +829,13 @@ this.programarTpEnemy9();
        this.physics.add.overlap(
       this.balas,
       enemies9,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+           this.physics.add.overlap(
+      this.balas,
+      enemies10,
       this.golpearEnemigo,
       null,
       this
@@ -897,6 +948,7 @@ this.programarTpEnemy9();
     this.physics.add.collider(enemy6, enemy6);
     this.physics.add.collider(enemy7, enemy7);
     this.physics.add.collider(enemy9, enemy9);
+    this.physics.add.collider(enemy10, enemy10);
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
@@ -960,6 +1012,7 @@ this.programarTpEnemy9();
       enemies7.countActive() +
       enemies8.countActive() +
       enemies9.countActive() +
+      enemies10.countActive() +
       (jefe.active ? 1 : 0) +
       (enemy.active ? 1 : 0) +
       (enemy2.active ? 1 : 0) +
@@ -969,7 +1022,8 @@ this.programarTpEnemy9();
       (enemy6.active ? 1 : 0) +
       (enemy7.active ? 1 : 0) +
       (enemy8.active ? 1 : 0) +
-      (enemy9.active ? 1 : 0);
+      (enemy9.active ? 1 : 0) +
+      (enemy10.active ? 1 : 0);
     if (enemigosVivos > 0) {
       return;
     }
@@ -988,6 +1042,7 @@ this.programarTpEnemy9();
     enemy7.disableBody(true, true);
     enemy8.disableBody(true, true);
     enemy9.disableBody(true, true);
+    enemy10.disableBody(true, true);
     jefe.disableBody(true, true);
     enemies.clear(true, true);
     enemies2.clear(true, true);
@@ -998,6 +1053,7 @@ this.programarTpEnemy9();
     enemies7.clear(true, true);
     enemies8.clear(true, true);
     enemies9.clear(true, true);
+    enemies10.clear(true, true);
 
     const posInicio = this.pos(100, 300);
 
@@ -1011,6 +1067,7 @@ this.programarTpEnemy9();
       enemy7.disableBody(true, true);
       enemy8.disableBody(true, true);
       enemy9.disableBody(true, true);
+      enemy10.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
     }
@@ -1038,6 +1095,13 @@ this.programarTpEnemy9();
         enemy9Clone.setScale(this.esc(0.5));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 3;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn10 = this.obtenerSpawnAleatorio();
+        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
+        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setCollideWorldBounds(true);
+        enemy10Clone.vida = 4;
       }
     } else if (currentRoom === 2) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -1763,6 +1827,7 @@ teletransportarEnemy9(obj) {
     enemy.actualizar(player, this.v(233));
     enemy3.actualizar(player, this.v(100));
     enemy9.actualizar(player, this.v(200));
+    enemy10.actualizar(player, this.v(40)),
     enemies.children.each((enemy) => {
       if (enemy.active) {
         this.physics.moveToObject(enemy, player, this.v(233));
