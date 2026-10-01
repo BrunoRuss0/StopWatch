@@ -1,3 +1,22 @@
+const FRAME_MS = 300;
+
+export function actualizarSpriteEnemy(obj, scene) {
+  if (!obj.active) return;
+
+  const arriba = obj.body.velocity.y < 0;
+  const frame2 = Math.floor(scene.time.now / FRAME_MS) % 2 === 1;
+
+  const key = arriba
+    ? frame2
+      ? "enemy-back-2frame"
+      : "enemy-back"
+    : frame2
+    ? "enemy-2frame"
+    : "enemy";
+
+  if (obj.texture.key !== key) obj.setTexture(key);
+}
+
 export default class Enemy extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy");
