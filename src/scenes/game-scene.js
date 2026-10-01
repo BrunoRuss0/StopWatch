@@ -45,6 +45,7 @@ let parryActivo = false;
 let puedeParry = true;
 let mostrandoPuedeParry = false;
 let puedeDispararEnemy4 = true;
+let enemy10Visible = true;
 let jefePatron = 1;
 const REF_WIDTH = 1280;
 const REF_HEIGHT = 720;
@@ -150,6 +151,7 @@ export class GameScene extends Phaser.Scene {
     puedeDispararEnemy4 = true;
     parryActivo = false;
     mostrandoPuedeParry = false;
+    enemy10Visible = true;
     jefePatron = 1;
     this.jefeDerrotadoFlag = false;
 
@@ -534,7 +536,7 @@ export class GameScene extends Phaser.Scene {
         });
       });
     });
-    //Enemy 9---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Enemy 9---------------------------------------------------------------------------------------------------------------------------------------------
     enemies9 = this.physics.add.group();
     const posEnemy9 = this.pos(1060, 600);
     enemy9 = new Enemy9(this, posEnemy9.x, posEnemy9.y);
@@ -574,7 +576,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy10, () => {
       if (hitCooldown) return;
-      time -= 10000;
+      time -= 5;
       if (time < 0) {
         time = 0;
       }
@@ -588,7 +590,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies10, (player, clone) => {
       if (hitCooldown) return;
-      time -= 100000;
+      time -= 5;
       if (time < 0) time = 0;
       timerText.setText("Time: " + time);
       hitCooldown = true;
@@ -596,6 +598,7 @@ export class GameScene extends Phaser.Scene {
         hitCooldown = false;
       });
     });
+    this.programarParpadeoEnemy10();
 
     //JEFE-------------------------------------------------------------------------------------------------------
     const posJefe = this.pos(1050, 300);
@@ -955,6 +958,8 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(enemy7, enemy7);
     this.physics.add.collider(enemy9, enemy9);
     this.physics.add.collider(enemy10, enemy10);
+    this.physics.add.collider(enemy9, player);
+    this.physics.add.collider(enemies9, player);
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
@@ -1095,6 +1100,13 @@ export class GameScene extends Phaser.Scene {
         enemy3Clone.setScale(this.esc(0.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn10 = this.obtenerSpawnAleatorio();
+        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
+        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setCollideWorldBounds(true);
+        enemy10Clone.vida = 4;
       }
     }
     //------------------------------------------------------------
@@ -1735,6 +1747,15 @@ export class GameScene extends Phaser.Scene {
     obj.body.reset(x, y);
   }
 
+  programarParpadeoEnemy10() {
+    const duracion = enemy10Visible ? 1000 : Phaser.Math.Between(3000, 4000);
+
+    this.time.delayedCall(duracion, () => {
+      enemy10Visible = !enemy10Visible;
+      this.programarParpadeoEnemy10();
+    });
+  }
+
   //PATRONES DEL JEFE ------------------------------------------------------------------------------------------------
   ejecutarPatronJefe() {
     if (!jefe.active) return;
@@ -2001,12 +2022,22 @@ export class GameScene extends Phaser.Scene {
     enemy.actualizar(player, this.v(233));
     enemy3.actualizar(player, this.v(100));
     enemy9.actualizar(player, this.v(200));
-    enemy10.actualizar(player, this.v(40)),
-      enemies.children.each((enemy) => {
-        if (enemy.active) {
-          this.physics.moveToObject(enemy, player, this.v(233));
-        }
-      });
+    if (enemy10.active) {
+      this.physics.moveToObject(enemy10, player, this.v(150));
+      enemy10.setVisible(enemy10Visible);
+    }
+    enemies10.children.each((clone) => {
+      if (clone.active) {
+        this.physics.moveToObject(clone, player, this.v(150));
+        clone.setVisible(enemy10Visible);
+      }
+    });
+
+    enemies.children.each((enemy) => {
+      if (enemy.active) {
+        this.physics.moveToObject(enemy, player, this.v(233));
+      }
+    });
     enemies3.children.each((enemy3) => {
       if (enemy3.active) {
         this.physics.moveToObject(enemy3, player, this.v(100));
