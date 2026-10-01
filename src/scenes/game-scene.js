@@ -114,6 +114,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy9", "assets/enemy9.png");
     this.load.image("enemy10", "assets/enemy10.png");
     this.load.image("jefe", "assets/jefe.png");
+    this.load.image("muerte", "assets/descarga.jpg");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("verity", "assets/Verity.mp3");
     this.load.audio("phonk", "assets/Phonk.mp3");
@@ -1836,12 +1837,29 @@ export class GameScene extends Phaser.Scene {
       enemigo.recibirDaño();
     } else {
       enemigo.vida -= 1;
+
       if (enemigo.vida <= 0) {
         if (enemigo.texture.key === "enemy6") {
           this.dispararRadialDesde(enemigo.x, enemigo.y);
         }
-        enemigo.disableBody(true, true);
+
+        if (enemigo.texture.key === "enemy10") {
+          enemigo.setTexture("muerte");
+          enemigo.setScale(this.esc(3));
+          enemigo.setVelocity(0, 0);
+          enemy10Visible = true
+
+          this.time.delayedCall(300, () => {
+            if (enemigo.active) {
+              enemigo.disableBody(true, true);
+            }
+          });
+        } else {
+          enemigo.disableBody(true, true);
+        }
       }
+    
+
     }
     if (enemigo === jefe && !jefe.active) {
       this.jefeDerrotado();
@@ -2080,11 +2098,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (enemy8.active) {
-      this.moverDiagonalHacia(enemy8, player, this.v(450));
+      this.moverDiagonalHacia(enemy8, player, this.v(350));
     }
     enemies8.children.each((clone) => {
       if (clone.active) {
-        this.moverDiagonalHacia(clone, player, this.v(450));
+        this.moverDiagonalHacia(clone, player, this.v(350));
       }
     });
     enemies.children.each((enemy) => {
