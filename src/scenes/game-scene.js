@@ -95,7 +95,6 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy-2frame", "assets/enemy-2frame.png");
     this.load.image("enemy-back", "assets/enemy-back.png");
     this.load.image("enemy-back-2frame", "assets/enemy-back-2frame.png");
-    this.load.image("enemy2", "assets/agustin.jpg");
     this.load.image("puerta", "assets/puerta.jPG");
     this.load.image("cursor", "assets/cursor.png");
     this.load.image("gun", "assets/gun.png");
@@ -105,6 +104,14 @@ export class GameScene extends Phaser.Scene {
     this.load.image("bala-jefe", "assets/bala-jefe.png");
     this.load.image("parry", "assets/parry.png");
     this.load.image("puede-parry", "assets/puedeparry.png");
+    this.load.image("enemy2", "assets/ENEMY2.png");
+    this.load.image("enemy2-2frame", "assets/ENEMY2-2frame.png");
+    this.load.image("enemy2-back", "assets/ENEMY2-back.png");
+    this.load.image("enemy2-back-2frame", "assets/ENEMY2-back-2frame.png");
+    this.load.image("enemy2-left", "assets/ENEMY2-left.png");
+    this.load.image("enemy2-left-2frame", "assets/ENEMY2-left-2frame.png");
+    this.load.image("enemy2-right", "assets/ENEMY2-right.png");
+    this.load.image("enemy2-right-2frame", "assets/ENEMY2-right-2frame.png");
     this.load.image("enemy3", "assets/enemy3.jpg");
     this.load.image("enemy4", "assets/enemy4.jpg");
     this.load.image("enemy5", "assets/enemy5.jpg");
@@ -261,8 +268,8 @@ export class GameScene extends Phaser.Scene {
 
     //GUN-----------------------------------------------------------------------------------------------------
     gun = this.add.image(player.x, player.y, "gun");
-    gun.setScale(this.esc(0.03));
-    gun.setOrigin(0.1, 0.5);
+    gun.setScale(this.esc(0.17));
+    gun.setOrigin(0.2, 0.45);
     gun.setDepth(player.depth + 1);
 
     //ENEMY-------------------------------------------------------------------------------------------------
@@ -287,7 +294,7 @@ export class GameScene extends Phaser.Scene {
     //ENEMY 2-------------------------------------------------------------------------------------------------------
     const posEnemy2 = this.pos(1050, 400);
     enemy2 = new Enemy2(this, posEnemy2.x, posEnemy2.y);
-    enemy2.setScale(this.esc(0.04));
+    enemy2.setScale(this.esc(0.1));
 
     this.physics.add.collider(player, enemy2, () => {
       if (hitCooldown) return;
@@ -1116,7 +1123,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
-        enemy2Clone.setScale(this.esc(0.04));
+        enemy2Clone.setScale(this.esc(0.5));
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = 4;
       }
@@ -1143,7 +1150,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
-        enemy2Clone.setScale(this.esc(0.04));
+        enemy2Clone.setScale(this.esc(0.5));
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = 4;
       }
@@ -1187,7 +1194,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
-        enemy2Clone.setScale(this.esc(0.04));
+        enemy2Clone.setScale(this.esc(0.5));
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = 4;
       }
@@ -1366,7 +1373,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
-        enemy2Clone.setScale(this.esc(0.04));
+        enemy2Clone.setScale(this.esc(0.5));
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = 4;
       }
@@ -1415,7 +1422,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
-        enemy2Clone.setScale(this.esc(0.04));
+        enemy2Clone.setScale(this.esc(0.5));
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = 4;
       }
@@ -1517,15 +1524,16 @@ export class GameScene extends Phaser.Scene {
   moverenemigoAleatorio() {
     const velocidad = this.v(200);
     const direcciones = [
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad },
+      { x: velocidad, y: 0, dir: "-right" },
+      { x: -velocidad, y: 0, dir: "-left" },
+      { x: 0, y: velocidad, dir: "" },
+      { x: 0, y: -velocidad, dir: "-back" },
     ];
     enemy2.moverAleatorio();
     enemies2.children.each((clone) => {
-      let dirClone = Phaser.Math.RND.pick(direcciones);
-      clone.setVelocity(dirClone.x, dirClone.y);
+      const d = Phaser.Math.RND.pick(direcciones);
+      clone.setVelocity(d.x, d.y);
+      clone.dir = d.dir;
     });
   }
   moverenemigo4Aleatorio() {
@@ -2000,6 +2008,12 @@ export class GameScene extends Phaser.Scene {
       );
     }
     this.bala_enemigo.play();
+  }
+  animarSprite(obj, base) {
+    if (!obj.active) return;
+    const frame2 = Math.floor(this.time.now / 500) % 2 === 1;
+    const key = base + (obj.dir || "") + (frame2 ? "-2frame" : "");
+    if (obj.texture.key !== key) obj.setTexture(key);
   }
 
   update() {

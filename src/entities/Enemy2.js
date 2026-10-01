@@ -3,7 +3,7 @@ export default class Enemy2 extends Phaser.Physics.Arcade.Image {
     super(scene, x, y, "enemy2");
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setScale(0.04);
+    this.setScale(1);
     this.setImmovable(true);
     this.body.setCollideWorldBounds(true);
     this.vida = 4;
@@ -13,13 +13,14 @@ export default class Enemy2 extends Phaser.Physics.Arcade.Image {
     if (!this.active) return;
     const velocidad = 200;
     const direcciones = [
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad },
+      { x: velocidad, y: 0, dir: "-right" },
+      { x: -velocidad, y: 0, dir: "-left" },
+      { x: 0, y: velocidad, dir: "" },
+      { x: 0, y: -velocidad, dir: "-back" },
     ];
-    const dir = Phaser.Math.RND.pick(direcciones);
-    this.setVelocity(dir.x, dir.y);
+    const d = Phaser.Math.RND.pick(direcciones);
+    this.setVelocity(d.x, d.y);
+    this.dir = d.dir;
   }
   recibirDaño() {
     if (!this.active) return;

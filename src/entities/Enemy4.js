@@ -13,13 +13,14 @@ export default class Enemy4 extends Phaser.Physics.Arcade.Image {
     if (!this.active) return;
     const velocidad = 200;
     const direcciones = [
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad },
+      { x: velocidad, y: 0, dir: "-right" },
+      { x: -velocidad, y: 0, dir: "-left" },
+      { x: 0, y: velocidad, dir: "" },
+      { x: 0, y: -velocidad, dir: "-back" },
     ];
-    const dir = Phaser.Math.RND.pick(direcciones);
-    this.setVelocity(dir.x, dir.y);
+    const d = Phaser.Math.RND.pick(direcciones);
+    this.setVelocity(d.x, d.y);
+    this.dir = d.dir;
   }
   recibirDaño() {
     if (!this.active) return;

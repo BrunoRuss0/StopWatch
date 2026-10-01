@@ -9,9 +9,18 @@ export default class Enemy7 extends Phaser.Physics.Arcade.Image {
     this.vida = 3;
     this.disableBody(true, true);
   }
-  actualizar(player, velocidad = 100) {
+  moverAleatorio() {
     if (!this.active) return;
-    this.scene.physics.moveToObject(this, player, velocidad);
+    const velocidad = 200;
+    const direcciones = [
+      { x: velocidad, y: 0, dir: "-right" },
+      { x: -velocidad, y: 0, dir: "-left" },
+      { x: 0, y: velocidad, dir: "" },
+      { x: 0, y: -velocidad, dir: "-back" },
+    ];
+    const d = Phaser.Math.RND.pick(direcciones);
+    this.setVelocity(d.x, d.y);
+    this.dir = d.dir;
   }
   recibirDaño() {
     if (!this.active) return;
