@@ -650,7 +650,7 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    // balas normales del jefe 2 y sus clones
+    // balas del jefe 2
     this.time.addEvent({
       delay: DELAY_BALA_JEFE2,
       callback: this.dispararJefe2,
@@ -1861,7 +1861,6 @@ export class GameScene extends Phaser.Scene {
 
   crearClonJefe2(x, y) {
     if (jefe2Clones.countActive() >= MAX_CLONES_JEFE2) return;
-
     const clon = jefe2Clones.create(x, y, "jefe2");
     clon.setDisplaySize(jefe2.displayWidth, jefe2.displayHeight);
     clon.setImmovable(true);
@@ -1917,7 +1916,6 @@ export class GameScene extends Phaser.Scene {
     if (!jefe2.active) return;
     jefe2.ocupado = true;
     jefe2.setVelocity(0, 0);
-    jefe2.setTint(0xff4444); // aviso: se pone rojo antes de embestir (ai slop)
 
     this.time.delayedCall(AVISO_DASH_JEFE2, () => {
       if (!jefe2.active) return;

@@ -11,7 +11,7 @@ export default class Jefe2 extends Phaser.Physics.Arcade.Image {
     this.puedemoverse = false;
   }
 
-  actualizar(player, velocidad = 80) {
+  actualizar(player, velocidad = 120) {
     if (!this.active || this.puedemoverse) return;
     this.scene.physics.moveToObject(this, player, velocidad);
   }

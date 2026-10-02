@@ -17,12 +17,11 @@ export default class Enemy10 extends Phaser.Physics.Arcade.Image {
     if (!this.active) return;
     this.vida -= 1;
     if (this.vida <= 0) {
-         this.setTexture("muerte");
-   this.scene.time.delayedCall(300, () => {
+      this.setTexture("muerte");
+      this.scene.time.delayedCall(300, () => {
         this.setTexture("enemy10");
-                    this.disableBody(true, true);
-
-              });
+        this.disableBody(true, true);
+      });
     }
   }
   reiniciarVida() {
