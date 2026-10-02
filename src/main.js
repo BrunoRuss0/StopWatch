@@ -3,6 +3,7 @@ import { MainMenu } from "./scenes/main-menu.js";
 import { GameOver } from "./scenes/game-over.js";
 import { Login } from "./scenes/login.js";
 import { Leaderboard } from "./scenes/leaderboard-scene.js";
+import { Gamewin } from "./scenes/game-win.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -14,14 +15,14 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: true,
+      debug: false,
     },
   },
   dom: {
     createContainer: true,
   },
   scale: { width: "100%", height: "100%", mode: Phaser.Scale.FIT },
-  scene: [Login, MainMenu, GameScene, GameOver, Leaderboard],
+  scene: [Login, MainMenu, GameScene, GameOver, Gamewin, Leaderboard],
 };
 
 const game = new Phaser.Game(config);

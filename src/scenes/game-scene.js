@@ -39,7 +39,7 @@ let enemies8;
 let enemies9;
 let enemies10;
 let currentRoom = 0;
-let time = 300;
+let time = 500;
 let timerText;
 let gun;
 let hitCooldown = false;
@@ -176,7 +176,7 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 0;
     puedeDisparar = true;
     puedeParry = true;
-    time = 300;
+    time = 500;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
     parryActivo = false;
@@ -1018,7 +1018,6 @@ export class GameScene extends Phaser.Scene {
     const dy = objetivo.y - obj.y;
     const margen = this.v(5);
     const comp = velocidad / Math.SQRT2; // esto es para que no sea mas rapido en diagonal (se lo pedi a la ia)
-
     const vx = Math.abs(dx) < margen ? 0 : Math.sign(dx) * comp;
     const vy = Math.abs(dy) < margen ? 0 : Math.sign(dy) * comp;
 
@@ -1140,6 +1139,7 @@ export class GameScene extends Phaser.Scene {
     if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
+      this.scene.start("Gamewin");
 
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
@@ -1294,12 +1294,37 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancionJ.stop();
       this.cancion2.play();
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn2 = this.obtenerSpawnAleatorio();
+        let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
+        enemy2Clone.setScale(this.esc(0.4));
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = 4;
+      }
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
         enemy8Clone.setScale(this.esc(0.1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
+      }
+    }
+    //------------------------------------------------------------
+    else if (currentRoom === 8) {
+      player.setPosition(posInicio.x, posInicio.y);
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn1 = this.obtenerSpawnAleatorio();
+        let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
+        enemyClone.setScale(this.esc(0.35));
+        enemyClone.setCollideWorldBounds(true);
+        enemyClone.vida = 3;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn3 = this.obtenerSpawnAleatorio();
+        let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
+        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setCollideWorldBounds(true);
+        enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn = this.obtenerSpawnAleatorio();
@@ -1309,50 +1334,25 @@ export class GameScene extends Phaser.Scene {
         enemy6Clone.vida = 2;
       }
 
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn10 = this.obtenerSpawnAleatorio();
-        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
-        enemy10Clone.setCollideWorldBounds(true);
-        enemy10Clone.vida = 4;
+      for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
+        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setCollideWorldBounds(true);
+        enemy8Clone.vida = 2;
       }
     }
     //------------------------------------------------------------
-    else if (currentRoom === 8) {
+    else if (currentRoom === 9) {
       player.setPosition(posInicio.x, posInicio.y);
-      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
-        let spawn7 = this.obtenerSpawnAleatorio();
-        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
-        enemy7Clone.setCollideWorldBounds(true);
-        enemy7Clone.vida = 3;
-      }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn9 = this.obtenerSpawnAleatorio();
-        let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.2));
-        enemy9Clone.setCollideWorldBounds(true);
-        enemy9Clone.vida = 2;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
         enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
-    }
-    //------------------------------------------------------------
-    else if (currentRoom === 9) {
-      player.setPosition(posInicio.x, posInicio.y);
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn = this.obtenerSpawnAleatorio();
-        let enemy6Clone = enemies6.create(spawn.x, spawn.y, "enemy6");
-        enemy6Clone.setScale(this.esc(0.25));
-        enemy6Clone.setCollideWorldBounds(true);
-        enemy6Clone.vida = 2;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
         enemy7Clone.setScale(this.esc(0.35));
@@ -1370,33 +1370,110 @@ export class GameScene extends Phaser.Scene {
     //------------------------------------------------------------
     else if (currentRoom === 10) {
       player.setPosition(posInicio.x, posInicio.y);
-      this.cancion2.stop();
-      this.cancionJ2.play();
-
-      for (let i = 0; i < Phaser.Math.Between(0, 1); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn2 = this.obtenerSpawnAleatorio();
+        let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
+        enemy2Clone.setScale(this.esc(0.4));
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn3 = this.obtenerSpawnAleatorio();
+        let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
+        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setCollideWorldBounds(true);
+        enemy3Clone.vida = 6;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn5 = this.obtenerSpawnAleatorio();
+        let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
+        enemy5Clone.setScale(this.esc(0.02));
+        enemy5Clone.setCollideWorldBounds(true);
+        enemy5Clone.vida = 3;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn6 = this.obtenerSpawnAleatorio();
         let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
         enemy6Clone.setScale(this.esc(0.25));
         enemy6Clone.setCollideWorldBounds(true);
         enemy6Clone.vida = 2;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn10 = this.obtenerSpawnAleatorio();
-        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
-        enemy10Clone.setCollideWorldBounds(true);
-        enemy10Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn9 = this.obtenerSpawnAleatorio();
-        let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.2));
-        enemy9Clone.setCollideWorldBounds(true);
-        enemy9Clone.vida = 2;
-      }
     }
     //------------------------------------------------------------
-    else if (currentRoom === SALA_JEFE2) {
+    else if (currentRoom === 11) {
+      player.setPosition(posInicio.x, posInicio.y);
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn2 = this.obtenerSpawnAleatorio();
+        let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
+        enemy2Clone.setScale(this.esc(0.4));
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn6 = this.obtenerSpawnAleatorio();
+        let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
+        enemy6Clone.setScale(this.esc(0.25));
+        enemy6Clone.setCollideWorldBounds(true);
+        enemy6Clone.vida = 2;
+      }
+
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn7 = this.obtenerSpawnAleatorio();
+        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
+        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setCollideWorldBounds(true);
+        enemy7Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
+        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setCollideWorldBounds(true);
+        enemy8Clone.vida = 2;
+      }
+    } else if (currentRoom === 12) {
+      player.setPosition(posInicio.x, posInicio.y);
+
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn3 = this.obtenerSpawnAleatorio();
+        let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
+        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setCollideWorldBounds(true);
+        enemy3Clone.vida = 6;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn4 = this.obtenerSpawnAleatorio();
+        let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
+        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setCollideWorldBounds(true);
+        enemy4Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn6 = this.obtenerSpawnAleatorio();
+        let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
+        enemy6Clone.setScale(this.esc(0.25));
+        enemy6Clone.setCollideWorldBounds(true);
+        enemy6Clone.vida = 2;
+      }
+
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn7 = this.obtenerSpawnAleatorio();
+        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
+        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setCollideWorldBounds(true);
+        enemy7Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
+        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setCollideWorldBounds(true);
+        enemy8Clone.vida = 2;
+      }
+    }
+
+    //------------------------------------------------------------
+    else if (currentRoom === 13) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancionJ2.stop();
       this.cancion3.play();
@@ -1407,57 +1484,39 @@ export class GameScene extends Phaser.Scene {
     }
 
     //------------------------------------------------------------
-    else if (currentRoom === 12) {
+    else if (currentRoom === 14) {
       player.setPosition(posInicio.x, posInicio.y);
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn4 = this.obtenerSpawnAleatorio();
-        let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
-        enemy4Clone.setCollideWorldBounds(true);
-        enemy4Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
         enemy2Clone.setScale(this.esc(0.4));
         enemy2Clone.setCollideWorldBounds(true);
         enemy2Clone.vida = 4;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn7 = this.obtenerSpawnAleatorio();
-        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
-        enemy7Clone.setCollideWorldBounds(true);
-        enemy7Clone.vida = 4;
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn4 = this.obtenerSpawnAleatorio();
+        let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
+        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setCollideWorldBounds(true);
+        enemy4Clone.vida = 4;
       }
-    }
-    //------------------------------------------------------------
-    else if (currentRoom === 13) {
-      player.setPosition(posInicio.x, posInicio.y);
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
+        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setCollideWorldBounds(true);
+        enemy8Clone.vida = 2;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
         enemy9Clone.setScale(this.esc(0.5));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn6 = this.obtenerSpawnAleatorio();
-        let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
-        enemy6Clone.setScale(this.esc(0.25));
-        enemy6Clone.setCollideWorldBounds(true);
-        enemy6Clone.vida = 2;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
-        let spawn5 = this.obtenerSpawnAleatorio();
-        let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.02));
-        enemy5Clone.setCollideWorldBounds(true);
-        enemy5Clone.vida = 3;
-      }
     }
     //------------------------------------------------------------
-    else if (currentRoom === 14) {
+    else if (currentRoom === 15) {
       player.setPosition(posInicio.x, posInicio.y);
 
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
@@ -1482,26 +1541,80 @@ export class GameScene extends Phaser.Scene {
         enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn10 = this.obtenerSpawnAleatorio();
+        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
+        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setCollideWorldBounds(true);
+        enemy10Clone.vida = 4;
+      }
+    }
+    //------------------------------------------------------------
+    else if (currentRoom === 16) {
+      player.setPosition(posInicio.x, posInicio.y);
+      this.cancion3.stop();
+      this.cancionJ3.play();
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn6 = this.obtenerSpawnAleatorio();
+        let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
+        enemy6Clone.setScale(this.esc(0.25));
+        enemy6Clone.setCollideWorldBounds(true);
+        enemy6Clone.vida = 2;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn7 = this.obtenerSpawnAleatorio();
+        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
+        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setCollideWorldBounds(true);
+        enemy7Clone.vida = 4;
+      }
+
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn9 = this.obtenerSpawnAleatorio();
+        let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
+        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setCollideWorldBounds(true);
+        enemy9Clone.vida = 2;
+      }
+    } else if (currentRoom === 17) {
+      player.setPosition(posInicio.x, posInicio.y);
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
         enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
         enemy5Clone.setScale(this.esc(0.02));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
-    }
-    //------------------------------------------------------------
-    else if (currentRoom === 15) {
+      for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
+        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setCollideWorldBounds(true);
+        enemy8Clone.vida = 2;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn10 = this.obtenerSpawnAleatorio();
+        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
+        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setCollideWorldBounds(true);
+        enemy10Clone.vida = 4;
+      }
+    } else if (currentRoom === 18) {
       player.setPosition(posInicio.x, posInicio.y);
-      this.cancion3.stop();
-      this.cancionJ3.play();
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn3 = this.obtenerSpawnAleatorio();
+        let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
+        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setCollideWorldBounds(true);
+        enemy3Clone.vida = 6;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn6 = this.obtenerSpawnAleatorio();
         let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
         enemy6Clone.setScale(this.esc(0.25));
@@ -1515,7 +1628,60 @@ export class GameScene extends Phaser.Scene {
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 4); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn9 = this.obtenerSpawnAleatorio();
+        let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
+        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setCollideWorldBounds(true);
+        enemy9Clone.vida = 2;
+      }
+    } else if (currentRoom === 19) {
+      player.setPosition(posInicio.x, posInicio.y);
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn2 = this.obtenerSpawnAleatorio();
+        let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
+        enemy2Clone.setScale(this.esc(0.4));
+        enemy2Clone.setCollideWorldBounds(true);
+        enemy2Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn7 = this.obtenerSpawnAleatorio();
+        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
+        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setCollideWorldBounds(true);
+        enemy7Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+        let spawn8 = this.obtenerSpawnAleatorio();
+        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
+        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setCollideWorldBounds(true);
+        enemy8Clone.vida = 2;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn10 = this.obtenerSpawnAleatorio();
+        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
+        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setCollideWorldBounds(true);
+        enemy10Clone.vida = 4;
+      }
+    } else if (currentRoom === 20) {
+      player.setPosition(posInicio.x, posInicio.y);
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn6 = this.obtenerSpawnAleatorio();
+        let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
+        enemy6Clone.setScale(this.esc(0.25));
+        enemy6Clone.setCollideWorldBounds(true);
+        enemy6Clone.vida = 2;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn7 = this.obtenerSpawnAleatorio();
+        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
+        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setCollideWorldBounds(true);
+        enemy7Clone.vida = 4;
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
         enemy8Clone.setScale(this.esc(0.1));
@@ -1529,13 +1695,28 @@ export class GameScene extends Phaser.Scene {
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
-      for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
         enemy10Clone.setScale(this.esc(0.4));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
+    } else if (currentRoom === 21) {
+      player.setPosition(posInicio.x, posInicio.y);
+      this.cancion3.stop();
+      this.cancionJ3.play();
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn10 = this.obtenerSpawnAleatorio();
+        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
+        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setCollideWorldBounds(true);
+        enemy10Clone.vida = 4;
+      }
+    } else if (currentRoom === 22) {
+      player.setPosition(posInicio.x, posInicio.y);
+      this.cancionJ3.stop();
+      this.scene.start("Gamewin");
     }
   }
 
@@ -1752,8 +1933,8 @@ export class GameScene extends Phaser.Scene {
     if (distancia > ancho / 2 + this.v(15)) return;
 
     if (parryActivo) {
-      time += 5;
-      if (time > 300) time = 300;
+      time += 3;
+      if (time > 500) time = 500;
       this.parry.play();
     } else {
       time -= DAÑO_LASER_ENEMY7;
