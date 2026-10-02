@@ -94,7 +94,6 @@ const DURACION_DASH_JEFE2 = 450;
 const VELOCIDAD_DASH_JEFE2 = 900;
 const CANTIDAD_BALAS_RADIAL_JEFE2 = 20;
 const VELOCIDAD_BALA_RADIAL_JEFE2 = 300;
-const SALA_JEFE2 = 11;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -1139,7 +1138,6 @@ export class GameScene extends Phaser.Scene {
     if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
-      this.scene.start("Gamewin");
 
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn = this.obtenerSpawnAleatorio();
@@ -1543,7 +1541,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setScale(this.esc(0.2));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -1601,7 +1599,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setScale(this.esc(0.2));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -1661,7 +1659,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setScale(this.esc(0.2));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -1698,7 +1696,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setScale(this.esc(0.2));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -1709,7 +1707,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.4));
+        enemy10Clone.setScale(this.esc(0.2));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -2328,8 +2326,8 @@ export class GameScene extends Phaser.Scene {
 
     if (parryActivo) {
       time += 5;
-      if (time > 300) {
-        time = 300;
+      if (time > 500) {
+        time = 500;
       }
       timerText.setText("Time: " + time);
       this.parry.play();
