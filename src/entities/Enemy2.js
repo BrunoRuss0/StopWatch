@@ -25,6 +25,10 @@ export default class Enemy2 extends Phaser.Physics.Arcade.Image {
   recibirDaño() {
     if (!this.active) return;
     this.vida -= 1;
+    this.setTintFill(0xffffff);
+    this.scene.time.delayedCall(60, () => {
+      this.clearTint();
+    });
     if (this.vida <= 0) {
       this.disableBody(true, true);
     }
