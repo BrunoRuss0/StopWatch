@@ -77,8 +77,6 @@ const ANCHO_LASER_ENEMY7 = 10;
 const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
-
-// ---------------- JEFE 2 ----------------
 const TAMAÑO_JEFE2 = 180;
 const VELOCIDAD_JEFE2 = 80;
 const TP_MIN_JEFE2 = 3000;
@@ -94,6 +92,8 @@ const DURACION_DASH_JEFE2 = 450;
 const VELOCIDAD_DASH_JEFE2 = 900;
 const CANTIDAD_BALAS_RADIAL_JEFE2 = 20;
 const VELOCIDAD_BALA_RADIAL_JEFE2 = 300;
+const VELOCIDAD_CLON_JEFE2 = 60;
+const CANTIDAD_BALAS_RADIAL_CLON_JEFE2 = 12;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -2223,6 +2223,14 @@ export class GameScene extends Phaser.Scene {
       enemigo.vida -= 1;
 
       if (enemigo.vida <= 0) {
+        if (jefe2Clones.contains(enemigo)) {
+          this.dispararRadialDesde(
+            enemigo.x,
+            enemigo.y,
+            CANTIDAD_BALAS_RADIAL_CLON_JEFE2,
+            VELOCIDAD_BALA_RADIAL_JEFE2
+          );
+        }
         if (enemigo.texture.key === "enemy6") {
           this.dispararRadialDesde(enemigo.x, enemigo.y);
         }
@@ -2473,6 +2481,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     jefe2.actualizar(player, this.v(VELOCIDAD_JEFE2));
+    jefe2Clones.children.each((clon) => {
+      if (clon.active) {
+        this.physics.moveToObject(clon, player, this.v(VELOCIDAD_CLON_JEFE2));
+      }
+    });
 
     if (enemy8.active) {
       this.moverDiagonalHacia(enemy8, player, this.v(350));
