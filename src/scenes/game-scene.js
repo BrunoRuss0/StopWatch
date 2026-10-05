@@ -132,8 +132,15 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy2-left-2frame", "assets/ENEMY2-left-2frame.png");
     this.load.image("enemy2-right", "assets/ENEMY2-right.png");
     this.load.image("enemy2-right-2frame", "assets/ENEMY2-right-2frame.png");
-    this.load.image("enemy3", "assets/enemy3.jpg");
-    this.load.image("enemy4", "assets/enemy4.jpg");
+    this.load.image("enemy4", "assets/ENEMY4.png");
+    this.load.image("enemy4-2frame", "assets/ENEMY4-2frame.png");
+    this.load.image("enemy4-back", "assets/ENEMY4-back.png");
+    this.load.image("enemy4-back-2frame", "assets/ENEMY4-back-2frame.png");
+    this.load.image("enemy4-left", "assets/ENEMY4-left.png");
+    this.load.image("enemy4-left-2frame", "assets/ENEMY4-left-2frame.png");
+    this.load.image("enemy4-right", "assets/ENEMY4-right.png");
+    this.load.image("enemy4-right-2frame", "assets/ENEMY4-right-2frame.png");
+    this.load.image("enemy3", "assets/bala-jefe.jpg");
     this.load.image("enemy5", "assets/enemy5.jpg");
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/enemy7.png");
@@ -358,7 +365,7 @@ export class GameScene extends Phaser.Scene {
     enemies4 = this.physics.add.group();
     const posEnemy4 = this.pos(1050, 400);
     enemy4 = new Enemy4(this, posEnemy4.x, posEnemy4.y);
-    enemy4.setScale(this.esc(0.5));
+    enemy4.setScale(this.esc(0.4));
     this.physics.add.collider(player, enemy4, () => {
       if (hitCooldown) return;
       time -= 3;
@@ -1169,7 +1176,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1230,7 +1237,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1269,7 +1276,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1346,7 +1353,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1442,7 +1449,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1494,7 +1501,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1578,7 +1585,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1766,19 +1773,21 @@ export class GameScene extends Phaser.Scene {
   moverenemigo4Aleatorio() {
     const velocidad = this.v(100);
     const direcciones = [
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad },
+      { x: velocidad, y: 0, dir: "-right" },
+      { x: -velocidad, y: 0, dir: "-left" },
+      { x: 0, y: velocidad, dir: "" },
+      { x: 0, y: -velocidad, dir: "-back" },
     ];
     if (enemy4.active) {
-      const dir = Phaser.Math.RND.pick(direcciones);
-      enemy4.setVelocity(dir.x, dir.y);
+      const d = Phaser.Math.RND.pick(direcciones);
+      enemy4.setVelocity(d.x, d.y);
+      enemy4.dir = d.dir;
     }
     enemies4.children.each((clone) => {
       if (!clone.active) return;
-      const dirClone = Phaser.Math.RND.pick(direcciones);
-      clone.setVelocity(dirClone.x, dirClone.y);
+      const d = Phaser.Math.RND.pick(direcciones);
+      clone.setVelocity(d.x, d.y);
+      clone.dir = d.dir;
     });
   }
 
@@ -2395,6 +2404,32 @@ export class GameScene extends Phaser.Scene {
     if (obj.texture.key !== key) obj.setTexture(key);
   }
 
+  actualizarArma(obj, escalaArma = 0.17, factorDistancia = 0.5) {
+    if (!obj.active) {
+      if (obj.arma) obj.arma.setVisible(false);
+      return;
+    }
+
+    if (!obj.arma) {
+      obj.arma = this.add.image(obj.x, obj.y, "gun");
+      obj.arma.setOrigin(0.2, 0.45);
+      obj.arma.setScale(this.esc(escalaArma));
+      obj.once("destroy", () => obj.arma.destroy());
+    }
+
+    const angulo = Phaser.Math.Angle.Between(obj.x, obj.y, player.x, player.y);
+    const dist =
+      Math.max(obj.displayWidth, obj.displayHeight) * factorDistancia;
+
+    obj.arma.setVisible(true);
+    obj.arma.setPosition(
+      obj.x + Math.cos(angulo) * dist,
+      obj.y + Math.sin(angulo) * dist
+    );
+    obj.arma.setRotation(angulo);
+    obj.arma.setDepth(obj.depth + 1);
+  }
+
   update() {
     //GUN------------------------------------------------------------------------------------------------------
     const angle = Phaser.Math.Angle.Between(
@@ -2494,10 +2529,22 @@ export class GameScene extends Phaser.Scene {
     enemies2.children.each((clone) => {
       this.animarSprite(clone, "enemy2");
     });
+    this.animarSprite(enemy4, "enemy4");
+    enemies4.children.each((clone) => {
+      this.animarSprite(clone, "enemy4");
+    });
     // MOVIMIENTO DEL JUGADOR
     let velocidadX = 0;
     let velocidadY = 0;
     const velJugador = this.v(VELOCIDAD_JUGADOR);
+    //armas enemigos
+    this.actualizarArma(enemy2);
+    enemies2.children.each((clone) => this.actualizarArma(clone));
+
+    this.actualizarArma(enemy4);
+    enemies4.children.each((clone) => this.actualizarArma(clone));
+
+    this.actualizarArma(jefe, 0.3);
 
     // HORIZONTAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
