@@ -1,45 +1,3 @@
-//cosas por hacer
-
-//Bruno
-//Menu de seleccion de personajes
-//2 personas más
-//Menú de opciones con una configuración
-//jefe final
-//que el login funcione posta
-//balancear el juego
-//(posiblemente) agregar más enemigos
-//—---------------------------------------------------------------------------------------
-//Agustin
-//Agregar objetos
-//cambiar las salas
-//disparar manteniendo apretado el click
-//que se reinicie manteniendo la r y no apretando una vez
-//agregar sprites para el resto de los enemigos (pueden no ser hechos por corbet pero tienen que ser acordes al juego)
-//—------------------------------------------------------------------------------------------
-//Corbet
-//hacer menu de inicio
-//menú de victoria
-//menú de configuración
-//menú de game over
-//fondo del piso 1
-//fondo del piso 2
-//fondo del piso 3
-//enemigo 4
-//enemigo 5
-//enemigo 6
-//enemigo 7
-//enemigo 8
-//enemigo 9
-//enemigo 10
-//jefes 1
-//jefes 2
-//jefes 3
-//arma del personaje
-//personaje 2
-//personaje 3
-//(en el hipotético caso que llegue[99% imposible]) particulas
-
-
 import Enemy, { actualizarSpriteEnemy } from "../entities/Enemy.js";
 import Enemy2 from "../entities/Enemy2.js";
 import Enemy3 from "../entities/Enemy3.js";
@@ -54,6 +12,15 @@ import Jefe from "../entities/Jefe.js";
 import Jefe2 from "../entities/jefe2.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
+import {
+  crearStats,
+  calcularPerdida,
+  multVelocidad,
+  golpesPorBala,
+  recompensaKill,
+  mostrarMenuMejoras,
+  TIEMPO_MAX,
+} from "../utils/upgrades.js";
 
 let player;
 let teclas;
@@ -81,7 +48,7 @@ let enemies8;
 let enemies9;
 let enemies10;
 let currentRoom = 0;
-let time = 500;
+let time = 300;
 let timerText;
 let gun;
 let hitCooldown = false;
@@ -107,11 +74,13 @@ const VELOCIDAD_BALA_RADIAL_JEFE = 350;
 const CANTIDAD_BALAS_ESCOPETA_JEFE = 10;
 const SEPARACION_ESCOPETA_JEFE = 0.15;
 const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
+// ---------------- DASH JEFE 1 ----------------
 const DASH_MIN_JEFE = 4000;
 const DASH_MAX_JEFE = 6000;
 const AVISO_DASH_JEFE = 500;
 const DURACION_DASH_JEFE = 9000;
 const VELOCIDAD_DASH_JEFE = 1800;
+// ----------------------------------------------
 const VELOCIDAD_ENEMY5 = 130;
 const VELOCIDAD_DASH_ENEMY5 = 1000;
 const DURACION_DASH_ENEMY5 = 700;
@@ -124,7 +93,9 @@ const ANCHO_LASER_ENEMY7 = 10;
 const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
-const DURACION_FLASH = 60; 
+const DURACION_FLASH = 60;
+
+// ---------------- JEFE 2 ----------------
 const TAMAÑO_JEFE2 = 180;
 const VELOCIDAD_JEFE2 = 80;
 const TP_MIN_JEFE2 = 3000;
@@ -133,6 +104,11 @@ const VIDA_CLON_JEFE2 = 4;
 const MAX_CLONES_JEFE2 = 6;
 const DELAY_BALA_JEFE2 = 1500;
 const VELOCIDAD_BALA_JEFE2 = 450;
+const DASH_MIN_JEFE2 = 4000;
+const DASH_MAX_JEFE2 = 6000;
+const AVISO_DASH_JEFE2 = 500;
+const DURACION_DASH_JEFE2 = 450;
+const VELOCIDAD_DASH_JEFE2 = 900;
 const CANTIDAD_BALAS_RADIAL_JEFE2 = 20;
 const VELOCIDAD_BALA_RADIAL_JEFE2 = 300;
 const VELOCIDAD_CLON_JEFE2 = 60;
@@ -175,8 +151,15 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy2-left-2frame", "assets/ENEMY2-left-2frame.png");
     this.load.image("enemy2-right", "assets/ENEMY2-right.png");
     this.load.image("enemy2-right-2frame", "assets/ENEMY2-right-2frame.png");
-    this.load.image("enemy3", "assets/enemy3.jpg");
-    this.load.image("enemy4", "assets/enemy4.jpg");
+    this.load.image("enemy4", "assets/ENEMY4.png");
+    this.load.image("enemy4-2frame", "assets/ENEMY4-2frame.png");
+    this.load.image("enemy4-back", "assets/ENEMY4-back.png");
+    this.load.image("enemy4-back-2frame", "assets/ENEMY4-back-2frame.png");
+    this.load.image("enemy4-left", "assets/ENEMY4-left.png");
+    this.load.image("enemy4-left-2frame", "assets/ENEMY4-left-2frame.png");
+    this.load.image("enemy4-right", "assets/ENEMY4-right.png");
+    this.load.image("enemy4-right-2frame", "assets/ENEMY4-right-2frame.png");
+    this.load.image("enemy3", "assets/enemy4.jpg");
     this.load.image("enemy5", "assets/enemy5.jpg");
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/enemy7.png");
@@ -218,7 +201,7 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 0;
     puedeDisparar = true;
     puedeParry = true;
-    time = 500;
+    time = 300;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
     parryActivo = false;
@@ -226,6 +209,9 @@ export class GameScene extends Phaser.Scene {
     enemy10Visible = true;
     jefePatron = 1;
     this.jefeDerrotadoFlag = false;
+    this.stats = crearStats();
+    this.menuAbierto = false;
+    this.dashActivo = false;
 
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
@@ -283,11 +269,12 @@ export class GameScene extends Phaser.Scene {
       parry: Phaser.Input.Keyboard.KeyCodes.Q,
     });
     this.input.keyboard.on("keydown-Q", () => {
-      if (!puedeParry) {
+      if (!puedeParry || this.menuAbierto) {
         return;
       }
       puedeParry = false;
       parryActivo = true;
+      if (this.stats.parryDash) this.iniciarDash();
       player.setTexture("parry");
       this.time.delayedCall(DURACION_parry, () => {
         parryActivo = false;
@@ -312,6 +299,11 @@ export class GameScene extends Phaser.Scene {
 
     this.input.keyboard.on("keydown-R", () => {
       this.scene.start("GameScene");
+    });
+
+    // TEMPORAL: abre el menu de mejoras con la tecla U para probar (borrar despues)
+    this.input.keyboard.on("keydown-U", () => {
+      if (!this.menuAbierto) mostrarMenuMejoras(this, this.stats);
     });
 
     //DOOR-------------------------------------------------------------------------------------------------
@@ -346,11 +338,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy, () => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -365,9 +353,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy2, () => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -386,11 +372,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy3, () => {
       if (hitCooldown) return;
-      time -= 10;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(10);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -401,12 +383,10 @@ export class GameScene extends Phaser.Scene {
     enemies4 = this.physics.add.group();
     const posEnemy4 = this.pos(1050, 400);
     enemy4 = new Enemy4(this, posEnemy4.x, posEnemy4.y);
-    enemy4.setScale(this.esc(0.5));
+    enemy4.setScale(this.esc(0.4));
     this.physics.add.collider(player, enemy4, () => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -415,9 +395,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies4, (player, clone) => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -438,11 +416,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy5, () => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -452,9 +426,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies5, (player, clone) => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -471,11 +443,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy6, () => {
       if (hitCooldown) return;
-      time -= 5;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(5);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -485,9 +453,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies6, (player, clone) => {
       if (hitCooldown) return;
-      time -= 5;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(5);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -501,11 +467,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy7, () => {
       if (hitCooldown) return;
-      time -= 5;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(5);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -515,9 +477,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies7, (player, clone) => {
       if (hitCooldown) return;
-      time -= 5;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(5);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -547,11 +507,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy8, () => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -561,11 +517,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies8, (player, clone) => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -580,11 +532,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy9, () => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -594,9 +542,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies9, (player, clone) => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -612,11 +558,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemy10, () => {
       if (hitCooldown) return;
-      time -= 5;
-      if (time < 0) {
-        time = 0;
-      }
-      timerText.setText("Time: " + time);
+      this.perderTiempo(5);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -626,9 +568,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, enemies10, (player, clone) => {
       if (hitCooldown) return;
-      time -= 5;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(5);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -643,9 +583,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, jefe, () => {
       if (hitCooldown) return;
-      time -= 12;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(12);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -671,9 +609,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, jefe2, () => {
       if (hitCooldown) return;
-      time -= 12;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(12);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -683,9 +619,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player, jefe2Clones, () => {
       if (hitCooldown) return;
-      time -= 6;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(6);
       hitCooldown = true;
       this.flashPlayer();
       this.time.delayedCall(500, () => {
@@ -693,7 +627,6 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    // balas del jefe 2
     this.time.addEvent({
       delay: DELAY_BALA_JEFE2,
       callback: this.dispararJefe2,
@@ -701,14 +634,13 @@ export class GameScene extends Phaser.Scene {
       loop: true,
     });
     this.programarTpJefe2();
+    this.programarDashJefe2();
 
     // GRUPO ENEMY ------------------------------------------------------------------------------------------------------
     enemies = this.physics.add.group();
     this.physics.add.collider(player, enemies, (player, clone) => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -718,9 +650,7 @@ export class GameScene extends Phaser.Scene {
     enemies2 = this.physics.add.group();
     this.physics.add.collider(player, enemies2, (player, clone) => {
       if (hitCooldown) return;
-      time -= 3;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(3);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -737,9 +667,7 @@ export class GameScene extends Phaser.Scene {
     enemies3 = this.physics.add.group();
     this.physics.add.collider(player, enemies3, (player, clone) => {
       if (hitCooldown) return;
-      time -= 10;
-      if (time < 0) time = 0;
-      timerText.setText("Time: " + time);
+      this.perderTiempo(10);
       hitCooldown = true;
       this.time.delayedCall(500, () => {
         hitCooldown = false;
@@ -1059,7 +987,7 @@ export class GameScene extends Phaser.Scene {
     const dx = objetivo.x - obj.x;
     const dy = objetivo.y - obj.y;
     const margen = this.v(5);
-    const comp = velocidad / Math.SQRT2; // esto es para que no sea mas rapido en diagonal (se lo pedi a la ia)
+    const comp = velocidad / Math.SQRT2;
     const vx = Math.abs(dx) < margen ? 0 : Math.sign(dx) * comp;
     const vy = Math.abs(dy) < margen ? 0 : Math.sign(dy) * comp;
 
@@ -1082,6 +1010,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  // hitmarker
   flashEnemigo(obj) {
     if (!obj || !obj.active) return;
     obj.setTintFill(0xffffff);
@@ -1220,7 +1149,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1273,7 +1202,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1281,7 +1210,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1313,14 +1242,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1372,7 +1301,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1398,7 +1327,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1430,7 +1359,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1487,14 +1416,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1546,7 +1475,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1586,7 +1515,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1630,7 +1559,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.5));
+        enemy4Clone.setScale(this.esc(0.4));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1660,7 +1589,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.1));
+        enemy3Clone.setScale(this.esc(0.3));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1818,19 +1747,21 @@ export class GameScene extends Phaser.Scene {
   moverenemigo4Aleatorio() {
     const velocidad = this.v(100);
     const direcciones = [
-      { x: velocidad, y: 0 },
-      { x: -velocidad, y: 0 },
-      { x: 0, y: velocidad },
-      { x: 0, y: -velocidad },
+      { x: velocidad, y: 0, dir: "-right" },
+      { x: -velocidad, y: 0, dir: "-left" },
+      { x: 0, y: velocidad, dir: "" },
+      { x: 0, y: -velocidad, dir: "-back" },
     ];
     if (enemy4.active) {
-      const dir = Phaser.Math.RND.pick(direcciones);
-      enemy4.setVelocity(dir.x, dir.y);
+      const d = Phaser.Math.RND.pick(direcciones);
+      enemy4.setVelocity(d.x, d.y);
+      enemy4.dir = d.dir;
     }
     enemies4.children.each((clone) => {
       if (!clone.active) return;
-      const dirClone = Phaser.Math.RND.pick(direcciones);
-      clone.setVelocity(dirClone.x, dirClone.y);
+      const d = Phaser.Math.RND.pick(direcciones);
+      clone.setVelocity(d.x, d.y);
+      clone.dir = d.dir;
     });
   }
 
@@ -1983,16 +1914,13 @@ export class GameScene extends Phaser.Scene {
     if (distancia > ancho / 2 + this.v(15)) return;
 
     if (parryActivo) {
-      time += 3;
-      if (time > 500) time = 500;
+      this.ganarTiempo(3 + this.stats.bonusParry);
       this.parry.play();
     } else {
-      time -= DAÑO_LASER_ENEMY7;
-      if (time < 0) time = 0;
+      this.perderTiempo(DAÑO_LASER_ENEMY7);
       this.flashPlayer();
     }
 
-    timerText.setText("Time: " + time);
     hitCooldown = true;
     this.time.delayedCall(500, () => {
       hitCooldown = false;
@@ -2055,7 +1983,7 @@ export class GameScene extends Phaser.Scene {
     return { x, y };
   }
 
-  // TELETRANSPORTE
+  // tp
   programarTpJefe2() {
     const delay = Phaser.Math.Between(TP_MIN_JEFE2, TP_MAX_JEFE2);
     this.time.delayedCall(delay, () => {
@@ -2132,54 +2060,93 @@ export class GameScene extends Phaser.Scene {
     if (disparo) this.bala_enemigo.play();
   }
 
-// DASH DEL JEFE 1 ------------------------------------------------------
+  // dash jefe 2-------------------------------------------------------------
+  programarDashJefe2() {
+    const delay = Phaser.Math.Between(DASH_MIN_JEFE2, DASH_MAX_JEFE2);
+    this.time.delayedCall(delay, () => {
+      if (jefe2.active && !jefe2.ocupado) {
+        this.dashJefe2();
+      }
+      this.programarDashJefe2();
+    });
+  }
 
-programarDashJefe() {
-  const delay = Phaser.Math.Between(DASH_MIN_JEFE, DASH_MAX_JEFE);
-  this.time.delayedCall(delay, () => {
-    if (jefe.active && !jefe.ocupado) {
-      this.dashJefe();
-    }
-    this.programarDashJefe();
-  });
-}
+  dashJefe2() {
+    if (!jefe2.active) return;
+    jefe2.ocupado = true;
+    jefe2.setVelocity(0, 0);
 
-dashJefe() {
-  if (!jefe.active || jefe.dasheando) return;
-  jefe.dasheando = false;
-  jefe.setTint(0xff2222);
-  this.time.delayedCall(AVISO_DASH_JEFE, () => {
-    if (!jefe.active) {
-      jefe.dasheando = false;
-      return;
-    }
-    jefe.dasheando = true;
-    jefe.clearTint();
-    const objetivoX = player.x;
-    const objetivoY = player.y;
+    this.time.delayedCall(AVISO_DASH_JEFE2, () => {
+      if (!jefe2.active) return;
+      jefe2.clearTint();
 
-    const angle = Phaser.Math.Angle.Between(
-      jefe.x,
-      jefe.y,
-      objetivoX,
-      objetivoY
-    );
-    this.physics.velocityFromRotation(
-      angle,
-      this.v(VELOCIDAD_DASH_JEFE),
-      jefe.body.velocity
-    );
-    this.time.delayedCall(DURACION_DASH_JEFE, () => {
+      const angle = Phaser.Math.Angle.Between(
+        jefe2.x,
+        jefe2.y,
+        player.x,
+        player.y
+      );
+      this.physics.velocityFromRotation(
+        angle,
+        this.v(VELOCIDAD_DASH_JEFE2),
+        jefe2.body.velocity
+      );
+
+      this.time.delayedCall(DURACION_DASH_JEFE2, () => {
+        if (!jefe2.active) return;
+        jefe2.setVelocity(0, 0);
+        jefe2.ocupado = false;
+      });
+    });
+  }
+
+  // DASH DEL JEFE 1 ------------------------------------------------------
+
+  programarDashJefe() {
+    const delay = Phaser.Math.Between(DASH_MIN_JEFE, DASH_MAX_JEFE);
+    this.time.delayedCall(delay, () => {
+      if (jefe.active && !jefe.ocupado) {
+        this.dashJefe();
+      }
+      this.programarDashJefe();
+    });
+  }
+
+  dashJefe() {
+    if (!jefe.active || jefe.dasheando) return;
+    jefe.dasheando = false;
+    jefe.setTint(0xff2222);
+    this.time.delayedCall(AVISO_DASH_JEFE, () => {
       if (!jefe.active) {
         jefe.dasheando = false;
         return;
       }
-      jefe.setVelocity(0, 0);
-      jefe.dasheando = false;
-    });
-  });
-}
+      jefe.dasheando = true;
+      jefe.clearTint();
+      const objetivoX = player.x;
+      const objetivoY = player.y;
 
+      const angle = Phaser.Math.Angle.Between(
+        jefe.x,
+        jefe.y,
+        objetivoX,
+        objetivoY
+      );
+      this.physics.velocityFromRotation(
+        angle,
+        this.v(VELOCIDAD_DASH_JEFE),
+        jefe.body.velocity
+      );
+      this.time.delayedCall(DURACION_DASH_JEFE, () => {
+        if (!jefe.active) {
+          jefe.dasheando = false;
+          return;
+        }
+        jefe.setVelocity(0, 0);
+        jefe.dasheando = false;
+      });
+    });
+  }
 
   jefe2Derrotado() {
     if (this.jefeDerrotadoFlag) return;
@@ -2250,7 +2217,7 @@ dashJefe() {
 
   //DISPARAR-------------------------------------------------------------------------------------------------
   disparar(pointer) {
-    if (!puedeDisparar) {
+    if (!puedeDisparar || this.menuAbierto) {
       return;
     }
     let bala = this.balas.get(gun.x, gun.y);
@@ -2263,9 +2230,12 @@ dashJefe() {
       bala.setRotation(angle);
       this.physics.velocityFromRotation(angle, this.v(700), bala.body.velocity);
       this.bala.play();
-      this.time.delayedCall(DELAY_BALA, () => {
-        puedeDisparar = true;
-      });
+      this.time.delayedCall(
+        DELAY_BALA / multVelocidad(this.stats, time),
+        () => {
+          puedeDisparar = true;
+        }
+      );
     }
   }
 
@@ -2274,19 +2244,27 @@ dashJefe() {
     const enemigo = bala === obj1 ? obj2 : obj1;
 
     bala.disableBody(true, true);
-    if (!enemigo.active) {
+    if (!enemigo.active || enemigo.muerto) {
       return;
     }
 
-    // hitmarkers
+    // the madafakin hitmarker
     this.flashEnemigo(enemigo);
 
+    const clave = this.claveEnemigo(enemigo);
+    const golpes = golpesPorBala(this.stats);
+
     if (typeof enemigo.recibirDaño === "function") {
-      enemigo.recibirDaño();
+      for (let i = 0; i < golpes && enemigo.active; i++) {
+        enemigo.recibirDaño();
+      }
     } else {
-      enemigo.vida -= 1;
+      enemigo.vida -= golpes;
 
       if (enemigo.vida <= 0) {
+        enemigo.muerto = true;
+
+        // EXPLOSION CLONES
         if (jefe2Clones.contains(enemigo)) {
           this.dispararRadialDesde(
             enemigo.x,
@@ -2296,11 +2274,11 @@ dashJefe() {
           );
         }
 
-        if (enemigo.texture.key === "enemy6") {
+        if (clave === "enemy6") {
           this.dispararRadialDesde(enemigo.x, enemigo.y);
         }
 
-        if (enemigo.texture.key === "enemy10") {
+        if (clave === "enemy10") {
           enemigo.setTexture("muerte");
           enemigo.setScale(this.esc(3));
           enemigo.setVelocity(0, 0);
@@ -2317,8 +2295,19 @@ dashJefe() {
       }
     }
 
+    const murio = !enemigo.active || enemigo.muerto;
+    //ganar tiempo
+    if (murio && enemigo !== jefe && enemigo !== jefe2) {
+      this.ganarTiempo(recompensaKill(clave, this.stats));
+    }
+
     if (enemigo === jefe2 && !jefe2.active) {
       this.jefe2Derrotado();
+    }
+
+    // menu de mejoras
+    if ((enemigo === jefe || enemigo === jefe2) && !enemigo.active) {
+      mostrarMenuMejoras(this, this.stats);
     }
   }
 
@@ -2397,11 +2386,7 @@ dashJefe() {
     if (hitCooldown) return;
 
     if (parryActivo) {
-      time += 5;
-      if (time > 500) {
-        time = 500;
-      }
-      timerText.setText("Time: " + time);
+      this.ganarTiempo(5 + this.stats.bonusParry);
       this.parry.play();
       hitCooldown = true;
 
@@ -2413,12 +2398,7 @@ dashJefe() {
 
       return;
     }
-    time -= 5;
-    if (time < 0) {
-      time = 0;
-    }
-
-    timerText.setText("Time: " + time);
+    this.perderTiempo(5);
     hitCooldown = true;
 
     this.flashPlayer();
@@ -2467,6 +2447,32 @@ dashJefe() {
     if (obj.texture.key !== key) obj.setTexture(key);
   }
 
+  actualizarArma(obj, escalaArma = 0.17, factorDistancia = 0.5) {
+    if (!obj.active) {
+      if (obj.arma) obj.arma.setVisible(false);
+      return;
+    }
+
+    if (!obj.arma) {
+      obj.arma = this.add.image(obj.x, obj.y, "gun");
+      obj.arma.setOrigin(0.2, 0.45);
+      obj.arma.setScale(this.esc(escalaArma));
+      obj.once("destroy", () => obj.arma.destroy());
+    }
+
+    const angulo = Phaser.Math.Angle.Between(obj.x, obj.y, player.x, player.y);
+    const dist =
+      Math.max(obj.displayWidth, obj.displayHeight) * factorDistancia;
+
+    obj.arma.setVisible(true);
+    obj.arma.setPosition(
+      obj.x + Math.cos(angulo) * dist,
+      obj.y + Math.sin(angulo) * dist
+    );
+    obj.arma.setRotation(angulo);
+    obj.arma.setDepth(obj.depth + 1);
+  }
+
   update() {
     //GUN------------------------------------------------------------------------------------------------------
     const angle = Phaser.Math.Angle.Between(
@@ -2483,7 +2489,7 @@ dashJefe() {
     this.cursor.x = this.input.activePointer.x;
     this.cursor.y = this.input.activePointer.y;
 
-    //ENEMY MOVEMENT-------------------------------------------------------------------------------------------------
+    //ENEMY MOVEr-------------------------------------------------------------------------------------------------
     enemy.actualizar(player, this.v(233));
     enemy3.actualizar(player, this.v(100));
     enemy9.actualizar(player, this.v(200));
@@ -2536,7 +2542,7 @@ dashJefe() {
       this.physics.moveToObject(enemy6, player, this.v(300));
     }
 
-    if (jefe.active && !jefe.ocupado) {
+    if (jefe.active && !jefe.ocupado && !jefe.dasheando) {
       this.physics.moveToObject(
         jefe,
         player,
@@ -2572,10 +2578,23 @@ dashJefe() {
     enemies2.children.each((clone) => {
       this.animarSprite(clone, "enemy2");
     });
+    this.animarSprite(enemy4, "enemy4");
+    enemies4.children.each((clone) => {
+      this.animarSprite(clone, "enemy4");
+    });
     // MOVIMIENTO DEL JUGADOR
     let velocidadX = 0;
     let velocidadY = 0;
-    const velJugador = this.v(VELOCIDAD_JUGADOR);
+    const velJugador =
+      this.v(VELOCIDAD_JUGADOR) * multVelocidad(this.stats, time);
+    //armas enemigos
+    this.actualizarArma(enemy2);
+    enemies2.children.each((clone) => this.actualizarArma(clone));
+
+    this.actualizarArma(enemy4);
+    enemies4.children.each((clone) => this.actualizarArma(clone));
+
+    this.actualizarArma(jefe, 0.3);
 
     // HORIZONTAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
@@ -2591,8 +2610,10 @@ dashJefe() {
       velocidadY = velJugador;
     }
 
-    player.body.setVelocityX(velocidadX);
-    player.body.setVelocityY(velocidadY);
+    if (!this.dashActivo) {
+      player.body.setVelocityX(velocidadX);
+      player.body.setVelocityY(velocidadY);
+    }
 
     if (parryActivo) {
       player.setTexture("parry");
@@ -2611,5 +2632,39 @@ dashJefe() {
     } else {
       player.setTexture("player");
     }
+  }
+
+  //MEJORAS-------------------------------------------------------------------------------------------------
+  perderTiempo(base) {
+    time = Math.max(0, time - calcularPerdida(base, this.stats, time));
+    timerText.setText("Time: " + time);
+  }
+
+  ganarTiempo(cantidad) {
+    time = Math.min(TIEMPO_MAX, time + cantidad);
+    timerText.setText("Time: " + time);
+  }
+
+  claveEnemigo(e) {
+    return e.texture.key.replace(/-.*$/, "").toLowerCase();
+  }
+
+  iniciarDash() {
+    let dx = (teclas.right.isDown ? 1 : 0) - (teclas.left.isDown ? 1 : 0);
+    let dy = (teclas.down.isDown ? 1 : 0) - (teclas.up.isDown ? 1 : 0);
+    if (dx === 0 && dy === 0) {
+      const a = Phaser.Math.Angle.Between(
+        player.x,
+        player.y,
+        this.input.activePointer.x,
+        this.input.activePointer.y
+      );
+      dx = Math.cos(a);
+      dy = Math.sin(a);
+    }
+    const len = Math.hypot(dx, dy);
+    this.dashActivo = true;
+    player.body.setVelocity((dx / len) * this.v(900), (dy / len) * this.v(900));
+    this.time.delayedCall(DURACION_parry, () => (this.dashActivo = false));
   }
 }
