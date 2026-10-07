@@ -59,8 +59,11 @@ let mostrandoPuedeParry = false;
 let puedeDispararEnemy4 = true;
 let enemy10Visible = true;
 let jefePatron = 1;
+//constantes (las cuales odio)
+//tamaño pantalla
 const REF_WIDTH = 1280;
 const REF_HEIGHT = 720;
+//delays,cooldowns y velocidades
 const DELAY_BALA_ENEMIGO = 1200;
 const DELAY_BALA_ENEMY4 = 3000;
 const COOLDOWN_parry = 3000;
@@ -74,13 +77,13 @@ const VELOCIDAD_BALA_RADIAL_JEFE = 350;
 const CANTIDAD_BALAS_ESCOPETA_JEFE = 10;
 const SEPARACION_ESCOPETA_JEFE = 0.15;
 const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
-// ---------------- DASH JEFE 1 ----------------
+// dash jefe1
 const DASH_MIN_JEFE = 4000;
 const DASH_MAX_JEFE = 6000;
 const AVISO_DASH_JEFE = 500;
 const DURACION_DASH_JEFE = 9000;
 const VELOCIDAD_DASH_JEFE = 1800;
-// ----------------------------------------------
+//mas velocidades y propiedades (gero arias) de enemigos
 const VELOCIDAD_ENEMY5 = 130;
 const VELOCIDAD_DASH_ENEMY5 = 1000;
 const DURACION_DASH_ENEMY5 = 700;
@@ -94,8 +97,7 @@ const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
 const DURACION_FLASH = 60;
-
-// ---------------- JEFE 2 ----------------
+//jefe 2 (sigo sin entender porque burno uso tantas cconstantes)
 const TAMAÑO_JEFE2 = 180;
 const VELOCIDAD_JEFE2 = 80;
 const TP_MIN_JEFE2 = 3000;
@@ -121,6 +123,7 @@ export class GameScene extends Phaser.Scene {
 
   init() {}
 
+  //preload assets
   preload() {
     this.load.image("background", "assets/background.png");
     this.load.image("background2", "assets/background2.JPG");
@@ -222,21 +225,19 @@ export class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, this.gameWidth, this.gameHeight);
     this.cameras.main.setBounds(0, 0, this.gameWidth, this.gameHeight);
 
+    //cursor
     this.input.setDefaultCursor("none");
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(this.esc(0.1));
     this.cursor.setDepth(100000000);
 
-    //sonidos
-
+    //sonidos (those who snow)
     this.parry = this.sound.add("parry");
     this.cancion = this.sound.add("verity");
     this.cancion2 = this.sound.add("phonk");
     this.cancion3 = this.sound.add("flight");
-
     this.cancionJ2 = this.sound.add("quagmire");
     this.cancionJ3 = this.sound.add("flight2");
-
     this.cancionJ = this.sound.add("mario", {
       volume: 1.5,
     });
@@ -247,14 +248,14 @@ export class GameScene extends Phaser.Scene {
       volume: 0.5,
     });
     //BACKGROUND-------------------------------------------------------------------------------------------------
-    const bg = this.add.image(300, 300, "background");
-    bg.setPosition(this.gameWidth / 2, this.gameHeight / 2);
-    bg.setDisplaySize(this.gameWidth, this.gameHeight);
+    const background = this.add.image(300, 300, "background");
+    background.setPosition(this.gameWidth / 2, this.gameHeight / 2);
+    background.setDisplaySize(this.gameWidth, this.gameHeight);
     //BACKGROUND2-------------------------------------------------------------------------------------------------
-    this.bg = this.add.image(300, 300, "background2");
-    this.bg.setPosition(this.gameWidth / 2, this.gameHeight / 2);
-    this.bg.setDisplaySize(this.gameWidth, this.gameHeight);
-    this.bg.setAlpha(0);
+    this.background = this.add.image(300, 300, "background2");
+    this.background.setPosition(this.gameWidth / 2, this.gameHeight / 2);
+    this.background.setDisplaySize(this.gameWidth, this.gameHeight);
+    this.background.setAlpha(0);
     //PLAYER-------------------------------------------------------------------------------------------------
     player = this.add.image(0, 0, "player");
     const posPlayer = this.pos(265, 190);
@@ -268,6 +269,7 @@ export class GameScene extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
       parry: Phaser.Input.Keyboard.KeyCodes.Q,
     });
+    //PLAYER PARRY
     this.input.keyboard.on("keydown-Q", () => {
       if (!puedeParry || this.menuAbierto) {
         return;
@@ -297,16 +299,17 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
+    //player
     this.input.keyboard.on("keydown-R", () => {
       this.scene.start("GameScene");
     });
 
-    // TEMPORAL: abre el menu de mejoras con la tecla U para probar (borrar despues)
+    //cosa para probar mejoras (BORRAR PARA EL FINAL DEL PROYECTO!!!!!!!!!!!!!!)
     this.input.keyboard.on("keydown-U", () => {
       if (!this.menuAbierto) mostrarMenuMejoras(this, this.stats);
     });
 
-    //DOOR-------------------------------------------------------------------------------------------------
+    //PUERTINI GUZINI-------------------------------------------------------------------------------------------------
     const posDoor = this.pos(1200, 300);
     this.door = this.physics.add.staticImage(posDoor.x, posDoor.y, "puerta");
     this.door.setScale(this.esc(0.15));
@@ -331,7 +334,7 @@ export class GameScene extends Phaser.Scene {
     gun.setOrigin(0.2, 0.45);
     gun.setDepth(player.depth + 1);
 
-    //ENEMY-------------------------------------------------------------------------------------------------
+    //ENEMY 1-------------------------------------------------------------------------------------------------
     const posEnemy = this.pos(1050, 190);
     enemy = new Enemy(this, posEnemy.x, posEnemy.y);
     enemy.setScale(this.esc(0.35));
@@ -491,7 +494,7 @@ export class GameScene extends Phaser.Scene {
       loop: true,
     });
 
-    // LASER DE ENEMY7 -----------------------------------------------------------------------------------------
+    // Laser enemy7
     this.time.addEvent({
       delay: DELAY_LASER_ENEMY7,
       callback: this.intentarDispararLaserEnemy7,
@@ -499,7 +502,7 @@ export class GameScene extends Phaser.Scene {
       loop: true,
     });
 
-    //enemy8
+    //enemy8----------------------------------------------------------------------------------------------------------
     enemies8 = this.physics.add.group();
     const posEnemy8 = this.pos(1050, 190);
     enemy8 = new Enemy8(this, posEnemy8.x, posEnemy8.y);
@@ -550,7 +553,7 @@ export class GameScene extends Phaser.Scene {
     });
     this.programarTpEnemy9();
 
-    //Enemy10------------------------------------------
+    //Enemy10-------------------------------------------------------------------------------------------------------------
     enemies10 = this.physics.add.group();
     const posEnemy10 = this.pos(1060, 600);
     enemy10 = new Enemy10(this, posEnemy10.x, posEnemy10.y);
@@ -604,7 +607,6 @@ export class GameScene extends Phaser.Scene {
     jefe2 = new Jefe2(this, posJefe2.x, posJefe2.y);
     jefe2.setDisplaySize(this.v(TAMAÑO_JEFE2), this.v(TAMAÑO_JEFE2));
     jefe2.disableBody(true, true);
-
     jefe2Clones = this.physics.add.group({ immovable: true });
 
     this.physics.add.collider(player, jefe2, () => {
@@ -674,7 +676,7 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    //TIMES-------------------------------------------------------------------------------------------------
+    //TIMERs-------------------------------------------------------------------------------------------------
     const posTimer = this.pos(580, 10);
     timerText = this.add.text(posTimer.x, posTimer.y, "Time: " + time, {
       fontSize: Math.round(32 * this.escala) + "px",
@@ -706,7 +708,6 @@ export class GameScene extends Phaser.Scene {
       defaultKey: "balas",
       maxSize: -1,
     });
-
     this.physics.add.overlap(
       this.balas,
       enemy,
@@ -714,7 +715,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(
       this.balas,
       enemy3,
@@ -729,7 +729,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(
       this.balas,
       enemy2,
@@ -737,7 +736,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(
       this.balas,
       enemy5,
@@ -780,7 +778,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(this.balas, jefe, this.golpearEnemigo, null, this);
     this.physics.add.overlap(
       this.balas,
@@ -796,7 +793,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(
       this.balas,
       enemies2,
@@ -804,7 +800,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(
       this.balas,
       enemies3,
@@ -812,7 +807,6 @@ export class GameScene extends Phaser.Scene {
       null,
       this
     );
-
     this.physics.add.overlap(
       this.balas,
       enemies,
@@ -990,7 +984,6 @@ export class GameScene extends Phaser.Scene {
     const comp = velocidad / Math.SQRT2;
     const vx = Math.abs(dx) < margen ? 0 : Math.sign(dx) * comp;
     const vy = Math.abs(dy) < margen ? 0 : Math.sign(dy) * comp;
-
     obj.setVelocity(vx, vy);
   }
 
@@ -1019,6 +1012,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  //spawn aleatorio
   obtenerSpawnAleatorio() {
     let x;
     let y;
@@ -1450,7 +1444,6 @@ export class GameScene extends Phaser.Scene {
         enemy8Clone.vida = 2;
       }
     }
-
     //------------------------------------------------------------
     else if (currentRoom === 13) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -1461,7 +1454,6 @@ export class GameScene extends Phaser.Scene {
       jefe2.reiniciarVida();
       jefe2.enableBody(true, posJefe2Sala.x, posJefe2Sala.y, true, true);
     }
-
     //------------------------------------------------------------
     else if (currentRoom === 14) {
       player.setPosition(posInicio.x, posInicio.y);
@@ -1724,10 +1716,8 @@ export class GameScene extends Phaser.Scene {
         bala.body.velocity
       );
     }
-
     this.bala_enemigo.play();
   }
-
   //MOVIMIENTO RANDOM ------------------------------------------------------------------------------------------------
   moverenemigoAleatorio() {
     const velocidad = this.v(200);
@@ -1784,7 +1774,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  //ENEMY5 ------------------------------------------------------------------------------------------------
+  //ENEMY5 dash ------------------------------------------------------------------------------------------------
   programarDashEnemy5() {
     const delay = Phaser.Math.Between(DASH_MIN_ENEMY5, DASH_MAX_ENEMY5);
 
@@ -1840,22 +1830,18 @@ export class GameScene extends Phaser.Scene {
       }
     });
   }
-
   dispararLaserEnemy7(origen) {
     if (!origen.active) return;
-
     const angulo = Phaser.Math.Angle.Between(
       origen.x,
       origen.y,
       player.x,
       player.y
     );
-
     const largoTotal =
       Math.sqrt(this.gameWidth ** 2 + this.gameHeight ** 2) * 2;
     const finX = origen.x + Math.cos(angulo) * largoTotal;
     const finY = origen.y + Math.sin(angulo) * largoTotal;
-
     const aviso = this.add.graphics();
     aviso.lineStyle(this.v(2), 0xff0000, 0.5);
     aviso.beginPath();
@@ -1863,13 +1849,10 @@ export class GameScene extends Phaser.Scene {
     aviso.lineTo(finX, finY);
     aviso.strokePath();
     aviso.setDepth(99999);
-
     this.time.delayedCall(DELAY_TELEGRAPH_LASER_ENEMY7, () => {
       aviso.destroy();
       if (!origen.active) return;
-
       const anchoLaser = this.v(ANCHO_LASER_ENEMY7);
-
       const rayo = this.add.graphics();
       rayo.lineStyle(anchoLaser, 0xff2222, 0.9);
       rayo.beginPath();
@@ -1877,15 +1860,14 @@ export class GameScene extends Phaser.Scene {
       rayo.lineTo(finX, finY);
       rayo.strokePath();
       rayo.setDepth(99999);
-
       this.golpearJugadorConLaser(origen.x, origen.y, finX, finY, anchoLaser);
-
       this.time.delayedCall(DURACION_LASER_ENEMY7, () => {
         rayo.destroy();
       });
     });
   }
 
+  //no fakin idea de que es esto
   distanciaPuntoALinea(px, py, x1, y1, x2, y2) {
     const A = px - x1;
     const B = py - y1;
@@ -1961,7 +1943,6 @@ export class GameScene extends Phaser.Scene {
     const y = Phaser.Math.Between(this.v(40), this.gameHeight - this.v(40));
     obj.body.reset(x, y);
   }
-
   programarParpadeoEnemy10() {
     const duracion = enemy10Visible ? 1000 : Phaser.Math.Between(3000, 4000);
 
@@ -1983,7 +1964,7 @@ export class GameScene extends Phaser.Scene {
     return { x, y };
   }
 
-  // tp
+  // tp jefe2
   programarTpJefe2() {
     const delay = Phaser.Math.Between(TP_MIN_JEFE2, TP_MAX_JEFE2);
     this.time.delayedCall(delay, () => {
@@ -2017,7 +1998,7 @@ export class GameScene extends Phaser.Scene {
       jefe2.ocupado = false;
     });
   }
-
+  // clon jefe2
   crearClonJefe2(x, y) {
     if (jefe2Clones.countActive() >= MAX_CLONES_JEFE2) return;
     const clon = jefe2Clones.create(x, y, "jefe2");
@@ -2028,7 +2009,7 @@ export class GameScene extends Phaser.Scene {
     clon.vida = VIDA_CLON_JEFE2;
   }
 
-  // BALAS
+  // disparo boss2
   dispararJefe2() {
     let disparo = false;
 
@@ -2100,8 +2081,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  // DASH DEL JEFE 1 ------------------------------------------------------
-
+  // DASH DEL JEFE 1 (tendrian que estar arriba pero cada uno con lo suyo)------------------------------------------------------
   programarDashJefe() {
     const delay = Phaser.Math.Between(DASH_MIN_JEFE, DASH_MAX_JEFE);
     this.time.delayedCall(delay, () => {
@@ -2148,6 +2128,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  // jefe 2 kill
   jefe2Derrotado() {
     if (this.jefeDerrotadoFlag) return;
     this.jefeDerrotadoFlag = true;
@@ -2165,7 +2146,7 @@ export class GameScene extends Phaser.Scene {
 
     const usuario = getLoggedInUser() || "Invitado";
     addScore(time, usuario).then(() => {
-      this.bg.setAlpha(1);
+      this.background.setAlpha(1);
     });
   }
 
@@ -2294,7 +2275,6 @@ export class GameScene extends Phaser.Scene {
         }
       }
     }
-
     const murio = !enemigo.active || enemigo.muerto;
     //ganar tiempo
     if (murio && enemigo !== jefe && enemigo !== jefe2) {
@@ -2336,7 +2316,7 @@ export class GameScene extends Phaser.Scene {
     if (puedeDispararEnemy4) {
       puedeDispararEnemy4 = false;
 
-      // ENEMY4-------------------------------------------------------------------------------------------------------------------------------------------
+      // ENEMY4 escopeta?-------------------------------------------------------------------------------------------------------------------------------------------
       if (enemy4.active) {
         this.dispararConEscopeta(enemy4);
       }
@@ -2440,6 +2420,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.bala_enemigo.play();
   }
+  //sprites
   animarSprite(obj, base) {
     if (!obj.active) return;
     const frame2 = Math.floor(this.time.now / 250) % 2 === 1;
@@ -2489,7 +2470,7 @@ export class GameScene extends Phaser.Scene {
     this.cursor.x = this.input.activePointer.x;
     this.cursor.y = this.input.activePointer.y;
 
-    //ENEMY MOVEr-------------------------------------------------------------------------------------------------
+    //ENEMY moverse-------------------------------------------------------------------------------------------------
     enemy.actualizar(player, this.v(233));
     enemy3.actualizar(player, this.v(100));
     enemy9.actualizar(player, this.v(200));
@@ -2573,7 +2554,7 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    //sprites enemy2 type shi
+    //sprites enemigos type shi
     this.animarSprite(enemy2, "enemy2");
     enemies2.children.each((clone) => {
       this.animarSprite(clone, "enemy2");
@@ -2590,31 +2571,25 @@ export class GameScene extends Phaser.Scene {
     //armas enemigos
     this.actualizarArma(enemy2);
     enemies2.children.each((clone) => this.actualizarArma(clone));
-
     this.actualizarArma(enemy4);
     enemies4.children.each((clone) => this.actualizarArma(clone));
-
     this.actualizarArma(jefe, 0.3);
-
     // HORIZONTAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
       velocidadX = -velJugador;
     } else if (teclas.right.isDown) {
       velocidadX = velJugador;
     }
-
     // VERTICAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.up.isDown) {
       velocidadY = -velJugador;
     } else if (teclas.down.isDown) {
       velocidadY = velJugador;
     }
-
     if (!this.dashActivo) {
       player.body.setVelocityX(velocidadX);
       player.body.setVelocityY(velocidadY);
     }
-
     if (parryActivo) {
       player.setTexture("parry");
     } else if (mostrandoPuedeParry) {
@@ -2633,22 +2608,18 @@ export class GameScene extends Phaser.Scene {
       player.setTexture("player");
     }
   }
-
   //MEJORAS-------------------------------------------------------------------------------------------------
   perderTiempo(base) {
     time = Math.max(0, time - calcularPerdida(base, this.stats, time));
     timerText.setText("Time: " + time);
   }
-
   ganarTiempo(cantidad) {
     time = Math.min(TIEMPO_MAX, time + cantidad);
     timerText.setText("Time: " + time);
   }
-
   claveEnemigo(e) {
     return e.texture.key.replace(/-.*$/, "").toLowerCase();
   }
-
   iniciarDash() {
     let dx = (teclas.right.isDown ? 1 : 0) - (teclas.left.isDown ? 1 : 0);
     let dy = (teclas.down.isDown ? 1 : 0) - (teclas.up.isDown ? 1 : 0);
