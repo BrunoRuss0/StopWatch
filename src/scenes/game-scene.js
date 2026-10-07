@@ -1,3 +1,45 @@
+//cosas por hacer
+
+//Bruno
+//Menu de seleccion de personajes
+//2 personas más
+//Menú de opciones con una configuración
+//jefe final
+//que el login funcione posta
+//balancear el juego
+//(posiblemente) agregar más enemigos
+//—---------------------------------------------------------------------------------------
+//Agustin
+//Agregar objetos
+//cambiar las salas
+//disparar manteniendo apretado el click
+//que se reinicie manteniendo la r y no apretando una vez
+//agregar sprites para el resto de los enemigos (pueden no ser hechos por corbet pero tienen que ser acordes al juego)
+//—------------------------------------------------------------------------------------------
+//Corbet
+//hacer menu de inicio
+//menú de victoria
+//menú de configuración
+//menú de game over
+//fondo del piso 1
+//fondo del piso 2
+//fondo del piso 3
+//enemigo 4
+//enemigo 5
+//enemigo 6
+//enemigo 7
+//enemigo 8
+//enemigo 9
+//enemigo 10
+//jefes 1
+//jefes 2
+//jefes 3
+//arma del personaje
+//personaje 2
+//personaje 3
+//(en el hipotético caso que llegue[99% imposible]) particulas
+
+
 import Enemy, { actualizarSpriteEnemy } from "../entities/Enemy.js";
 import Enemy2 from "../entities/Enemy2.js";
 import Enemy3 from "../entities/Enemy3.js";
@@ -68,8 +110,8 @@ const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
 const DASH_MIN_JEFE = 4000;
 const DASH_MAX_JEFE = 6000;
 const AVISO_DASH_JEFE = 500;
-const DURACION_DASH_JEFE = 450;
-const VELOCIDAD_DASH_JEFE = 900;
+const DURACION_DASH_JEFE = 9000;
+const VELOCIDAD_DASH_JEFE = 1800;
 const VELOCIDAD_ENEMY5 = 130;
 const VELOCIDAD_DASH_ENEMY5 = 1000;
 const DURACION_DASH_ENEMY5 = 700;
@@ -2090,46 +2132,54 @@ export class GameScene extends Phaser.Scene {
     if (disparo) this.bala_enemigo.play();
   }
 
-  // DASH DEL JEFE 1 ------------------------------------------------------
-  programarDashJefe() {
-    const delay = Phaser.Math.Between(DASH_MIN_JEFE, DASH_MAX_JEFE);
-    this.time.delayedCall(delay, () => {
-      if (jefe.active && !jefe.ocupado) {
-        this.dashJefe();
+// DASH DEL JEFE 1 ------------------------------------------------------
+
+programarDashJefe() {
+  const delay = Phaser.Math.Between(DASH_MIN_JEFE, DASH_MAX_JEFE);
+  this.time.delayedCall(delay, () => {
+    if (jefe.active && !jefe.ocupado) {
+      this.dashJefe();
+    }
+    this.programarDashJefe();
+  });
+}
+
+dashJefe() {
+  if (!jefe.active || jefe.dasheando) return;
+  jefe.dasheando = false;
+  jefe.setTint(0xff2222);
+  this.time.delayedCall(AVISO_DASH_JEFE, () => {
+    if (!jefe.active) {
+      jefe.dasheando = false;
+      return;
+    }
+    jefe.dasheando = true;
+    jefe.clearTint();
+    const objetivoX = player.x;
+    const objetivoY = player.y;
+
+    const angle = Phaser.Math.Angle.Between(
+      jefe.x,
+      jefe.y,
+      objetivoX,
+      objetivoY
+    );
+    this.physics.velocityFromRotation(
+      angle,
+      this.v(VELOCIDAD_DASH_JEFE),
+      jefe.body.velocity
+    );
+    this.time.delayedCall(DURACION_DASH_JEFE, () => {
+      if (!jefe.active) {
+        jefe.dasheando = false;
+        return;
       }
-      this.programarDashJefe();
+      jefe.setVelocity(0, 0);
+      jefe.dasheando = false;
     });
-  }
+  });
+}
 
-  dashJefe() {
-    if (!jefe.active) return;
-    jefe.ocupado = true;
-    jefe.setVelocity(0, 0);
-    jefe.setTint(0xff4444); 
-
-    this.time.delayedCall(AVISO_DASH_JEFE, () => {
-      if (!jefe.active) return;
-      jefe.clearTint();
-
-      const angle = Phaser.Math.Angle.Between(
-        jefe.x,
-        jefe.y,
-        player.x,
-        player.y
-      );
-      this.physics.velocityFromRotation(
-        angle,
-        this.v(VELOCIDAD_DASH_JEFE),
-        jefe.body.velocity
-      );
-
-      this.time.delayedCall(DURACION_DASH_JEFE, () => {
-        if (!jefe.active) return;
-        jefe.setVelocity(0, 0);
-        jefe.ocupado = false;
-      });
-    });
-  }
 
   jefe2Derrotado() {
     if (this.jefeDerrotadoFlag) return;
