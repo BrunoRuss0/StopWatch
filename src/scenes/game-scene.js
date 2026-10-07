@@ -65,6 +65,11 @@ const VELOCIDAD_BALA_RADIAL_JEFE = 350;
 const CANTIDAD_BALAS_ESCOPETA_JEFE = 10;
 const SEPARACION_ESCOPETA_JEFE = 0.15;
 const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
+const DASH_MIN_JEFE = 4000;
+const DASH_MAX_JEFE = 6000;
+const AVISO_DASH_JEFE = 500;
+const DURACION_DASH_JEFE = 450;
+const VELOCIDAD_DASH_JEFE = 900;
 const VELOCIDAD_ENEMY5 = 130;
 const VELOCIDAD_DASH_ENEMY5 = 1000;
 const DURACION_DASH_ENEMY5 = 700;
@@ -77,6 +82,7 @@ const ANCHO_LASER_ENEMY7 = 10;
 const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
+const DURACION_FLASH = 60; 
 const TAMAÑO_JEFE2 = 180;
 const VELOCIDAD_JEFE2 = 80;
 const TP_MIN_JEFE2 = 3000;
@@ -85,11 +91,6 @@ const VIDA_CLON_JEFE2 = 4;
 const MAX_CLONES_JEFE2 = 6;
 const DELAY_BALA_JEFE2 = 1500;
 const VELOCIDAD_BALA_JEFE2 = 450;
-const DASH_MIN_JEFE2 = 4000;
-const DASH_MAX_JEFE2 = 6000;
-const AVISO_DASH_JEFE2 = 500;
-const DURACION_DASH_JEFE2 = 450;
-const VELOCIDAD_DASH_JEFE2 = 900;
 const CANTIDAD_BALAS_RADIAL_JEFE2 = 20;
 const VELOCIDAD_BALA_RADIAL_JEFE2 = 300;
 const VELOCIDAD_CLON_JEFE2 = 60;
@@ -132,15 +133,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy2-left-2frame", "assets/ENEMY2-left-2frame.png");
     this.load.image("enemy2-right", "assets/ENEMY2-right.png");
     this.load.image("enemy2-right-2frame", "assets/ENEMY2-right-2frame.png");
-    this.load.image("enemy4", "assets/ENEMY4.png");
-    this.load.image("enemy4-2frame", "assets/ENEMY4-2frame.png");
-    this.load.image("enemy4-back", "assets/ENEMY4-back.png");
-    this.load.image("enemy4-back-2frame", "assets/ENEMY4-back-2frame.png");
-    this.load.image("enemy4-left", "assets/ENEMY4-left.png");
-    this.load.image("enemy4-left-2frame", "assets/ENEMY4-left-2frame.png");
-    this.load.image("enemy4-right", "assets/ENEMY4-right.png");
-    this.load.image("enemy4-right-2frame", "assets/ENEMY4-right-2frame.png");
-    this.load.image("enemy3", "assets/bala-jefe.jpg");
+    this.load.image("enemy3", "assets/enemy3.jpg");
+    this.load.image("enemy4", "assets/enemy4.jpg");
     this.load.image("enemy5", "assets/enemy5.jpg");
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/enemy7.png");
@@ -365,7 +359,7 @@ export class GameScene extends Phaser.Scene {
     enemies4 = this.physics.add.group();
     const posEnemy4 = this.pos(1050, 400);
     enemy4 = new Enemy4(this, posEnemy4.x, posEnemy4.y);
-    enemy4.setScale(this.esc(0.4));
+    enemy4.setScale(this.esc(0.5));
     this.physics.add.collider(player, enemy4, () => {
       if (hitCooldown) return;
       time -= 3;
@@ -623,6 +617,7 @@ export class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
+    this.programarDashJefe();
 
     //JEFE 2-------------------------------------------------------------------------------------------------------
     const posJefe2 = this.pos(900, 300);
@@ -664,7 +659,6 @@ export class GameScene extends Phaser.Scene {
       loop: true,
     });
     this.programarTpJefe2();
-    this.programarDashJefe2();
 
     // GRUPO ENEMY ------------------------------------------------------------------------------------------------------
     enemies = this.physics.add.group();
@@ -1046,6 +1040,14 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  flashEnemigo(obj) {
+    if (!obj || !obj.active) return;
+    obj.setTintFill(0xffffff);
+    this.time.delayedCall(DURACION_FLASH, () => {
+      if (obj.scene) obj.clearTint();
+    });
+  }
+
   obtenerSpawnAleatorio() {
     let x;
     let y;
@@ -1176,7 +1178,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1237,7 +1239,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1276,7 +1278,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1292,6 +1294,7 @@ export class GameScene extends Phaser.Scene {
       this.cancion.stop();
       const posJefeSala = this.pos(900, 100);
       this.cancionJ.play();
+      jefe.ocupado = false;
       jefe.enableBody(true, posJefeSala.x, posJefeSala.y, true, true);
     }
     //------------------------------------------------------------
@@ -1353,7 +1356,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1449,7 +1452,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1501,7 +1504,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1585,7 +1588,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.4));
+        enemy4Clone.setScale(this.esc(0.5));
         enemy4Clone.setCollideWorldBounds(true);
         enemy4Clone.vida = 4;
       }
@@ -1773,21 +1776,19 @@ export class GameScene extends Phaser.Scene {
   moverenemigo4Aleatorio() {
     const velocidad = this.v(100);
     const direcciones = [
-      { x: velocidad, y: 0, dir: "-right" },
-      { x: -velocidad, y: 0, dir: "-left" },
-      { x: 0, y: velocidad, dir: "" },
-      { x: 0, y: -velocidad, dir: "-back" },
+      { x: velocidad, y: 0 },
+      { x: -velocidad, y: 0 },
+      { x: 0, y: velocidad },
+      { x: 0, y: -velocidad },
     ];
     if (enemy4.active) {
-      const d = Phaser.Math.RND.pick(direcciones);
-      enemy4.setVelocity(d.x, d.y);
-      enemy4.dir = d.dir;
+      const dir = Phaser.Math.RND.pick(direcciones);
+      enemy4.setVelocity(dir.x, dir.y);
     }
     enemies4.children.each((clone) => {
       if (!clone.active) return;
-      const d = Phaser.Math.RND.pick(direcciones);
-      clone.setVelocity(d.x, d.y);
-      clone.dir = d.dir;
+      const dirClone = Phaser.Math.RND.pick(direcciones);
+      clone.setVelocity(dirClone.x, dirClone.y);
     });
   }
 
@@ -2089,42 +2090,43 @@ export class GameScene extends Phaser.Scene {
     if (disparo) this.bala_enemigo.play();
   }
 
-  // dash jefe-------------------------------------------------------------
-  programarDashJefe2() {
-    const delay = Phaser.Math.Between(DASH_MIN_JEFE2, DASH_MAX_JEFE2);
+  // DASH DEL JEFE 1 ------------------------------------------------------
+  programarDashJefe() {
+    const delay = Phaser.Math.Between(DASH_MIN_JEFE, DASH_MAX_JEFE);
     this.time.delayedCall(delay, () => {
-      if (jefe2.active && !jefe2.ocupado) {
-        this.dashJefe2();
+      if (jefe.active && !jefe.ocupado) {
+        this.dashJefe();
       }
-      this.programarDashJefe2();
+      this.programarDashJefe();
     });
   }
 
-  dashJefe2() {
-    if (!jefe2.active) return;
-    jefe2.ocupado = true;
-    jefe2.setVelocity(0, 0);
+  dashJefe() {
+    if (!jefe.active) return;
+    jefe.ocupado = true;
+    jefe.setVelocity(0, 0);
+    jefe.setTint(0xff4444); 
 
-    this.time.delayedCall(AVISO_DASH_JEFE2, () => {
-      if (!jefe2.active) return;
-      jefe2.clearTint();
+    this.time.delayedCall(AVISO_DASH_JEFE, () => {
+      if (!jefe.active) return;
+      jefe.clearTint();
 
       const angle = Phaser.Math.Angle.Between(
-        jefe2.x,
-        jefe2.y,
+        jefe.x,
+        jefe.y,
         player.x,
         player.y
       );
       this.physics.velocityFromRotation(
         angle,
-        this.v(VELOCIDAD_DASH_JEFE2),
-        jefe2.body.velocity
+        this.v(VELOCIDAD_DASH_JEFE),
+        jefe.body.velocity
       );
 
-      this.time.delayedCall(DURACION_DASH_JEFE2, () => {
-        if (!jefe2.active) return;
-        jefe2.setVelocity(0, 0);
-        jefe2.ocupado = false;
+      this.time.delayedCall(DURACION_DASH_JEFE, () => {
+        if (!jefe.active) return;
+        jefe.setVelocity(0, 0);
+        jefe.ocupado = false;
       });
     });
   }
@@ -2226,6 +2228,9 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    // hitmarkers
+    this.flashEnemigo(enemigo);
+
     if (typeof enemigo.recibirDaño === "function") {
       enemigo.recibirDaño();
     } else {
@@ -2240,6 +2245,7 @@ export class GameScene extends Phaser.Scene {
             VELOCIDAD_BALA_RADIAL_JEFE2
           );
         }
+
         if (enemigo.texture.key === "enemy6") {
           this.dispararRadialDesde(enemigo.x, enemigo.y);
         }
@@ -2248,7 +2254,6 @@ export class GameScene extends Phaser.Scene {
           enemigo.setTexture("muerte");
           enemigo.setScale(this.esc(3));
           enemigo.setVelocity(0, 0);
-          enemy10Visible = true;
           enemy10Visible = true;
 
           this.time.delayedCall(300, () => {
@@ -2412,32 +2417,6 @@ export class GameScene extends Phaser.Scene {
     if (obj.texture.key !== key) obj.setTexture(key);
   }
 
-  actualizarArma(obj, escalaArma = 0.17, factorDistancia = 0.5) {
-    if (!obj.active) {
-      if (obj.arma) obj.arma.setVisible(false);
-      return;
-    }
-
-    if (!obj.arma) {
-      obj.arma = this.add.image(obj.x, obj.y, "gun");
-      obj.arma.setOrigin(0.2, 0.45);
-      obj.arma.setScale(this.esc(escalaArma));
-      obj.once("destroy", () => obj.arma.destroy());
-    }
-
-    const angulo = Phaser.Math.Angle.Between(obj.x, obj.y, player.x, player.y);
-    const dist =
-      Math.max(obj.displayWidth, obj.displayHeight) * factorDistancia;
-
-    obj.arma.setVisible(true);
-    obj.arma.setPosition(
-      obj.x + Math.cos(angulo) * dist,
-      obj.y + Math.sin(angulo) * dist
-    );
-    obj.arma.setRotation(angulo);
-    obj.arma.setDepth(obj.depth + 1);
-  }
-
   update() {
     //GUN------------------------------------------------------------------------------------------------------
     const angle = Phaser.Math.Angle.Between(
@@ -2507,7 +2486,7 @@ export class GameScene extends Phaser.Scene {
       this.physics.moveToObject(enemy6, player, this.v(300));
     }
 
-    if (jefe.active) {
+    if (jefe.active && !jefe.ocupado) {
       this.physics.moveToObject(
         jefe,
         player,
@@ -2516,6 +2495,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     jefe2.actualizar(player, this.v(VELOCIDAD_JEFE2));
+
     jefe2Clones.children.each((clon) => {
       if (clon.active) {
         this.physics.moveToObject(clon, player, this.v(VELOCIDAD_CLON_JEFE2));
@@ -2542,22 +2522,10 @@ export class GameScene extends Phaser.Scene {
     enemies2.children.each((clone) => {
       this.animarSprite(clone, "enemy2");
     });
-    this.animarSprite(enemy4, "enemy4");
-    enemies4.children.each((clone) => {
-      this.animarSprite(clone, "enemy4");
-    });
     // MOVIMIENTO DEL JUGADOR
     let velocidadX = 0;
     let velocidadY = 0;
     const velJugador = this.v(VELOCIDAD_JUGADOR);
-    //armas enemigos
-    this.actualizarArma(enemy2);
-    enemies2.children.each((clone) => this.actualizarArma(clone));
-
-    this.actualizarArma(enemy4);
-    enemies4.children.each((clone) => this.actualizarArma(clone));
-
-    this.actualizarArma(jefe, 0.3);
 
     // HORIZONTAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
