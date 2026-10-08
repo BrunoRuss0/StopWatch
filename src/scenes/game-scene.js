@@ -21,6 +21,7 @@ import {
   mostrarMenuMejoras,
   TIEMPO_MAX,
 } from "../utils/upgrades.js";
+import { volMusica, volEfecto, aplicarMaster } from "../utils/audioconfig.js";
 
 let player;
 let teclas;
@@ -232,21 +233,16 @@ export class GameScene extends Phaser.Scene {
     this.cursor.setDepth(100000000);
 
     //sonidos (those who snow)
-    this.parry = this.sound.add("parry");
-    this.cancion = this.sound.add("verity");
-    this.cancion2 = this.sound.add("phonk");
-    this.cancion3 = this.sound.add("flight");
-    this.cancionJ2 = this.sound.add("quagmire");
-    this.cancionJ3 = this.sound.add("flight2");
-    this.cancionJ = this.sound.add("mario", {
-      volume: 1.5,
-    });
-    this.bala_enemigo = this.sound.add("bala_enemigo", {
-      volume: 0.5,
-    });
-    this.bala = this.sound.add("bala", {
-      volume: 0.5,
-    });
+   aplicarMaster(this);
+this.parry = this.sound.add("parry", { volume: volEfecto(1) });
+this.cancion = this.sound.add("verity", { volume: volMusica(1) });
+this.cancion2 = this.sound.add("phonk", { volume: volMusica(1) });
+this.cancion3 = this.sound.add("flight", { volume: volMusica(1) });
+this.cancionJ2 = this.sound.add("quagmire", { volume: volMusica(1) });
+this.cancionJ3 = this.sound.add("flight2", { volume: volMusica(1) });
+this.cancionJ = this.sound.add("mario", { volume: volMusica(1.5) });
+this.bala_enemigo = this.sound.add("bala_enemigo", { volume: volEfecto(0.5) });
+this.bala = this.sound.add("bala", { volume: volEfecto(0.5) });
     //BACKGROUND-------------------------------------------------------------------------------------------------
     const background = this.add.image(300, 300, "background");
     background.setPosition(this.gameWidth / 2, this.gameHeight / 2);

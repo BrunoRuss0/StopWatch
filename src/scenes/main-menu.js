@@ -18,7 +18,7 @@ export class MainMenu extends Phaser.Scene {
     bg.setDisplaySize(gameWidth, gameHeight);
     this.add.image(700, 200, "titulo");
 
-    const startButton = this.add.text(25, 450, "START GAME", {
+    const startButton = this.add.text(25, 350, "START GAME", {
       fontSize: "32px",
       color: "#000000",
       backgroundColor: "#ff3636",
@@ -36,7 +36,7 @@ export class MainMenu extends Phaser.Scene {
     });
 
     // BOTON LEADERBOARD---------------------------------------------------
-    const leaderboardButton = this.add.text(25, 520, "LEADERBOARD", {
+    const leaderboardButton = this.add.text(25, 420, "LEADERBOARD", {
       fontSize: "28px",
       color: "#000000",
       backgroundColor: "#ff3636",
@@ -52,6 +52,25 @@ export class MainMenu extends Phaser.Scene {
     leaderboardButton.on("pointerout", () => {
       leaderboardButton.setStyle({ backgroundColor: "#ff3636" });
     });
+
+    //boton configuracion
+        const configuracionButton = this.add.text(25, 485, "CONFIGURACION", {
+      fontSize: "28px",
+      color: "#000000",
+      backgroundColor: "#ff3636",
+      padding: { left: 30, right: 30, top: 15, bottom: 15 },
+    });
+    configuracionButton.setInteractive({ useHandCursor: true });
+    configuracionButton.on("pointerdown", () => {
+      this.scene.start("Configuracion");
+    });
+    configuracionButton.on("pointerover", () => {
+      configuracionButton.setStyle({ backgroundColor: "#f7ebeb" });
+    });
+    configuracionButton.on("pointerout", () => {
+      configuracionButton.setStyle({ backgroundColor: "#ff3636" });
+    });
+
 
     const usuario = getLoggedInUser();
 
