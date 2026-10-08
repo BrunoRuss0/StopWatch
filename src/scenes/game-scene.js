@@ -68,7 +68,7 @@ const DELAY_BALA_ENEMIGO = 1200;
 const DELAY_BALA_ENEMY4 = 3000;
 const COOLDOWN_parry = 3000;
 const DURACION_parry = 300;
-const DELAY_BALA = 300;
+const DELAY_BALA = 500;
 const VELOCIDAD_JUGADOR = 300;
 const DELAY_PATRON_JEFE = 3500;
 const VELOCIDAD_MOVIMIENTO_JEFE = 60;
@@ -127,6 +127,7 @@ export class GameScene extends Phaser.Scene {
   preload() {
     this.load.image("background", "assets/background.png");
     this.load.image("background2", "assets/background2.JPG");
+    this.load.image("background3", "assets/background3.JPG");
     this.load.image("player", "assets/player.png");
     this.load.image("player-left", "assets/player-left.png");
     this.load.image("player-right", "assets/player-right.png");
@@ -248,14 +249,19 @@ export class GameScene extends Phaser.Scene {
       volume: 0.5,
     });
     //BACKGROUND-------------------------------------------------------------------------------------------------
-    const background = this.add.image(300, 300, "background");
-    background.setPosition(this.gameWidth / 2, this.gameHeight / 2);
-    background.setDisplaySize(this.gameWidth, this.gameHeight);
-    //BACKGROUND2-------------------------------------------------------------------------------------------------
-    this.background = this.add.image(300, 300, "background2");
+    this.background = this.add.image(300, 300, "background");
     this.background.setPosition(this.gameWidth / 2, this.gameHeight / 2);
     this.background.setDisplaySize(this.gameWidth, this.gameHeight);
-    this.background.setAlpha(0);
+    //BACKGROUND2-------------------------------------------------------------------------------------------------
+    this.background2 = this.add.image(300, 300, "background2");
+    this.background2.setPosition(this.gameWidth / 2, this.gameHeight / 2);
+    this.background2.setDisplaySize(this.gameWidth, this.gameHeight);
+    this.background2.setAlpha(0);
+    //BACKGROUND3-------------------------------------------------------------------------------------------------
+    this.background3 = this.add.image(300, 300, "background3");
+    this.background3.setPosition(this.gameWidth / 2, this.gameHeight / 2);
+    this.background3.setDisplaySize(this.gameWidth, this.gameHeight);
+    this.background3.setAlpha(0);
     //PLAYER-------------------------------------------------------------------------------------------------
     player = this.add.image(0, 0, "player");
     const posPlayer = this.pos(265, 190);
@@ -299,7 +305,7 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    //player
+    //player reset
     this.input.keyboard.on("keydown-R", () => {
       this.scene.start("GameScene");
     });
@@ -865,6 +871,11 @@ export class GameScene extends Phaser.Scene {
     );
     this.input.on("pointerdown", (pointer) => {
       this.disparar(pointer);
+      if (hitCooldown) return;
+      hitCooldown = true;
+      this.time.delayedCall(DELAY_BALA, () => (hitCooldown = false));
+
+      return;
     });
 
     //BALAS ENEMIGO----------------------------------------------------------------------------------------------------
@@ -1107,6 +1118,15 @@ export class GameScene extends Phaser.Scene {
       enemy10.disableBody(true, true);
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
+      this.cancion.stop();
+      this.cancion2.stop();
+
+      this.cancion3.stop();
+
+      this.cancionJ.stop();
+      this.cancionJ2.stop();
+
+      this.cancionJ3.stop();
     }
     //------------------------------------------------------------
     if (currentRoom === 1) {
@@ -1131,6 +1151,7 @@ export class GameScene extends Phaser.Scene {
     //------------------------------------------------------------
     else if (currentRoom === 2) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras(this, this.stats);
 
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
@@ -1265,6 +1286,8 @@ export class GameScene extends Phaser.Scene {
     //------------------------------------------------------------
     else if (currentRoom === 7) {
       player.setPosition(posInicio.x, posInicio.y);
+      this.background.setAlpha(0);
+      this.background2.setAlpha(1);
       this.cancionJ.stop();
       this.cancion2.play();
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
@@ -1447,8 +1470,11 @@ export class GameScene extends Phaser.Scene {
     //------------------------------------------------------------
     else if (currentRoom === 13) {
       player.setPosition(posInicio.x, posInicio.y);
-      this.cancionJ2.stop();
-      this.cancion3.play();
+      this.cancionJ2.play();
+      this.cancion2.stop();
+      this.background2.setAlpha(0);
+
+      this.background3.setAlpha(1);
 
       const posJefe2Sala = this.pos(900, 300);
       jefe2.reiniciarVida();
@@ -1457,6 +1483,9 @@ export class GameScene extends Phaser.Scene {
     //------------------------------------------------------------
     else if (currentRoom === 14) {
       player.setPosition(posInicio.x, posInicio.y);
+      this.cancion3.play();
+      this.cancionJ2.stop();
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
@@ -1522,8 +1551,7 @@ export class GameScene extends Phaser.Scene {
     //------------------------------------------------------------
     else if (currentRoom === 16) {
       player.setPosition(posInicio.x, posInicio.y);
-      this.cancion3.stop();
-      this.cancionJ3.play();
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn6 = this.obtenerSpawnAleatorio();
         let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
@@ -1677,6 +1705,7 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion3.stop();
       this.cancionJ3.play();
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
@@ -1896,7 +1925,7 @@ export class GameScene extends Phaser.Scene {
     if (distancia > ancho / 2 + this.v(15)) return;
 
     if (parryActivo) {
-      this.ganarTiempo(3 + this.stats.bonusParry);
+      this.ganarTiempo(1 + this.stats.bonusParry);
       this.parry.play();
     } else {
       this.perderTiempo(DAÑO_LASER_ENEMY7);
@@ -2366,7 +2395,7 @@ export class GameScene extends Phaser.Scene {
     if (hitCooldown) return;
 
     if (parryActivo) {
-      this.ganarTiempo(5 + this.stats.bonusParry);
+      this.ganarTiempo(1 + this.stats.bonusParry);
       this.parry.play();
       hitCooldown = true;
 
@@ -2563,6 +2592,9 @@ export class GameScene extends Phaser.Scene {
     enemies4.children.each((clone) => {
       this.animarSprite(clone, "enemy4");
     });
+    if (this.input.activePointer.isDown) {
+      this.disparar(this.input.activePointer);
+    }
     // MOVIMIENTO DEL JUGADOR
     let velocidadX = 0;
     let velocidadY = 0;
