@@ -139,6 +139,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("puerta", "assets/puerta.jPG");
     this.load.image("cursor", "assets/cursor.png");
     this.load.image("gun", "assets/gun.png");
+    this.load.image("gun2", "assets/GUN2.png");
     this.load.image("balas", "assets/bala.png");
     this.load.image("bala-enemigo", "assets/bala-enemigo.png");
     this.load.image("GameOver", "assets/game-over.png");
@@ -168,7 +169,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy3", "assets/enemy4.jpg");
     this.load.image("enemy5", "assets/enemy5.jpg");
     this.load.image("enemy6", "assets/enemy6.png");
-    this.load.image("enemy7", "assets/enemy7.png");
+    this.load.image("enemy7", "assets/ENEMY7-.png");
+    this.load.image("enemy7-2frame", "assets/ENEMY7-2frame.png");
     this.load.image("enemy8", "assets/enemy8.png");
     this.load.image("enemy9", "assets/enemy9.png");
     this.load.image("enemy10", "assets/enemy10.png");
@@ -305,9 +307,8 @@ export class GameScene extends Phaser.Scene {
     });
 
     //player reset
-    this.input.keyboard.on("keydown-R", () => {
-      this.scene.start("GameScene");
-    });
+    this.teclaR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    this.cameras.main.setAlpha(1);
 
     //cosa para probar mejoras (BORRAR PARA EL FINAL DEL PROYECTO!!!!!!!!!!!!!!)
     this.input.keyboard.on("keydown-U", () => {
@@ -1119,16 +1120,20 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.stop();
       this.cancion2.stop();
-
       this.cancion3.stop();
-
       this.cancionJ.stop();
       this.cancionJ2.stop();
-
       this.cancionJ3.stop();
     } else if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn7 = this.obtenerSpawnAleatorio();
+        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
+        enemy7Clone.setScale(this.esc(0.5));
+        enemy7Clone.setCollideWorldBounds(true);
+        enemy7Clone.vida = 4;
+      }
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -1433,7 +1438,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 3;
       }
@@ -1494,7 +1499,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1554,7 +1559,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1591,7 +1596,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1628,7 +1633,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1723,7 +1728,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1814,7 +1819,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1837,7 +1842,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1867,7 +1872,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -1897,7 +1902,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn7 = this.obtenerSpawnAleatorio();
         let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.35));
+        enemy7Clone.setScale(this.esc(0.5));
         enemy7Clone.setCollideWorldBounds(true);
         enemy7Clone.vida = 4;
       }
@@ -2676,17 +2681,22 @@ export class GameScene extends Phaser.Scene {
     const key = base + (obj.dir || "") + (frame2 ? "-2frame" : "");
     if (obj.texture.key !== key) obj.setTexture(key);
   }
-
-  actualizarArma(obj, escalaArma = 0.17, factorDistancia = 0.5) {
+  actualizarArma(
+    obj,
+    escalaArma = 0.17,
+    factorDistancia = 0.5,
+    textura = "gun"
+  ) {
     if (!obj.active) {
       if (obj.arma) obj.arma.setVisible(false);
       return;
     }
 
     if (!obj.arma) {
-      obj.arma = this.add.image(obj.x, obj.y, "gun");
+      obj.arma = this.add.image(obj.x, obj.y, textura);
       obj.arma.setOrigin(0.2, 0.45);
       obj.arma.setScale(this.esc(escalaArma));
+      if (textura === "gun2") obj.arma.setFlipX(true);
       obj.once("destroy", () => obj.arma.destroy());
     }
 
@@ -2705,6 +2715,9 @@ export class GameScene extends Phaser.Scene {
 
   update() {
     //GUN------------------------------------------------------------------------------------------------------
+    const held = this.teclaR.isDown ? this.teclaR.getDuration() : 0;
+    this.cameras.main.setAlpha(1 - held / 5000);
+    if (held >= 5000) this.scene.start("GameScene");
     const angle = Phaser.Math.Angle.Between(
       player.x,
       player.y,
@@ -2812,6 +2825,10 @@ export class GameScene extends Phaser.Scene {
     enemies4.children.each((clone) => {
       this.animarSprite(clone, "enemy4");
     });
+    this.animarSprite(enemy2, "enemy7");
+    enemies7.children.each((clone) => {
+      this.animarSprite(clone, "enemy7");
+    });
     if (this.input.activePointer.isDown) {
       this.disparar(this.input.activePointer);
     }
@@ -2825,7 +2842,11 @@ export class GameScene extends Phaser.Scene {
     enemies2.children.each((clone) => this.actualizarArma(clone));
     this.actualizarArma(enemy4);
     enemies4.children.each((clone) => this.actualizarArma(clone));
-    this.actualizarArma(jefe, 0.3);
+    this.actualizarArma(enemy7, 0.3, 0.5, "gun2");
+    enemies7.children.each((clone) =>
+      this.actualizarArma(clone, 0.3, 0.5, "gun2")
+    );
+    this.actualizarArma(jefe, 0.5, 0.5, "gun2");
     // HORIZONTAL--------------------------------------------------------------------------------------------------------------------------------------
     if (teclas.left.isDown) {
       velocidadX = -velJugador;

@@ -3,7 +3,7 @@ export default class Enemy7 extends Phaser.Physics.Arcade.Image {
     super(scene, x, y, "enemy7");
     scene.add.existing(this);
     scene.physics.add.existing(this);
-    this.setScale(1);
+    this.setScale(0.5);
     this.setImmovable(true);
     this.body.setCollideWorldBounds(true);
     this.vida = 3;
