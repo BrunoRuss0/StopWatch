@@ -10,7 +10,8 @@ import Enemy8 from "../entities/Enemy8.js";
 import Enemy9 from "../entities/Enemy9.js";
 import Enemy10 from "../entities/Enemy10.js";
 import Jefe from "../entities/Jefe.js";
-import Jefe2 from "../entities/jefe2.js";
+import Jefe2 from "../entities/Jefe2.js";
+import Jefe3 from "../entities/Jefe3.js";
 import { addScore } from "../utils/leaderboard.js";
 import { getLoggedInUser } from "../utils/auth.js";
 import {
@@ -41,6 +42,7 @@ let enemy10;
 let jefe;
 let jefe2;
 let jefe2Clones;
+let jefe3;
 let enemies;
 let enemies2;
 let enemies3;
@@ -178,6 +180,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy10", "assets/enemy10.png");
     this.load.image("jefe", "assets/jefe.png");
     this.load.image("jefe2", "assets/jefe2.png");
+    this.load.image("jefe3", "assets/jefe3.png");
     this.load.image("muerte", "assets/descarga.jpg");
     this.load.audio("parry", "assets/parry.mp3");
     this.load.audio("verity", "assets/Verity.mp3");
