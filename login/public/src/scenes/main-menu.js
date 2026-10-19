@@ -26,7 +26,7 @@ export class MainMenu extends Phaser.Scene {
     });
     startButton.setInteractive({ useHandCursor: true });
     startButton.on("pointerdown", () => {
-      this.scene.start("GameScene");
+      this.scene.start("Seleccion");
     });
     startButton.on("pointerover", () => {
       startButton.setStyle({ backgroundColor: "#f7ebeb" });

@@ -5,13 +5,15 @@ import { Login } from "./scenes/login.js";
 import { Leaderboard } from "./scenes/leaderboard-scene.js";
 import { Gamewin } from "./scenes/game-win.js";
 import { Configuracion } from "./scenes/configuracion.js";
+import { Seleccion } from "./scenes/Seleccion.js";
+
 
 const config = {
   type: Phaser.AUTO,
   parent: "game-container",
   width: 1200,
   height: 600,
-  backgroundColor: "#f000ff",
+  backgroundColor: "#000000",
   physics: {
     default: "arcade",
     arcade: {
@@ -31,6 +33,7 @@ const config = {
     Gamewin,
     Leaderboard,
     Configuracion,
+    Seleccion,
   ],
 };
 

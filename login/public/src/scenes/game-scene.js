@@ -1136,13 +1136,6 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
 
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn7 = this.obtenerSpawnAleatorio();
-        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.5));
-        enemy7Clone.setCollideWorldBounds(true);
-        enemy7Clone.vida = 4;
-      }
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -2788,8 +2781,8 @@ export class GameScene extends Phaser.Scene {
   update() {
     //GUN------------------------------------------------------------------------------------------------------
     const held = this.teclaR.isDown ? this.teclaR.getDuration() : 0;
-    this.cameras.main.setAlpha(1 - held / 5000);
-    if (held >= 5000) this.scene.start("GameScene");
+    this.cameras.main.setAlpha(1 - held / 2000);
+    if (held >= 2000) this.scene.start("GameScene");
     const angle = Phaser.Math.Angle.Between(
       player.x,
       player.y,
