@@ -4,5 +4,11 @@
     "salt": "f796dba9f3cbcfcdac610a40b0f8180c",
     "hash": "5b14c74e0d2ddde8657864101d8fc0cfde934ee4ed33959d35997d6fd7757f11a29220be8b93aad781be01001742c94bfff94e8dfca391d14e8b7fe434d747df",
     "creado": 1791984657584
+  },
+  "bruno": {
+    "nombre": "bruno",
+    "salt": "558544c119ba20cee6fb020e315f1363",
+    "hash": "120b5c5af493626b61174d25ec756fe11d54d247e9afe624b7f8edb87d4df4715a5ee59d39722ed5d873c6e8540cdc5691a92828f034d9c12f1793461aac2073",
+    "creado": 1792414707510
   }
 }
