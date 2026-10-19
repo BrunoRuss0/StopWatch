@@ -1,7 +1,4 @@
 //para que funcione el login (desde la terminal)
-//npm init -y
-//npm pkg set type=module
-//npm install express
 //node server.js
 //node login/server.js
 //y doble click en el server de localhost
