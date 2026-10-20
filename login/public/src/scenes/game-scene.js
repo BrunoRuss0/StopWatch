@@ -53,8 +53,7 @@ let enemies8;
 let enemies9;
 let enemies10;
 let currentRoom = 0;
-let time = 300;
-let timerText;
+let time = 500;
 let gun;
 let hitCooldown = false;
 let puedeDisparar = true;
@@ -102,6 +101,8 @@ const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
 const DURACION_FLASH = 60;
+const ESCALA_TIMER = 3;      
+const COLOR_TIMER = 0x8a1ee3;
 //jefe 2 (sigo sin entender porque burno uso tantas cconstantes)
 const TAMAÑO_JEFE2 = 180;
 const VELOCIDAD_JEFE2 = 80;
@@ -206,6 +207,8 @@ export class GameScene extends Phaser.Scene {
     this.load.audio("flight2", "assets/Flight2.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
+    this.load.image("timer-frame", "assets/timer-frame.png");
+this.load.image("timer-fill", "assets/timer-fill.png");
   }
 
   px(x) {
@@ -229,7 +232,7 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 0;
     puedeDisparar = true;
     puedeParry = true;
-    time = 300;
+    time = 500;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
     parryActivo = false;
@@ -744,12 +747,36 @@ export class GameScene extends Phaser.Scene {
     });
 
     //TIMERs-------------------------------------------------------------------------------------------------
-    const posTimer = this.pos(580, 10);
-    timerText = this.add.text(posTimer.x, posTimer.y, "Time: " + time, {
-      fontSize: Math.round(32 * this.escala) + "px",
-      fill: "#8a1ee3",
-      fontStyle: "bold italic",
-    });
+const posTimer = this.pos(635, 8);
+this.textures.get("timer-fill").setFilter(Phaser.Textures.FilterMode.NEAREST);
+this.textures.get("timer-frame").setFilter(Phaser.Textures.FilterMode.NEAREST);
+this.timerRelleno = this.add
+  .image(posTimer.x, posTimer.y, "timer-fill")
+  .setOrigin(0.5, 0)
+  .setScale(this.esc(ESCALA_TIMER))
+  .setDepth(99997);
+this.timerMarco = this.add
+  .image(posTimer.x, posTimer.y, "timer-frame")
+  .setOrigin(0.5, 0)
+  .setScale(this.esc(ESCALA_TIMER))
+  .setDepth(99998);
+
+this.time.addEvent({
+  delay: 1000,
+  callback: actualizarTiempo,
+  callbackScope: this,
+  loop: true,
+});
+function actualizarTiempo() {
+  if (time > 0) {
+    time -= 1;
+  }
+  if (time <= 0) {
+    time = 0;
+    this.physics.pause();
+    this.scene.start("GameOver");
+  }
+}
     this.time.addEvent({
       delay: 1000,
       callback: actualizarTiempo,
@@ -762,11 +789,9 @@ export class GameScene extends Phaser.Scene {
       }
       if (time <= 0) {
         time = 0;
-        timerText.setText("Time: 0");
         this.physics.pause();
         this.scene.start("GameOver");
       } else {
-        timerText.setText("Time: " + time);
       }
     }
 
@@ -1194,6 +1219,7 @@ export class GameScene extends Phaser.Scene {
       this.cancionJ.stop();
       this.cancionJ2.stop();
       this.cancionJ3.stop();
+      time.stop();
     } else if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
@@ -2610,7 +2636,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   // barra de vida 
-
+  actualizarBarraTiempo() {
+    const ratio = Phaser.Math.Clamp(time / TIEMPO_MAX, 0, 1);
+    this.timerRelleno.setVisible(ratio > 0);
+    this.timerRelleno.setCrop(0, 0, this.timerRelleno.width * ratio, this.timerRelleno.height);
+    this.timerRelleno.setTint(ratio < 0.2 ? 0xff2222 : COLOR_TIMER);
+  }
   actualizarBarraJefe3() {
     const g = this.barraJefe3;
     g.clear();
@@ -2719,7 +2750,7 @@ export class GameScene extends Phaser.Scene {
     }
   
     if (this.personaje === 3) {
-      this.crearBala(angle, 1000, 0.1);
+      this.crearBala(angle, 1000, 0.175);
       delay = 75;
     }
   
@@ -3077,11 +3108,12 @@ if (typeof enemigo.recibirDaño === "function") {
     });
 
     // jefe 3 (velocidad constante)
+    
     if (jefe3.active && !jefe3.ocupado) {
       this.physics.moveToObject(jefe3, player, this.v(VELOCIDAD_JEFE3));
     }
     this.actualizarBarraJefe3();
-
+    this.actualizarBarraTiempo();
     if (enemy8.active) {
       this.moverDiagonalHacia(enemy8, player, this.v(350));
     }
@@ -3097,6 +3129,7 @@ if (typeof enemigo.recibirDaño === "function") {
       }
     });
 
+    
     //sprites enemigos type shi
     this.animarSprite(enemy2, "enemy2");
     enemies2.children.each((clone) => {
@@ -3165,11 +3198,9 @@ if (typeof enemigo.recibirDaño === "function") {
   //MEJORAS-------------------------------------------------------------------------------------------------
   perderTiempo(base) {
     time = Math.max(0, time - calcularPerdida(base, this.stats, time));
-    timerText.setText("Time: " + time);
   }
   ganarTiempo(cantidad) {
     time = Math.min(TIEMPO_MAX, time + cantidad);
-    timerText.setText("Time: " + time);
   }
   claveEnemigo(e) {
     return e.texture.key.replace(/-.*$/, "").toLowerCase();
