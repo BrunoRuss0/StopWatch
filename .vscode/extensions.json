@@ -4,5 +4,5 @@
 //y doble click en el server de localhost
 
 {
-  "recommendations": ["esbenp.prettier-vscode", "ritwickdey.liveserver"]
+  "recommendations": ["esbenp.prettier-vscode"]
 }

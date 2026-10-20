@@ -3193,4 +3193,4 @@ if (typeof enemigo.recibirDaño === "function") {
     this.time.delayedCall(DURACION_parry, () => (this.dashActivo = false));
   }
 }
-//3165 lineas de pura dinamita
+//31967 lineas de pura dinamita 20 + 20 + 20 + 7

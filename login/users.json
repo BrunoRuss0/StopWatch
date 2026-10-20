@@ -1,14 +1,8 @@
 {
-  "agus": {
-    "nombre": "agus",
-    "salt": "f796dba9f3cbcfcdac610a40b0f8180c",
-    "hash": "5b14c74e0d2ddde8657864101d8fc0cfde934ee4ed33959d35997d6fd7757f11a29220be8b93aad781be01001742c94bfff94e8dfca391d14e8b7fe434d747df",
-    "creado": 1791984657584
-  },
-  "bruno": {
-    "nombre": "bruno",
-    "salt": "558544c119ba20cee6fb020e315f1363",
-    "hash": "120b5c5af493626b61174d25ec756fe11d54d247e9afe624b7f8edb87d4df4715a5ee59d39722ed5d873c6e8540cdc5691a92828f034d9c12f1793461aac2073",
-    "creado": 1792414707510
+  "merchad": {
+    "nombre": "merchad",
+    "salt": "713f6cc48524ccd7566b2dc17f8a32ce",
+    "hash": "990a514bc084ce78e90f1edcd4e0717838705a5c3c185f6f06343ef462a736e2b222301ddc0d5c94d8b8e40cf840a44e08600e0d7e9deacff4d77de36c763b17",
+    "creado": 1792508289723
   }
 }
