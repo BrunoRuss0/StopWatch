@@ -225,7 +225,7 @@ export class GameScene extends Phaser.Scene {
     this.stats = crearStats();
     this.menuAbierto = false;
     this.dashActivo = false;
-
+    this.personaje = this.registry.get("personaje") || 1;   
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
     this.gameHeight = this.scale.height;

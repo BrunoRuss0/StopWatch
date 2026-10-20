@@ -23,6 +23,7 @@ export class Seleccion extends Phaser.Scene {
       });
       Personaje1.setInteractive({ useHandCursor: true });
       Personaje1.on("pointerdown", () => {
+        this.registry.set("personaje", 1);
         this.scene.start("GameScene");
       });
       Personaje1.on("pointerover", () => {
@@ -31,6 +32,7 @@ export class Seleccion extends Phaser.Scene {
       Personaje1.on("pointerout", () => {
         Personaje1.setStyle({ backgroundColor: "#ff3636" });
       });
+      
   
       const Personaje2 = this.add.text(550, 350, "Personaje 2", {
         fontSize: "32px",
@@ -40,6 +42,8 @@ export class Seleccion extends Phaser.Scene {
       });
       Personaje2.setInteractive({ useHandCursor: true });
       Personaje2.on("pointerdown", () => {
+        this.registry.set("personaje", 2);
+
         this.scene.start("GameScene");
       });
       Personaje2.on("pointerover", () => {
@@ -58,6 +62,7 @@ export class Seleccion extends Phaser.Scene {
       });
       Personaje3.setInteractive({ useHandCursor: true });
       Personaje3.on("pointerdown", () => {
+        this.registry.set("personaje", 3);
         this.scene.start("GameScene");
       });
       Personaje3.on("pointerover", () => {
