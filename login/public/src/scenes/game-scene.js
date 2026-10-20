@@ -1,4 +1,3 @@
-//Claro!, aqui tienes un codigo de un quadrillon de dolares escrito como si hubiese sido hecho por un genio y un estupido (cual es cual?)
 import Enemy, { actualizarSpriteEnemy } from "../entities/Enemy.js";
 import Enemy2 from "../entities/Enemy2.js";
 import Enemy3 from "../entities/Enemy3.js";
@@ -121,6 +120,22 @@ const CANTIDAD_BALAS_RADIAL_JEFE2 = 20;
 const VELOCIDAD_BALA_RADIAL_JEFE2 = 300;
 const VELOCIDAD_CLON_JEFE2 = 60;
 const CANTIDAD_BALAS_RADIAL_CLON_JEFE2 = 12;
+const VELOCIDAD_JEFE3 = 100;
+const DELAY_PATRON_JEFE3 = 2000;
+const DELAY_ESBIROS_JEFE3 = 4000;
+const ESBIROS_MIN_JEFE3 = 1;
+const ESBIROS_MAX_JEFE3 = 3;
+const MAX_ESBIROS_JEFE3 = 8000;
+const DELAY_TELEGRAPH_LASER_JEFE3 = 600;
+const DURACION_LASER_JEFE3 = 200;
+const ANCHO_LASER_JEFE3 = 12;
+const DAÑO_LASER_JEFE3 = 10;
+const SEPARACION_ABANICO_LASER_JEFE3 = 0.35;
+const CANTIDAD_BALAS_RADIAL_JEFE3 = 16;
+const VELOCIDAD_BALA_RADIAL_JEFE3 = 300;
+const CANTIDAD_BALAS_ESCOPETA_JEFE3 = 10;
+const SEPARACION_ESCOPETA_JEFE3 = 0.15;
+const VELOCIDAD_BALA_ESCOPETA_JEFE3 = 320;
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -222,6 +237,8 @@ export class GameScene extends Phaser.Scene {
     enemy10Visible = true;
     jefePatron = 1;
     this.jefeDerrotadoFlag = false;
+    this.jefe3DerrotadoFlag = false;
+    this.patronJefe3 = 0;
     this.stats = crearStats();
     this.menuAbierto = false;
     this.dashActivo = false;
@@ -652,6 +669,36 @@ export class GameScene extends Phaser.Scene {
     this.programarTpJefe2();
     this.programarDashJefe2();
 
+    //JEFE 3-------------------------------------------------------------------------------------------------------
+    const posJefe3 = this.pos(900, 300);
+    jefe3 = new Jefe3(this, posJefe3.x, posJefe3.y);
+    jefe3.setScale(this.esc(0.5));
+    this.barraJefe3 = this.add.graphics().setDepth(99998);
+
+    this.physics.add.collider(player, jefe3, () => {
+      if (hitCooldown) return;
+      this.perderTiempo(12);
+      hitCooldown = true;
+      this.flashPlayer();
+      this.time.delayedCall(500, () => {
+        hitCooldown = false;
+      });
+    });
+
+    // ataques niggerjefe3
+    this.time.addEvent({
+      delay: DELAY_PATRON_JEFE3,
+      callback: this.ejecutarPatronJefe3,
+      callbackScope: this,
+      loop: true,
+    });
+    this.time.addEvent({
+      delay: DELAY_ESBIROS_JEFE3,
+      callback: this.spawnearEsbirrosJefe3,
+      callbackScope: this,
+      loop: true,
+    });
+
     // GRUPO ENEMY ------------------------------------------------------------------------------------------------------
     enemies = this.physics.add.group();
     this.physics.add.collider(player, enemies, (player, clone) => {
@@ -796,6 +843,13 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.balas,
       jefe2,
+      this.golpearEnemigo,
+      null,
+      this
+    );
+    this.physics.add.overlap(
+      this.balas,
+      jefe3,
       this.golpearEnemigo,
       null,
       this
@@ -1068,6 +1122,7 @@ export class GameScene extends Phaser.Scene {
       jefe2Clones.countActive() +
       (jefe.active ? 1 : 0) +
       (jefe2.active ? 1 : 0) +
+      (jefe3.active ? 1 : 0) +
       (enemy.active ? 1 : 0) +
       (enemy2.active ? 1 : 0) +
       (enemy3.active ? 1 : 0) +
@@ -1099,6 +1154,7 @@ export class GameScene extends Phaser.Scene {
     enemy10.disableBody(true, true);
     jefe.disableBody(true, true);
     jefe2.disableBody(true, true);
+    jefe3.disableBody(true, true);
     jefe2Clones.clear(true, true);
     enemies.clear(true, true);
     enemies2.clear(true, true);
@@ -1378,7 +1434,6 @@ export class GameScene extends Phaser.Scene {
       jefe.ocupado = false;
       jefe.enableBody(true, posJefeSala.x, posJefeSala.y, true, true);
     } else if (currentRoom === 11) {
-
       player.setPosition(posInicio.x, posInicio.y);
       this.background.setAlpha(0);
       this.background2.setAlpha(1);
@@ -1932,77 +1987,10 @@ export class GameScene extends Phaser.Scene {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion3.stop();
       this.cancionJ3.play();
-     
-            for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn = this.obtenerSpawnAleatorio();
-        let enemyClone = enemies.create(spawn.x, spawn.y, "enemy");
-        enemyClone.setScale(this.esc(0.2));
-        enemyClone.setCollideWorldBounds(true);
-        enemyClone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn2 = this.obtenerSpawnAleatorio();
-        let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
-        enemy2Clone.setScale(this.esc(0.2));
-        enemy2Clone.setCollideWorldBounds(true);
-        enemy2Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn3 = this.obtenerSpawnAleatorio();
-        let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.2));
-        enemy3Clone.setCollideWorldBounds(true);
-        enemy3Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn4 = this.obtenerSpawnAleatorio();
-        let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
-        enemy4Clone.setScale(this.esc(0.2));
-        enemy4Clone.setCollideWorldBounds(true);
-        enemy4Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn5 = this.obtenerSpawnAleatorio();
-        let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.2));
-        enemy5Clone.setCollideWorldBounds(true);
-        enemy5Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn6 = this.obtenerSpawnAleatorio();
-        let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
-        enemy6Clone.setScale(this.esc(0.2));
-        enemy6Clone.setCollideWorldBounds(true);
-        enemy6Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn7 = this.obtenerSpawnAleatorio();
-        let enemy7Clone = enemies7.create(spawn7.x, spawn7.y, "enemy7");
-        enemy7Clone.setScale(this.esc(0.2));
-        enemy7Clone.setCollideWorldBounds(true);
-        enemy7Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn8 = this.obtenerSpawnAleatorio();
-        let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.2));
-        enemy8Clone.setCollideWorldBounds(true);
-        enemy8Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn9 = this.obtenerSpawnAleatorio();
-        let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.2));
-        enemy9Clone.setCollideWorldBounds(true);
-        enemy9Clone.vida = 4;
-      }
-      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
-        let spawn10 = this.obtenerSpawnAleatorio();
-        let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.2));
-        enemy10Clone.setCollideWorldBounds(true);
-        enemy10Clone.vida = 4;
-      }
+      const posJefe3Sala = this.pos(900, 300);
+      jefe3.reiniciarVida();
+      this.patronJefe3 = 0;
+      jefe3.enableBody(true, posJefe3Sala.x, posJefe3Sala.y, true, true);
     } else if (currentRoom === 31) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancionJ3.stop();
@@ -2200,7 +2188,7 @@ export class GameScene extends Phaser.Scene {
     return Phaser.Math.Distance.Between(px, py, xx, yy);
   }
 
-  golpearJugadorConLaser(x1, y1, x2, y2, ancho) {
+  golpearJugadorConLaser(x1, y1, x2, y2, ancho, daño = DAÑO_LASER_ENEMY7) {
     if (hitCooldown) return;
 
     const distancia = this.distanciaPuntoALinea(
@@ -2218,7 +2206,7 @@ export class GameScene extends Phaser.Scene {
       this.ganarTiempo(2 + this.stats.bonusParry);
       this.parry.play();
     } else {
-      this.perderTiempo(DAÑO_LASER_ENEMY7);
+      this.perderTiempo(daño);
       this.flashPlayer();
     }
 
@@ -2447,7 +2435,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  // jefe 2 kill
+  // jefe 2 muerto
   jefe2Derrotado() {
     if (this.jefeDerrotadoFlag) return;
     this.jefeDerrotadoFlag = true;
@@ -2462,6 +2450,193 @@ export class GameScene extends Phaser.Scene {
     jefe2Clones.children.each((clon) => {
       clon.disableBody(true, true);
     });
+
+    const usuario = getLoggedInUser() || "Invitado";
+    addScore(time, usuario).then(() => {
+      this.background.setAlpha(1);
+    });
+  }
+
+  //JEFE 3 ------------------------------------------------------------------------------------------------
+  
+  dispararLaserAngulo(origen, angulo) {
+    if (!origen.active) return;
+    const ox = origen.x;
+    const oy = origen.y;
+    const largoTotal =
+      Math.sqrt(this.gameWidth ** 2 + this.gameHeight ** 2) * 2;
+    const finX = ox + Math.cos(angulo) * largoTotal;
+    const finY = oy + Math.sin(angulo) * largoTotal;
+
+    const aviso = this.add.graphics();
+    aviso.lineStyle(this.v(2), 0xff0000, 0.5);
+    aviso.beginPath();
+    aviso.moveTo(ox, oy);
+    aviso.lineTo(finX, finY);
+    aviso.strokePath();
+    aviso.setDepth(99999);
+
+    this.time.delayedCall(DELAY_TELEGRAPH_LASER_JEFE3, () => {
+      aviso.destroy();
+      if (!origen.active) return;
+      const anchoLaser = this.v(ANCHO_LASER_JEFE3);
+      const rayo = this.add.graphics();
+      rayo.lineStyle(anchoLaser, 0xff2222, 0.9);
+      rayo.beginPath();
+      rayo.moveTo(ox, oy);
+      rayo.lineTo(finX, finY);
+      rayo.strokePath();
+      rayo.setDepth(99999);
+      this.golpearJugadorConLaser(
+        ox,
+        oy,
+        finX,
+        finY,
+        anchoLaser,
+        DAÑO_LASER_JEFE3
+      );
+      this.time.delayedCall(DURACION_LASER_JEFE3, () => {
+        rayo.destroy();
+      });
+    });
+  }
+
+  dispararLaserJefe3() {
+    if (!jefe3.active) return;
+    const base = Phaser.Math.Angle.Between(
+      jefe3.x,
+      jefe3.y,
+      player.x,
+      player.y
+    );
+    [-SEPARACION_ABANICO_LASER_JEFE3, 0, SEPARACION_ABANICO_LASER_JEFE3].forEach(
+      (offset) => this.dispararLaserAngulo(jefe3, base + offset)
+    );
+  }
+
+  ejecutarPatronJefe3() {
+    if (!jefe3.active) return;
+    const patrones = ["laser", "radial", "laser", "escopeta"];
+    const patron = patrones[this.patronJefe3 % patrones.length];
+    this.patronJefe3++;
+
+    if (patron === "laser") {
+      this.dispararLaserJefe3();
+    } else if (patron === "radial") {
+      this.dispararRadialDesde(
+        jefe3.x,
+        jefe3.y,
+        CANTIDAD_BALAS_RADIAL_JEFE3,
+        VELOCIDAD_BALA_RADIAL_JEFE3,
+        this.balasJefe
+      );
+    } else {
+      this.dispararConEscopeta(
+        jefe3,
+        CANTIDAD_BALAS_ESCOPETA_JEFE3,
+        SEPARACION_ESCOPETA_JEFE3,
+        VELOCIDAD_BALA_ESCOPETA_JEFE3,
+        this.balasJefe
+      );
+    }
+  }
+
+  spawnearEsbirrosJefe3() {
+    if (!jefe3.active) return;
+
+    const grupos = [
+      enemies,
+      enemies2,
+      enemies3,
+      enemies4,
+      enemies5,
+      enemies6,
+      enemies7,
+      enemies8,
+      enemies9,
+      enemies10,
+    ];
+    const vivos = grupos.reduce((suma, g) => suma + g.countActive(), 0);
+    if (vivos >= MAX_ESBIROS_JEFE3) return;
+
+    const tipos = [
+      { grupo: enemies, tex: "enemy", esc: 0.35, vida: 3 },
+      { grupo: enemies2, tex: "enemy2", esc: 0.4, vida: 4 },
+      { grupo: enemies3, tex: "enemy3", esc: 0.3, vida: 6 },
+      { grupo: enemies4, tex: "enemy4", esc: 0.4, vida: 4 },
+      { grupo: enemies5, tex: "enemy5", esc: 0.02, vida: 3 },
+      { grupo: enemies6, tex: "enemy6", esc: 0.25, vida: 2 },
+      { grupo: enemies7, tex: "enemy7", esc: 0.5, vida: 4 },
+      { grupo: enemies8, tex: "enemy8", esc: 0.1, vida: 2 },
+      { grupo: enemies9, tex: "enemy9", esc: 0.5, vida: 2 },
+      { grupo: enemies10, tex: "enemy10", esc: 0.2, vida: 4 },
+    ];
+
+    const cantidad = Phaser.Math.Between(ESBIROS_MIN_JEFE3, ESBIROS_MAX_JEFE3);
+    for (let i = 0; i < cantidad; i++) {
+      const tipo = Phaser.Math.RND.pick(tipos);
+      const spawn = this.obtenerSpawnAleatorio();
+
+      // aviso spawn
+      const aviso = this.add.circle(
+        spawn.x,
+        spawn.y,
+        this.v(30),
+        0xff0000,
+        0.5
+      );
+      aviso.setDepth(99990);
+      this.tweens.add({
+        targets: aviso,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => aviso.destroy(),
+      });
+
+      this.time.delayedCall(500, () => {
+        if (!jefe3.active) return;
+        const clone = tipo.grupo.create(spawn.x, spawn.y, tipo.tex);
+        clone.setScale(this.esc(tipo.esc));
+        clone.setCollideWorldBounds(true);
+        clone.vida = tipo.vida;
+      });
+    }
+  }
+
+  // barra de vida 
+
+  actualizarBarraJefe3() {
+    const g = this.barraJefe3;
+    g.clear();
+    if (!jefe3.active) return;
+    const ancho = this.px(600);
+    const alto = this.py(14);
+    const x = (this.gameWidth - ancho) / 2;
+    const y = this.py(55);
+    g.fillStyle(0x000000, 0.6);
+    g.fillRect(x - 2, y - 2, ancho + 4, alto + 4);
+    g.fillStyle(0xe31e1e, 1);
+    g.fillRect(x, y, ancho * (jefe3.vida / jefe3.vidaMax), alto);
+  }
+
+  // jefe 3 muerto
+  jefe3Derrotado() {
+    if (this.jefe3DerrotadoFlag) return;
+    this.jefe3DerrotadoFlag = true;
+
+    this.dispararRadialDesde(jefe3.x, jefe3.y, 30, 300, this.balasJefe);
+    this.cameras.main.shake(600, 0.015);
+
+    enemies.clear(true, true);
+    enemies2.clear(true, true);
+    enemies3.clear(true, true);
+    enemies4.clear(true, true);
+    enemies5.clear(true, true);
+    enemies6.clear(true, true);
+    enemies7.clear(true, true);
+    enemies8.clear(true, true);
+    enemies9.clear(true, true);
+    enemies10.clear(true, true);
 
     const usuario = getLoggedInUser() || "Invitado";
     addScore(time, usuario).then(() => {
@@ -2596,12 +2771,16 @@ export class GameScene extends Phaser.Scene {
     }
     const murio = !enemigo.active || enemigo.muerto;
     //ganar tiempo
-    if (murio && enemigo !== jefe && enemigo !== jefe2) {
+    if (murio && enemigo !== jefe && enemigo !== jefe2 && enemigo !== jefe3) {
       this.ganarTiempo(recompensaKill(clave, this.stats));
     }
 
     if (enemigo === jefe2 && !jefe2.active) {
       this.jefe2Derrotado();
+    }
+
+    if (enemigo === jefe3 && !jefe3.active) {
+      this.jefe3Derrotado();
     }
 
     // menu de mejoras
@@ -2866,6 +3045,12 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
+    // jefe 3 (velocidad constante)
+    if (jefe3.active && !jefe3.ocupado) {
+      this.physics.moveToObject(jefe3, player, this.v(VELOCIDAD_JEFE3));
+    }
+    this.actualizarBarraJefe3();
+
     if (enemy8.active) {
       this.moverDiagonalHacia(enemy8, player, this.v(350));
     }
@@ -2977,3 +3162,4 @@ export class GameScene extends Phaser.Scene {
     this.time.delayedCall(DURACION_parry, () => (this.dashActivo = false));
   }
 }
+//3165 lineas de pura dinamita
