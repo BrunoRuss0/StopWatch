@@ -298,6 +298,7 @@ export class GameScene extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
       parry: Phaser.Input.Keyboard.KeyCodes.Q,
     });
+    
     // PARRY jugador
     this.input.keyboard.on("keydown-Q", () => {
       if (!puedeParry || this.menuAbierto) {
@@ -339,7 +340,12 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on("keydown-Y", () => {
       if (!this.menuAbierto) mostrarMenuMejoras2(this, this.stats);
     });
-
+    this.input.keyboard.on("keydown-I", () => {
+      this.physics.pause();
+    });
+    this.input.keyboard.on("keydown-O", () => {
+      this.physics.resume();
+    });
     //PUERTINI GUZINI-------------------------------------------------------------------------------------------------
     const posDoor = this.pos(1200, 300);
     this.door = this.physics.add.staticImage(posDoor.x, posDoor.y, "puerta");
