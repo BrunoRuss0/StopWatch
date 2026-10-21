@@ -1,7 +1,7 @@
 //para que funcione el login (desde la terminal)
 //node server.js
 //node login/server.js
-//y doble click en el server de localhost
+//y control click en el server de localhost
 
 {
   "recommendations": ["esbenp.prettier-vscode"]

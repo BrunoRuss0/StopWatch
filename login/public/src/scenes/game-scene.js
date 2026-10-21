@@ -101,7 +101,7 @@ const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
 const DURACION_FLASH = 60;
-const ESCALA_TIMER = 3;      
+const ESCALA_TIMER = 3;
 const COLOR_TIMER = 0x8a1ee3;
 //jefe 2 (sigo sin entender porque burno uso tantas cconstantes)
 const TAMAÑO_JEFE2 = 180;
@@ -208,7 +208,7 @@ export class GameScene extends Phaser.Scene {
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
     this.load.image("timer-frame", "assets/timer-frame.png");
-this.load.image("timer-fill", "assets/timer-fill.png");
+    this.load.image("timer-fill", "assets/timer-fill.png");
   }
 
   px(x) {
@@ -245,7 +245,8 @@ this.load.image("timer-fill", "assets/timer-fill.png");
     this.stats = crearStats();
     this.menuAbierto = false;
     this.dashActivo = false;
-    this.personaje = this.registry.get("personaje") || 1;   
+    this.pausado = false;
+    this.personaje = this.registry.get("personaje") || 1;
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
     this.gameHeight = this.scale.height;
@@ -260,6 +261,10 @@ this.load.image("timer-fill", "assets/timer-fill.png");
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(this.esc(0.1));
     this.cursor.setDepth(100000000);
+
+    //MENU DE pausa
+    this.crearMenuPausa();
+    this.input.keyboard.on("keydown-ESC", () => this.togglePausa());
 
     //sonidos (those who snow)
     aplicarMaster(this);
@@ -301,10 +306,10 @@ this.load.image("timer-fill", "assets/timer-fill.png");
       right: Phaser.Input.Keyboard.KeyCodes.D,
       parry: Phaser.Input.Keyboard.KeyCodes.Q,
     });
-    
+
     // PARRY jugador
     this.input.keyboard.on("keydown-Q", () => {
-      if (!puedeParry || this.menuAbierto) {
+      if (!puedeParry || this.menuAbierto || this.pausado) {
         return;
       }
       puedeParry = false;
@@ -338,16 +343,10 @@ this.load.image("timer-fill", "assets/timer-fill.png");
 
     //cosa para probar mejoras (BORRAR PARA EL FINAL DEL PROYECTO!!!!!!!!!!!!!!)
     this.input.keyboard.on("keydown-U", () => {
-      if (!this.menuAbierto) mostrarMenuMejoras(this, this.stats);
+      if (!this.menuAbierto && !this.pausado) mostrarMenuMejoras(this, this.stats);
     });
     this.input.keyboard.on("keydown-Y", () => {
-      if (!this.menuAbierto) mostrarMenuMejoras2(this, this.stats);
-    });
-    this.input.keyboard.on("keydown-I", () => {
-      this.physics.pause();
-    });
-    this.input.keyboard.on("keydown-O", () => {
-      this.physics.resume();
+      if (!this.menuAbierto && !this.pausado) mostrarMenuMejoras2(this, this.stats);
     });
     //PUERTINI GUZINI-------------------------------------------------------------------------------------------------
     const posDoor = this.pos(1200, 300);
@@ -694,7 +693,7 @@ this.load.image("timer-fill", "assets/timer-fill.png");
       });
     });
 
-    // ataques niggerjefe3
+    // ataques jefe3
     this.time.addEvent({
       delay: DELAY_PATRON_JEFE3,
       callback: this.ejecutarPatronJefe3,
@@ -747,36 +746,40 @@ this.load.image("timer-fill", "assets/timer-fill.png");
     });
 
     //TIMERs-------------------------------------------------------------------------------------------------
-const posTimer = this.pos(635, 8);
-this.textures.get("timer-fill").setFilter(Phaser.Textures.FilterMode.NEAREST);
-this.textures.get("timer-frame").setFilter(Phaser.Textures.FilterMode.NEAREST);
-this.timerRelleno = this.add
-  .image(posTimer.x, posTimer.y, "timer-fill")
-  .setOrigin(0.5, 0)
-  .setScale(this.esc(ESCALA_TIMER))
-  .setDepth(99997);
-this.timerMarco = this.add
-  .image(posTimer.x, posTimer.y, "timer-frame")
-  .setOrigin(0.5, 0)
-  .setScale(this.esc(ESCALA_TIMER))
-  .setDepth(99998);
+    const posTimer = this.pos(635, 8);
+    this.textures
+      .get("timer-fill")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
+      .get("timer-frame")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.timerRelleno = this.add
+      .image(posTimer.x, posTimer.y, "timer-fill")
+      .setOrigin(0.5, 0)
+      .setScale(this.esc(ESCALA_TIMER))
+      .setDepth(99997);
+    this.timerMarco = this.add
+      .image(posTimer.x, posTimer.y, "timer-frame")
+      .setOrigin(0.5, 0)
+      .setScale(this.esc(ESCALA_TIMER))
+      .setDepth(99998);
 
-this.time.addEvent({
-  delay: 1000,
-  callback: actualizarTiempo,
-  callbackScope: this,
-  loop: true,
-});
-function actualizarTiempo() {
-  if (time > 0) {
-    time -= 1;
-  }
-  if (time <= 0) {
-    time = 0;
-    this.physics.pause();
-    this.scene.start("GameOver");
-  }
-}
+    this.time.addEvent({
+      delay: 1000,
+      callback: actualizarTiempo,
+      callbackScope: this,
+      loop: true,
+    });
+    function actualizarTiempo() {
+      if (time > 0) {
+        time -= 1;
+      }
+      if (time <= 0) {
+        time = 0;
+        this.physics.pause();
+        this.scene.start("GameOver");
+      }
+    }
     this.time.addEvent({
       delay: 1000,
       callback: actualizarTiempo,
@@ -963,6 +966,7 @@ function actualizarTiempo() {
       this
     );
     this.input.on("pointerdown", (pointer) => {
+      if (this.pausado) return;
       this.disparar(pointer);
       if (hitCooldown) return;
       hitCooldown = true;
@@ -1081,6 +1085,91 @@ function actualizarTiempo() {
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
+
+  //PAUSA-------------------------------------------------------------------------------------------------
+  togglePausa() {
+    if (this.menuAbierto) return; 
+    if (this.pausado) {
+      this.reanudarJuego();
+    } else {
+      this.pausado = true;
+      this.physics.pause();
+      this.time.paused = true;
+      this.tweens.pauseAll();
+      this.sound.pauseAll();
+      this.menuPausa.setVisible(true);
+    }
+  }
+
+  reanudarJuego() {
+    this.pausado = false;
+    this.physics.resume();
+    this.time.paused = false;
+    this.tweens.resumeAll();
+    this.sound.resumeAll();
+    this.menuPausa.setVisible(false);
+  }
+
+  crearMenuPausa() {
+    const cx = this.gameWidth / 2;
+    const cy = this.gameHeight / 2;
+
+    const fondo = this.add
+      .rectangle(cx, cy, this.gameWidth, this.gameHeight, 0x000000, 0.65)
+      .setInteractive(); 
+
+    const titulo = this.add
+      .text(cx, cy - this.py(170), "PAUSA", {
+        fontSize: `${Math.round(this.v(64))}px`,
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    const crearBoton = (y, texto, accion) => {
+      const btn = this.add
+        .text(cx, y, texto, {
+          fontSize: `${Math.round(this.v(28))}px`,
+          color: "#000000",
+          backgroundColor: "#ff3636",
+          padding: {
+            left: this.v(30),
+            right: this.v(30),
+            top: this.v(15),
+            bottom: this.v(15),
+          },
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      btn.on("pointerover", () => btn.setStyle({ backgroundColor: "#f7ebeb" }));
+      btn.on("pointerout", () => btn.setStyle({ backgroundColor: "#ff3636" }));
+      btn.on("pointerdown", accion);
+      return btn;
+    };
+
+    const btnContinuar = crearBoton(cy - this.py(60), "CONTINUAR", () =>
+      this.reanudarJuego()
+    );
+
+    const btnReiniciar = crearBoton(cy + this.py(30), "REINICIAR", () => {
+      this.reanudarJuego(); 
+      this.sound.stopAll();
+      this.scene.start("GameScene");
+    });
+
+    const btnMenu = crearBoton(cy + this.py(120), "MENU PRINCIPAL", () => {
+      this.reanudarJuego();
+      this.sound.stopAll();
+      this.scene.start("MainMenu");
+    });
+
+    this.menuPausa = this.add
+      .container(0, 0, [fondo, titulo, btnContinuar, btnReiniciar, btnMenu])
+      .setDepth(99999999) 
+      .setVisible(false);
+  }
+
   moverDiagonalHacia(obj, objetivo, velocidad) {
     const dx = objetivo.x - obj.x;
     const dy = objetivo.y - obj.y;
@@ -2490,7 +2579,7 @@ function actualizarTiempo() {
   }
 
   //JEFE 3 ------------------------------------------------------------------------------------------------
-  
+
   dispararLaserAngulo(origen, angulo) {
     if (!origen.active) return;
     const ox = origen.x;
@@ -2635,11 +2724,16 @@ function actualizarTiempo() {
     }
   }
 
-  // barra de vida 
+  // barra de vida
   actualizarBarraTiempo() {
     const ratio = Phaser.Math.Clamp(time / TIEMPO_MAX, 0, 1);
     this.timerRelleno.setVisible(ratio > 0);
-    this.timerRelleno.setCrop(0, 0, this.timerRelleno.width * ratio, this.timerRelleno.height);
+    this.timerRelleno.setCrop(
+      0,
+      0,
+      this.timerRelleno.width * ratio,
+      this.timerRelleno.height
+    );
     this.timerRelleno.setTint(ratio < 0.2 ? 0xff2222 : COLOR_TIMER);
   }
   actualizarBarraJefe3() {
@@ -2729,18 +2823,18 @@ function actualizarTiempo() {
 
   //DISPARAR-------------------------------------------------------------------------------------------------
   disparar(pointer) {
-    if (!puedeDisparar || this.menuAbierto) {
+    if (!puedeDisparar || this.menuAbierto || this.pausado) {
       return;
     }
     const angle = Phaser.Math.Angle.Between(gun.x, gun.y, pointer.x, pointer.y);
     let delay = DELAY_BALA;
-  
+
     //personajes
     if (this.personaje === 1) {
       this.crearBala(angle);
       this.bala.play();
     }
-  
+
     if (this.personaje === 2) {
       this.crearBala(angle - 0.25);
       this.crearBala(angle);
@@ -2748,26 +2842,30 @@ function actualizarTiempo() {
       this.bala.play();
       delay = DELAY_BALA * 2.5;
     }
-  
+
     if (this.personaje === 3) {
       this.crearBala(angle, 1000, 0.175);
       delay = 75;
     }
-  
+
     puedeDisparar = false;
     this.time.delayedCall(delay / multVelocidad(this.stats, time), () => {
       puedeDisparar = true;
     });
   }
-  
+
   crearBala(angle, velocidad = 700, dano = 1) {
     const bala = this.balas.get(gun.x, gun.y);
     if (!bala) return;
     bala.enableBody(true, gun.x, gun.y, true, true);
     bala.setScale(this.esc(0.1));
     bala.setRotation(angle);
-    bala.dano = dano
-    this.physics.velocityFromRotation(angle, this.v(velocidad), bala.body.velocity);
+    bala.dano = dano;
+    this.physics.velocityFromRotation(
+      angle,
+      this.v(velocidad),
+      bala.body.velocity
+    );
   }
 
   golpearEnemigo(obj1, obj2) {
@@ -2785,13 +2883,13 @@ function actualizarTiempo() {
     const clave = this.claveEnemigo(enemigo);
     const golpes = golpesPorBala(this.stats) * bala.dano;
 
-if (typeof enemigo.recibirDaño === "function") {
-  enemigo.golpesPendientes = (enemigo.golpesPendientes || 0) + golpes;
-  while (enemigo.golpesPendientes >= 1 && enemigo.active) {
-    enemigo.recibirDaño();
-    enemigo.golpesPendientes -= 1;
-  }
-} else {
+    if (typeof enemigo.recibirDaño === "function") {
+      enemigo.golpesPendientes = (enemigo.golpesPendientes || 0) + golpes;
+      while (enemigo.golpesPendientes >= 1 && enemigo.active) {
+        enemigo.recibirDaño();
+        enemigo.golpesPendientes -= 1;
+      }
+    } else {
       enemigo.vida -= golpes;
 
       if (enemigo.vida <= 0) {
@@ -2929,7 +3027,7 @@ if (typeof enemigo.recibirDaño === "function") {
       this.physics.pause();
       this.time.delayedCall(500, () => {
         hitCooldown = false;
-        this.physics.resume();
+        if (!this.pausado) this.physics.resume();
       });
 
       return;
@@ -3033,8 +3131,12 @@ if (typeof enemigo.recibirDaño === "function") {
     gun.rotation = angle;
     this.cursor.x = this.input.activePointer.x;
     this.cursor.y = this.input.activePointer.y;
+    if (this.pausado) return; 
     this.balas.children.each((b) => {
-      if (b.active && (b.x < 0 || b.x > this.gameWidth || b.y < 0 || b.y > this.gameHeight)) {
+      if (
+        b.active &&
+        (b.x < 0 || b.x > this.gameWidth || b.y < 0 || b.y > this.gameHeight)
+      ) {
         b.disableBody(true, true);
       }
     });
@@ -3108,7 +3210,7 @@ if (typeof enemigo.recibirDaño === "function") {
     });
 
     // jefe 3 (velocidad constante)
-    
+
     if (jefe3.active && !jefe3.ocupado) {
       this.physics.moveToObject(jefe3, player, this.v(VELOCIDAD_JEFE3));
     }
@@ -3129,7 +3231,6 @@ if (typeof enemigo.recibirDaño === "function") {
       }
     });
 
-    
     //sprites enemigos type shi
     this.animarSprite(enemy2, "enemy2");
     enemies2.children.each((clone) => {
@@ -3224,4 +3325,4 @@ if (typeof enemigo.recibirDaño === "function") {
     this.time.delayedCall(DURACION_parry, () => (this.dashActivo = false));
   }
 }
-//31967 lineas de pura dinamita 20 + 20 + 20 + 7
+//3328 67 lineas de pura dinamita 20 + 20 + 20 + 7

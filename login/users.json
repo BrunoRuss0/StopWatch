@@ -4,5 +4,17 @@
     "salt": "713f6cc48524ccd7566b2dc17f8a32ce",
     "hash": "990a514bc084ce78e90f1edcd4e0717838705a5c3c185f6f06343ef462a736e2b222301ddc0d5c94d8b8e40cf840a44e08600e0d7e9deacff4d77de36c763b17",
     "creado": 1792508289723
+  },
+  "nigga": {
+    "nombre": "nigga",
+    "salt": "581d141ebde82678aba6fcf0e75fca26",
+    "hash": "365f8507343fc1bee43b0263ef74a6fe7fd2b2ba917fc0d2b492d7ca73bc6b6669bc286b7886a37e0b18c4379b35f3207d17e64edcf878d23e3ea8afbca538a2",
+    "creado": 1792587195829
+  },
+  "ganci": {
+    "nombre": "ganci",
+    "salt": "cf9f0fa344eac9411144581ea0c75ebd",
+    "hash": "6cc7684cbab476e9c61a4c3c447daa14a51c5af9e0b1d7a69a3f33504d38cf02503228156f8fe64cbc81ce64c9bdf3061d66868c2a5f0835c0784c2150b9efa7",
+    "creado": 1792589571476
   }
 }

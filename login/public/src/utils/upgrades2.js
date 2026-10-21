@@ -60,7 +60,7 @@ export const UPGRADES = [
 
   {
     id: "daño",
-    nombre: "Mejora de dalo",
+    nombre: "Mejora de daño",
     max: 2,
     desc: "+25% de daño.",
     aplicar: (s) => (s.daño += 0.25),
