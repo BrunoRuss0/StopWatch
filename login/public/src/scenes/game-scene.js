@@ -245,6 +245,7 @@ export class GameScene extends Phaser.Scene {
     this.stats = crearStats();
     this.menuAbierto = false;
     this.dashActivo = false;
+    this.pausado = false;
     this.personaje = this.registry.get("personaje") || 1;
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
@@ -260,6 +261,10 @@ export class GameScene extends Phaser.Scene {
     this.cursor = this.add.image(0, 0, "cursor");
     this.cursor.setScale(this.esc(0.1));
     this.cursor.setDepth(100000000);
+
+    //MENU DE pausa
+    this.crearMenuPausa();
+    this.input.keyboard.on("keydown-ESC", () => this.togglePausa());
 
     //sonidos (those who snow)
     aplicarMaster(this);
@@ -304,7 +309,7 @@ export class GameScene extends Phaser.Scene {
 
     // PARRY jugador
     this.input.keyboard.on("keydown-Q", () => {
-      if (!puedeParry || this.menuAbierto) {
+      if (!puedeParry || this.menuAbierto || this.pausado) {
         return;
       }
       puedeParry = false;
@@ -338,16 +343,12 @@ export class GameScene extends Phaser.Scene {
 
     //cosa para probar mejoras (BORRAR PARA EL FINAL DEL PROYECTO!!!!!!!!!!!!!!)
     this.input.keyboard.on("keydown-U", () => {
-      if (!this.menuAbierto) mostrarMenuMejoras(this, this.stats);
+      if (!this.menuAbierto && !this.pausado)
+        mostrarMenuMejoras(this, this.stats);
     });
     this.input.keyboard.on("keydown-Y", () => {
-      if (!this.menuAbierto) mostrarMenuMejoras2(this, this.stats);
-    });
-    this.input.keyboard.on("keydown-I", () => {
-      this.physics.pause();
-    });
-    this.input.keyboard.on("keydown-O", () => {
-      this.physics.resume();
+      if (!this.menuAbierto && !this.pausado)
+        mostrarMenuMejoras2(this, this.stats);
     });
     //PUERTINI GUZINI-------------------------------------------------------------------------------------------------
     const posDoor = this.pos(1200, 300);
@@ -694,7 +695,7 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    // ataques niggerjefe3
+    // ataques jefe3
     this.time.addEvent({
       delay: DELAY_PATRON_JEFE3,
       callback: this.ejecutarPatronJefe3,
@@ -967,6 +968,7 @@ export class GameScene extends Phaser.Scene {
       this
     );
     this.input.on("pointerdown", (pointer) => {
+      if (this.pausado) return;
       this.disparar(pointer);
       if (hitCooldown) return;
       hitCooldown = true;
@@ -1085,6 +1087,91 @@ export class GameScene extends Phaser.Scene {
   }
 
   //FIN CREATE-------------------------------------------------------------------------------------------------
+
+  //PAUSA-------------------------------------------------------------------------------------------------
+  togglePausa() {
+    if (this.menuAbierto) return;
+    if (this.pausado) {
+      this.reanudarJuego();
+    } else {
+      this.pausado = true;
+      this.physics.pause();
+      this.time.paused = true;
+      this.tweens.pauseAll();
+      this.sound.pauseAll();
+      this.menuPausa.setVisible(true);
+    }
+  }
+
+  reanudarJuego() {
+    this.pausado = false;
+    this.physics.resume();
+    this.time.paused = false;
+    this.tweens.resumeAll();
+    this.sound.resumeAll();
+    this.menuPausa.setVisible(false);
+  }
+
+  crearMenuPausa() {
+    const cx = this.gameWidth / 2;
+    const cy = this.gameHeight / 2;
+
+    const fondo = this.add
+      .rectangle(cx, cy, this.gameWidth, this.gameHeight, 0x000000, 0.65)
+      .setInteractive();
+
+    const titulo = this.add
+      .text(cx, cy - this.py(170), "PAUSA", {
+        fontSize: `${Math.round(this.v(64))}px`,
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    const crearBoton = (y, texto, accion) => {
+      const btn = this.add
+        .text(cx, y, texto, {
+          fontSize: `${Math.round(this.v(28))}px`,
+          color: "#000000",
+          backgroundColor: "#ff3636",
+          padding: {
+            left: this.v(30),
+            right: this.v(30),
+            top: this.v(15),
+            bottom: this.v(15),
+          },
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      btn.on("pointerover", () => btn.setStyle({ backgroundColor: "#f7ebeb" }));
+      btn.on("pointerout", () => btn.setStyle({ backgroundColor: "#ff3636" }));
+      btn.on("pointerdown", accion);
+      return btn;
+    };
+
+    const btnContinuar = crearBoton(cy - this.py(60), "CONTINUAR", () =>
+      this.reanudarJuego()
+    );
+
+    const btnReiniciar = crearBoton(cy + this.py(30), "REINICIAR", () => {
+      this.reanudarJuego();
+      this.sound.stopAll();
+      this.scene.start("GameScene");
+    });
+
+    const btnMenu = crearBoton(cy + this.py(120), "MENU PRINCIPAL", () => {
+      this.reanudarJuego();
+      this.sound.stopAll();
+      this.scene.start("MainMenu");
+    });
+
+    this.menuPausa = this.add
+      .container(0, 0, [fondo, titulo, btnContinuar, btnReiniciar, btnMenu])
+      .setDepth(99999999)
+      .setVisible(false);
+  }
+
   moverDiagonalHacia(obj, objetivo, velocidad) {
     const dx = objetivo.x - obj.x;
     const dy = objetivo.y - obj.y;
@@ -2741,7 +2828,7 @@ export class GameScene extends Phaser.Scene {
 
   //DISPARAR-------------------------------------------------------------------------------------------------
   disparar(pointer) {
-    if (!puedeDisparar || this.menuAbierto) {
+    if (!puedeDisparar || this.menuAbierto || this.pausado) {
       return;
     }
     const angle = Phaser.Math.Angle.Between(gun.x, gun.y, pointer.x, pointer.y);
@@ -2946,7 +3033,7 @@ export class GameScene extends Phaser.Scene {
       this.physics.pause();
       this.time.delayedCall(500, () => {
         hitCooldown = false;
-        this.physics.resume();
+        if (!this.pausado) this.physics.resume();
       });
 
       return;
@@ -3050,6 +3137,7 @@ export class GameScene extends Phaser.Scene {
     gun.rotation = angle;
     this.cursor.x = this.input.activePointer.x;
     this.cursor.y = this.input.activePointer.y;
+    if (this.pausado) return;
     this.balas.children.each((b) => {
       if (
         b.active &&
@@ -3243,4 +3331,4 @@ export class GameScene extends Phaser.Scene {
     this.time.delayedCall(DURACION_parry, () => (this.dashActivo = false));
   }
 }
-//31967 lineas de pura dinamita 20 + 20 + 20 + 7
+//3328 67 lineas de pura dinamita 20 + 20 + 20 + 7
