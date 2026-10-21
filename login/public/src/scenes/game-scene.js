@@ -53,7 +53,7 @@ let enemies8;
 let enemies9;
 let enemies10;
 let currentRoom = 0;
-let time = 500;
+let time = 600;
 let gun;
 let hitCooldown = false;
 let puedeDisparar = true;
@@ -121,12 +121,13 @@ const CANTIDAD_BALAS_RADIAL_JEFE2 = 20;
 const VELOCIDAD_BALA_RADIAL_JEFE2 = 300;
 const VELOCIDAD_CLON_JEFE2 = 60;
 const CANTIDAD_BALAS_RADIAL_CLON_JEFE2 = 12;
+//jefe 3
 const VELOCIDAD_JEFE3 = 100;
 const DELAY_PATRON_JEFE3 = 2000;
-const DELAY_ESBIROS_JEFE3 = 4000;
+const DELAY_ESBIROS_JEFE3 = 5000;
 const ESBIROS_MIN_JEFE3 = 1;
-const ESBIROS_MAX_JEFE3 = 3;
-const MAX_ESBIROS_JEFE3 = 8000;
+const ESBIROS_MAX_JEFE3 = 2;
+const MAX_ESBIROS_JEFE3 = 5;
 const DELAY_TELEGRAPH_LASER_JEFE3 = 600;
 const DURACION_LASER_JEFE3 = 200;
 const ANCHO_LASER_JEFE3 = 12;
@@ -137,6 +138,12 @@ const VELOCIDAD_BALA_RADIAL_JEFE3 = 300;
 const CANTIDAD_BALAS_ESCOPETA_JEFE3 = 10;
 const SEPARACION_ESCOPETA_JEFE3 = 0.15;
 const VELOCIDAD_BALA_ESCOPETA_JEFE3 = 320;
+//dificultad
+const ROOM_LIMITS = {
+  easy: 11,
+  medium: 21,
+  hard: 31,
+};
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -232,7 +239,7 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 0;
     puedeDisparar = true;
     puedeParry = true;
-    time = 500;
+    time = 600;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
     parryActivo = false;
@@ -1291,6 +1298,21 @@ export class GameScene extends Phaser.Scene {
 
     const posInicio = this.pos(100, 300);
 
+    const difficulty = this.registry.get("difficulty") || "medium";
+    const roomLimit = ROOM_LIMITS[difficulty] ?? ROOM_LIMITS.medium;
+
+    if (currentRoom >= roomLimit) {
+      this.cancion.stop();
+      this.cancion2.stop();
+      this.cancion3.stop();
+      this.cancionJ.stop();
+      this.cancionJ2.stop();
+      this.cancionJ3.stop();
+
+      this.scene.start("Gamewin");
+      return;
+    }
+
     if (currentRoom === 0) {
       enemy.disableBody(true, true);
       enemy2.disableBody(true, true);
@@ -1354,6 +1376,8 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 3) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras2(this, this.stats);
+
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -1407,7 +1431,6 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 5) {
       player.setPosition(posInicio.x, posInicio.y);
-      mostrarMenuMejoras2(this, this.stats);
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -1454,6 +1477,8 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 7) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras2(this, this.stats);
+
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -1608,6 +1633,8 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 13) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras2(this, this.stats);
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
@@ -1661,7 +1688,6 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 15) {
       player.setPosition(posInicio.x, posInicio.y);
-      mostrarMenuMejoras2(this, this.stats);
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
         let enemy2Clone = enemies2.create(spawn2.x, spawn2.y, "enemy2");
@@ -1722,6 +1748,8 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 17) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras2(this, this.stats);
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
@@ -1897,6 +1925,8 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 23) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras2(this, this.stats);
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn6 = this.obtenerSpawnAleatorio();
         let enemy6Clone = enemies6.create(spawn6.x, spawn6.y, "enemy6");
@@ -1950,7 +1980,6 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 25) {
       player.setPosition(posInicio.x, posInicio.y);
-      mostrarMenuMejoras2(this, this.stats);
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn4 = this.obtenerSpawnAleatorio();
         let enemy4Clone = enemies4.create(spawn4.x, spawn4.y, "enemy4");
@@ -1981,6 +2010,8 @@ export class GameScene extends Phaser.Scene {
       }
     } else if (currentRoom === 26) {
       player.setPosition(posInicio.x, posInicio.y);
+      mostrarMenuMejoras2(this, this.stats);
+
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");

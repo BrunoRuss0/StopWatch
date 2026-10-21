@@ -1,4 +1,4 @@
-export const TIEMPO_MAX = 500;
+export const TIEMPO_MAX = 600;
 
 export function crearStats() {
   return {
@@ -53,15 +53,15 @@ export const UPGRADES = [
   {
     id: "armadura",
     nombre: "Armadura",
-    max: 2,
-    desc: "Perdes 7% menos de tiempo al ser golpeado.",
-    aplicar: (s) => (s.perdidaReducida += 0.07),
+    max: 3,
+    desc: "Perdes 15% menos de tiempo al ser golpeado.",
+    aplicar: (s) => (s.perdidaReducida += 0.15),
   },
 
   {
     id: "daño",
     nombre: "Mejora de daño",
-    max: 2,
+    max: 3,
     desc: "+25% de daño.",
     aplicar: (s) => (s.daño += 0.25),
   },
@@ -75,9 +75,9 @@ export const UPGRADES = [
   {
     id: "parryTiempo",
     nombre: "Mejora Parry",
-    max: 2,
-    desc: "El parry da +1 segundo extra.",
-    aplicar: (s) => (s.bonusParry += 1),
+    max: 3,
+    desc: "El parry da +2 segundo extra.",
+    aplicar: (s) => (s.bonusParry += 2),
   },
 ];
 

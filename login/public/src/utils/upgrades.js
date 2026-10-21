@@ -1,4 +1,4 @@
-export const TIEMPO_MAX = 500;
+export const TIEMPO_MAX = 600;
 
 export function crearStats() {
   return {
@@ -51,26 +51,13 @@ export function recompensaKill(clave, stats) {
 
 export const UPGRADES = [
   {
-    id: "armadura",
-    nombre: "Armadura",
-    max: 2,
-    desc: "Perdes 15% menos de tiempo al ser golpeado.",
-    aplicar: (s) => (s.perdidaReducida += 0.15),
-  },
-  {
     id: "ladron",
     nombre: "Ladron",
     max: 2,
     desc: "Cada kill da tiempo",
     aplicar: (s) => (s.tiempoPorKill += 1),
   },
-  {
-    id: "daño",
-    nombre: "Mejora de daño",
-    max: 2,
-    desc: "+50% de daño.",
-    aplicar: (s) => (s.daño += 0.5),
-  },
+
   {
     id: "reloj",
     nombre: "reloj",
@@ -78,13 +65,7 @@ export const UPGRADES = [
     desc: "+40 segundos extras.",
     aplicar: (s, scene) => scene.ganarTiempo(40),
   },
-  {
-    id: "parryTiempo",
-    nombre: "Mejora Parry",
-    max: 2,
-    desc: "El parry da +3 segundos extra.",
-    aplicar: (s) => (s.bonusParry += 3),
-  },
+
   {
     id: "adrenalina",
     nombre: "Adrenalina",

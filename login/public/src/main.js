@@ -6,7 +6,7 @@ import { Leaderboard } from "./scenes/leaderboard-scene.js";
 import { Gamewin } from "./scenes/game-win.js";
 import { Configuracion } from "./scenes/configuracion.js";
 import { Seleccion } from "./scenes/Seleccion.js";
-
+import { Dificultad } from "./scenes/Dificultad.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -34,6 +34,7 @@ const config = {
     Leaderboard,
     Configuracion,
     Seleccion,
+    Dificultad,
   ],
 };
 
