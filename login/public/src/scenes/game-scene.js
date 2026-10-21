@@ -101,7 +101,7 @@ const DAÑO_LASER_ENEMY7 = 8;
 const TP_MIN_ENEMY9 = 2000;
 const TP_MAX_ENEMY9 = 4000;
 const DURACION_FLASH = 60;
-const ESCALA_TIMER = 3;      
+const ESCALA_TIMER = 3;
 const COLOR_TIMER = 0x8a1ee3;
 //jefe 2 (sigo sin entender porque burno uso tantas cconstantes)
 const TAMAÑO_JEFE2 = 180;
@@ -208,7 +208,7 @@ export class GameScene extends Phaser.Scene {
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
     this.load.image("timer-frame", "assets/timer-frame.png");
-this.load.image("timer-fill", "assets/timer-fill.png");
+    this.load.image("timer-fill", "assets/timer-fill.png");
   }
 
   px(x) {
@@ -245,7 +245,7 @@ this.load.image("timer-fill", "assets/timer-fill.png");
     this.stats = crearStats();
     this.menuAbierto = false;
     this.dashActivo = false;
-    this.personaje = this.registry.get("personaje") || 1;   
+    this.personaje = this.registry.get("personaje") || 1;
     //ESCALADO-------------------------------------------------------------------------------------------------
     this.gameWidth = this.scale.width;
     this.gameHeight = this.scale.height;
@@ -301,7 +301,7 @@ this.load.image("timer-fill", "assets/timer-fill.png");
       right: Phaser.Input.Keyboard.KeyCodes.D,
       parry: Phaser.Input.Keyboard.KeyCodes.Q,
     });
-    
+
     // PARRY jugador
     this.input.keyboard.on("keydown-Q", () => {
       if (!puedeParry || this.menuAbierto) {
@@ -747,36 +747,40 @@ this.load.image("timer-fill", "assets/timer-fill.png");
     });
 
     //TIMERs-------------------------------------------------------------------------------------------------
-const posTimer = this.pos(635, 8);
-this.textures.get("timer-fill").setFilter(Phaser.Textures.FilterMode.NEAREST);
-this.textures.get("timer-frame").setFilter(Phaser.Textures.FilterMode.NEAREST);
-this.timerRelleno = this.add
-  .image(posTimer.x, posTimer.y, "timer-fill")
-  .setOrigin(0.5, 0)
-  .setScale(this.esc(ESCALA_TIMER))
-  .setDepth(99997);
-this.timerMarco = this.add
-  .image(posTimer.x, posTimer.y, "timer-frame")
-  .setOrigin(0.5, 0)
-  .setScale(this.esc(ESCALA_TIMER))
-  .setDepth(99998);
+    const posTimer = this.pos(635, 8);
+    this.textures
+      .get("timer-fill")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.textures
+      .get("timer-frame")
+      .setFilter(Phaser.Textures.FilterMode.NEAREST);
+    this.timerRelleno = this.add
+      .image(posTimer.x, posTimer.y, "timer-fill")
+      .setOrigin(0.5, 0)
+      .setScale(this.esc(ESCALA_TIMER))
+      .setDepth(99997);
+    this.timerMarco = this.add
+      .image(posTimer.x, posTimer.y, "timer-frame")
+      .setOrigin(0.5, 0)
+      .setScale(this.esc(ESCALA_TIMER))
+      .setDepth(99998);
 
-this.time.addEvent({
-  delay: 1000,
-  callback: actualizarTiempo,
-  callbackScope: this,
-  loop: true,
-});
-function actualizarTiempo() {
-  if (time > 0) {
-    time -= 1;
-  }
-  if (time <= 0) {
-    time = 0;
-    this.physics.pause();
-    this.scene.start("GameOver");
-  }
-}
+    this.time.addEvent({
+      delay: 1000,
+      callback: actualizarTiempo,
+      callbackScope: this,
+      loop: true,
+    });
+    function actualizarTiempo() {
+      if (time > 0) {
+        time -= 1;
+      }
+      if (time <= 0) {
+        time = 0;
+        this.physics.pause();
+        this.scene.start("GameOver");
+      }
+    }
     this.time.addEvent({
       delay: 1000,
       callback: actualizarTiempo,
@@ -2442,6 +2446,7 @@ function actualizarTiempo() {
       }
       jefe.dasheando = true;
       jefe.clearTint();
+      this.cameras.main.shake(250, 0.01);
       const objetivoX = player.x;
       const objetivoY = player.y;
 
@@ -2490,7 +2495,7 @@ function actualizarTiempo() {
   }
 
   //JEFE 3 ------------------------------------------------------------------------------------------------
-  
+
   dispararLaserAngulo(origen, angulo) {
     if (!origen.active) return;
     const ox = origen.x;
@@ -2541,9 +2546,11 @@ function actualizarTiempo() {
       player.x,
       player.y
     );
-    [-SEPARACION_ABANICO_LASER_JEFE3, 0, SEPARACION_ABANICO_LASER_JEFE3].forEach(
-      (offset) => this.dispararLaserAngulo(jefe3, base + offset)
-    );
+    [
+      -SEPARACION_ABANICO_LASER_JEFE3,
+      0,
+      SEPARACION_ABANICO_LASER_JEFE3,
+    ].forEach((offset) => this.dispararLaserAngulo(jefe3, base + offset));
   }
 
   ejecutarPatronJefe3() {
@@ -2635,11 +2642,16 @@ function actualizarTiempo() {
     }
   }
 
-  // barra de vida 
+  // barra de vida
   actualizarBarraTiempo() {
     const ratio = Phaser.Math.Clamp(time / TIEMPO_MAX, 0, 1);
     this.timerRelleno.setVisible(ratio > 0);
-    this.timerRelleno.setCrop(0, 0, this.timerRelleno.width * ratio, this.timerRelleno.height);
+    this.timerRelleno.setCrop(
+      0,
+      0,
+      this.timerRelleno.width * ratio,
+      this.timerRelleno.height
+    );
     this.timerRelleno.setTint(ratio < 0.2 ? 0xff2222 : COLOR_TIMER);
   }
   actualizarBarraJefe3() {
@@ -2734,13 +2746,13 @@ function actualizarTiempo() {
     }
     const angle = Phaser.Math.Angle.Between(gun.x, gun.y, pointer.x, pointer.y);
     let delay = DELAY_BALA;
-  
+
     //personajes
     if (this.personaje === 1) {
       this.crearBala(angle);
       this.bala.play();
     }
-  
+
     if (this.personaje === 2) {
       this.crearBala(angle - 0.25);
       this.crearBala(angle);
@@ -2748,26 +2760,30 @@ function actualizarTiempo() {
       this.bala.play();
       delay = DELAY_BALA * 2.5;
     }
-  
+
     if (this.personaje === 3) {
-      this.crearBala(angle, 1000, 0.175);
+      this.crearBala(angle, 1000, 0.135);
       delay = 75;
     }
-  
+
     puedeDisparar = false;
     this.time.delayedCall(delay / multVelocidad(this.stats, time), () => {
       puedeDisparar = true;
     });
   }
-  
+
   crearBala(angle, velocidad = 700, dano = 1) {
     const bala = this.balas.get(gun.x, gun.y);
     if (!bala) return;
     bala.enableBody(true, gun.x, gun.y, true, true);
     bala.setScale(this.esc(0.1));
     bala.setRotation(angle);
-    bala.dano = dano
-    this.physics.velocityFromRotation(angle, this.v(velocidad), bala.body.velocity);
+    bala.dano = dano;
+    this.physics.velocityFromRotation(
+      angle,
+      this.v(velocidad),
+      bala.body.velocity
+    );
   }
 
   golpearEnemigo(obj1, obj2) {
@@ -2785,13 +2801,13 @@ function actualizarTiempo() {
     const clave = this.claveEnemigo(enemigo);
     const golpes = golpesPorBala(this.stats) * bala.dano;
 
-if (typeof enemigo.recibirDaño === "function") {
-  enemigo.golpesPendientes = (enemigo.golpesPendientes || 0) + golpes;
-  while (enemigo.golpesPendientes >= 1 && enemigo.active) {
-    enemigo.recibirDaño();
-    enemigo.golpesPendientes -= 1;
-  }
-} else {
+    if (typeof enemigo.recibirDaño === "function") {
+      enemigo.golpesPendientes = (enemigo.golpesPendientes || 0) + golpes;
+      while (enemigo.golpesPendientes >= 1 && enemigo.active) {
+        enemigo.recibirDaño();
+        enemigo.golpesPendientes -= 1;
+      }
+    } else {
       enemigo.vida -= golpes;
 
       if (enemigo.vida <= 0) {
@@ -2843,6 +2859,7 @@ if (typeof enemigo.recibirDaño === "function") {
 
     // menu de mejoras
     if ((enemigo === jefe || enemigo === jefe2) && !enemigo.active) {
+      this.cameras.main.shake(600, 0.015, true);
       mostrarMenuMejoras(this, this.stats);
     }
   }
@@ -3034,7 +3051,10 @@ if (typeof enemigo.recibirDaño === "function") {
     this.cursor.x = this.input.activePointer.x;
     this.cursor.y = this.input.activePointer.y;
     this.balas.children.each((b) => {
-      if (b.active && (b.x < 0 || b.x > this.gameWidth || b.y < 0 || b.y > this.gameHeight)) {
+      if (
+        b.active &&
+        (b.x < 0 || b.x > this.gameWidth || b.y < 0 || b.y > this.gameHeight)
+      ) {
         b.disableBody(true, true);
       }
     });
@@ -3108,7 +3128,7 @@ if (typeof enemigo.recibirDaño === "function") {
     });
 
     // jefe 3 (velocidad constante)
-    
+
     if (jefe3.active && !jefe3.ocupado) {
       this.physics.moveToObject(jefe3, player, this.v(VELOCIDAD_JEFE3));
     }
@@ -3129,7 +3149,6 @@ if (typeof enemigo.recibirDaño === "function") {
       }
     });
 
-    
     //sprites enemigos type shi
     this.animarSprite(enemy2, "enemy2");
     enemies2.children.each((clone) => {
