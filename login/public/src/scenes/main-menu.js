@@ -71,6 +71,23 @@ export class MainMenu extends Phaser.Scene {
       configuracionButton.setStyle({ backgroundColor: "#ff3636" });
     });
 
+    const tutorialButton = this.add.text(25, 280, "CONTROLES", {
+      fontSize: "32px",
+      color: "#000000",
+      backgroundColor: "#ff3636",
+      padding: { left: 30, right: 30, top: 15, bottom: 15 },
+    });
+    tutorialButton.setInteractive({ useHandCursor: true });
+    tutorialButton.on("pointerdown", () => {
+      this.scene.start("Tutorial");
+    });
+    tutorialButton.on("pointerover", () => {
+      tutorialButton.setStyle({ backgroundColor: "#f7ebeb" });
+    });
+    tutorialButton.on("pointerout", () => {
+      tutorialButton.setStyle({ backgroundColor: "#ff3636" });
+    });
+
     const usuario = getLoggedInUser();
 
     this.add
@@ -106,7 +123,10 @@ export class MainMenu extends Phaser.Scene {
         logoutButton.setStyle({ backgroundColor: "#333333" });
       });
     }
-  }
+    
+
+
+    }
 
   update() {}
 }

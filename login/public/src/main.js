@@ -7,6 +7,7 @@ import { Gamewin } from "./scenes/game-win.js";
 import { Configuracion } from "./scenes/configuracion.js";
 import { Seleccion } from "./scenes/Seleccion.js";
 import { Dificultad } from "./scenes/Dificultad.js";
+import { Tutorial } from "./scenes/Tutorial.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -35,6 +36,7 @@ const config = {
     Configuracion,
     Seleccion,
     Dificultad,
+    Tutorial,
   ],
 };
 
