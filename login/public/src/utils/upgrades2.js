@@ -1,4 +1,4 @@
-export const TIEMPO_MAX = 600;
+export const TIEMPO_MAX = 350;
 
 export function crearStats() {
   return {

@@ -53,7 +53,7 @@ let enemies8;
 let enemies9;
 let enemies10;
 let currentRoom = 0;
-let time = 600;
+let time = 350;
 let gun;
 let hitCooldown = false;
 let puedeDisparar = true;
@@ -214,6 +214,9 @@ export class GameScene extends Phaser.Scene {
     this.load.audio("flight2", "assets/Flight2.mp3");
     this.load.audio("bala", "assets/bala.wav");
     this.load.audio("bala_enemigo", "assets/bala_enemigo.wav");
+    this.load.audio("perdiste", "assets/Perdiste.wav");
+    this.load.audio("laser", "assets/Laser.wav");
+    this.load.audio("ganaste", "assets/Ganaste.wav");
     this.load.image("timer-frame", "assets/timer-frame.png");
     this.load.image("timer-fill", "assets/timer-fill.png");
   }
@@ -239,7 +242,7 @@ export class GameScene extends Phaser.Scene {
     currentRoom = 0;
     puedeDisparar = true;
     puedeParry = true;
-    time = 600;
+    time = 350;
     hitCooldown = false;
     puedeDispararEnemy4 = true;
     parryActivo = false;
@@ -275,16 +278,21 @@ export class GameScene extends Phaser.Scene {
 
     //sonidos (those who snow)
     aplicarMaster(this);
+    this.perdiste = this.sound.add("perdiste", { volume: volEfecto(1) });
+    this.ganaste = this.sound.add("ganaste", { volume: volEfecto(1) });
+    this.laser = this.sound.add("laser", { volume: volEfecto(1) });
+    this.bala_enemigo = this.sound.add("bala_enemigo", {
+      volume: volEfecto(1),
+    });
+
     this.parry = this.sound.add("parry", { volume: volEfecto(1) });
-    this.cancion = this.sound.add("verity", { volume: volMusica(1) });
+    this.cancion = this.sound.add("verity", { volume: volMusica(0) });
     this.cancion2 = this.sound.add("phonk", { volume: volMusica(1) });
     this.cancion3 = this.sound.add("flight", { volume: volMusica(1) });
     this.cancionJ2 = this.sound.add("quagmire", { volume: volMusica(1) });
     this.cancionJ3 = this.sound.add("flight2", { volume: volMusica(1) });
     this.cancionJ = this.sound.add("mario", { volume: volMusica(1.5) });
-    this.bala_enemigo = this.sound.add("bala_enemigo", {
-      volume: volEfecto(0.5),
-    });
+
     this.bala = this.sound.add("bala", { volume: volEfecto(0.5) });
     //BACKGROUND-------------------------------------------------------------------------------------------------
     this.background = this.add.image(300, 300, "background");
@@ -787,23 +795,7 @@ export class GameScene extends Phaser.Scene {
         time = 0;
         this.physics.pause();
         this.scene.start("GameOver");
-      }
-    }
-    this.time.addEvent({
-      delay: 1000,
-      callback: actualizarTiempo,
-      callbackScope: this,
-      loop: true,
-    });
-    function actualizarTiempo() {
-      if (time > 0) {
-        time -= 1;
-      }
-      if (time <= 0) {
-        time = 0;
-        this.physics.pause();
-        this.scene.start("GameOver");
-      } else {
+        this.perdiste.play();
       }
     }
 
@@ -1310,6 +1302,8 @@ export class GameScene extends Phaser.Scene {
       this.cancionJ3.stop();
 
       this.scene.start("Gamewin");
+      this.ganaste.play();
+
       return;
     }
 
@@ -1332,10 +1326,10 @@ export class GameScene extends Phaser.Scene {
       this.cancionJ.stop();
       this.cancionJ2.stop();
       this.cancionJ3.stop();
-      time.stop();
     } else if (currentRoom === 1) {
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.play();
+      this.ganaste.play();
 
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
@@ -3277,7 +3271,7 @@ export class GameScene extends Phaser.Scene {
     enemies4.children.each((clone) => {
       this.animarSprite(clone, "enemy4");
     });
-    this.animarSprite(enemy2, "enemy7");
+    this.animarSprite(enemy7, "enemy7");
     enemies7.children.each((clone) => {
       this.animarSprite(clone, "enemy7");
     });
