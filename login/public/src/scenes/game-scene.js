@@ -1295,6 +1295,9 @@ export class GameScene extends Phaser.Scene {
     enemies8.clear(true, true);
     enemies9.clear(true, true);
     enemies10.clear(true, true);
+    this.balas.children.each((b) => b.disableBody(true, true));
+    this.balasEnemy.children.each((b) => b.disableBody(true, true));
+    this.balasJefe.children.each((b) => b.disableBody(true, true));
 
     const posInicio = this.pos(100, 300);
 
@@ -1323,7 +1326,7 @@ export class GameScene extends Phaser.Scene {
       enemy7.disableBody(true, true);
       enemy8.disableBody(true, true);
       enemy9.disableBody(true, true);
-      enemy10.disableBody(true, true);
+      enemy10.disableBody(true, true);  
       jefe.disableBody(true, true);
       player.setPosition(posInicio.x, posInicio.y);
       this.cancion.stop();
@@ -1343,6 +1346,7 @@ export class GameScene extends Phaser.Scene {
         enemyClone.setScale(this.esc(0.35));
         enemyClone.setCollideWorldBounds(true);
         enemyClone.vida = 3;
+        
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
