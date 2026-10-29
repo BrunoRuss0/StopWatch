@@ -7,7 +7,8 @@ export default class Jefe2 extends Phaser.Physics.Arcade.Image {
     scene.physics.add.existing(this);
     this.setImmovable(true);
     this.body.setCollideWorldBounds(true);
-    this.vida = VIDA_JEFE2;
+    this.vidaMax = VIDA_JEFE2;
+    this.vida = this.vidaMax;
     this.puedemoverse = false;
   }
 
@@ -33,7 +34,7 @@ export default class Jefe2 extends Phaser.Physics.Arcade.Image {
   }
 
   reiniciarVida() {
-    this.vida = VIDA_JEFE2;
+    this.vida = this.vidaMax;
     this.puedemoverse = false;
     this.clearTint();
     this.setAlpha(1);

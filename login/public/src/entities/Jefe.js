@@ -1,3 +1,5 @@
+export const VIDA_JEFE = 25;
+
 export default class Jefe extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y) {
     super(scene, x, y, "jefe");
@@ -5,13 +7,16 @@ export default class Jefe extends Phaser.Physics.Arcade.Image {
     scene.physics.add.existing(this);
     this.setImmovable(true);
     this.body.setCollideWorldBounds(true);
-    this.vida = 25;
+    this.vidaMax = VIDA_JEFE;
+    this.vida = this.vidaMax;
     this.disableBody(true, true);
   }
+
   actualizar(player, velocidad = 60) {
     if (!this.active) return;
     this.scene.physics.moveToObject(this, player, velocidad);
   }
+
   recibirDaño() {
     if (!this.active) return;
     this.vida -= 1;
@@ -23,7 +28,8 @@ export default class Jefe extends Phaser.Physics.Arcade.Image {
       this.disableBody(true, true);
     }
   }
+
   reiniciarVida() {
-    this.vida = 25;
+    this.vida = this.vidaMax;
   }
 }

@@ -639,6 +639,7 @@ export class GameScene extends Phaser.Scene {
     const posJefe = this.pos(1050, 300);
     jefe = new Jefe(this, posJefe.x, posJefe.y);
     jefe.setScale(this.esc(0.5));
+    this.barraJefe = this.add.graphics().setDepth(99998);
 
     this.physics.add.collider(player, jefe, () => {
       if (hitCooldown) return;
@@ -664,6 +665,7 @@ export class GameScene extends Phaser.Scene {
     jefe2.setDisplaySize(this.v(TAMAÑO_JEFE2), this.v(TAMAÑO_JEFE2));
     jefe2.disableBody(true, true);
     jefe2Clones = this.physics.add.group({ immovable: true });
+    this.barraJefe2 = this.add.graphics().setDepth(99998);
 
     this.physics.add.collider(player, jefe2, () => {
       if (hitCooldown) return;
@@ -2783,6 +2785,32 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0xe31e1e, 1);
     g.fillRect(x, y, ancho * (jefe3.vida / jefe3.vidaMax), alto);
   }
+  actualizarBarraJefe() {
+    const g = this.barraJefe;
+    g.clear();
+    if (!jefe.active) return;
+    const ancho = this.px(600);
+    const alto = this.py(14);
+    const x = (this.gameWidth - ancho) / 2;
+    const y = this.py(55);
+    g.fillStyle(0x000000, 0.6);
+    g.fillRect(x - 2, y - 2, ancho + 4, alto + 4);
+    g.fillStyle(0xe31e1e, 1);
+    g.fillRect(x, y, ancho * (jefe.vida / jefe.vidaMax), alto);
+  }
+  actualizarBarraJefe2() {
+    const g = this.barraJefe2;
+    g.clear();
+    if (!jefe2.active) return;
+    const ancho = this.px(600);
+    const alto = this.py(14);
+    const x = (this.gameWidth - ancho) / 2;
+    const y = this.py(55);
+    g.fillStyle(0x000000, 0.6);
+    g.fillRect(x - 2, y - 2, ancho + 4, alto + 4);
+    g.fillStyle(0xe31e1e, 1);
+    g.fillRect(x, y, ancho * (jefe2.vida / jefe2.vidaMax), alto);
+  }
 
   // jefe 3 muerto
   jefe3Derrotado() {
@@ -3227,7 +3255,9 @@ export class GameScene extends Phaser.Scene {
     if (enemy6.active) {
       this.physics.moveToObject(enemy6, player, this.v(300));
     }
-
+      this.actualizarBarraJefe();  
+      this.actualizarBarraJefe2();
+ 
     if (jefe.active && !jefe.ocupado && !jefe.dasheando) {
       this.physics.moveToObject(
         jefe,

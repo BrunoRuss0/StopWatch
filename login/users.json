@@ -16,5 +16,11 @@
     "salt": "cf9f0fa344eac9411144581ea0c75ebd",
     "hash": "6cc7684cbab476e9c61a4c3c447daa14a51c5af9e0b1d7a69a3f33504d38cf02503228156f8fe64cbc81ce64c9bdf3061d66868c2a5f0835c0784c2150b9efa7",
     "creado": 1792589571476
+  },
+  "agusnigga": {
+    "nombre": "agusnigga",
+    "salt": "a4840d401215d7698abf9a87644e9301",
+    "hash": "17049e72ff3f88f1efbf285d84edcd3e1f037247e6b72b506726f29d9508ea601128510a7552c87dee89df3f7cacf975ad4c736ffff5fd06c71ff4ecb1a90b94",
+    "creado": 1793283634807
   }
 }
