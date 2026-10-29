@@ -16,5 +16,11 @@
     "salt": "cf9f0fa344eac9411144581ea0c75ebd",
     "hash": "6cc7684cbab476e9c61a4c3c447daa14a51c5af9e0b1d7a69a3f33504d38cf02503228156f8fe64cbc81ce64c9bdf3061d66868c2a5f0835c0784c2150b9efa7",
     "creado": 1792589571476
+  },
+  "pafundih": {
+    "nombre": "PAFUNDIH",
+    "salt": "7c5f75d8d86ebe81b0e3b0c760ac04ce",
+    "hash": "0636bd83cc76bbf2548a06698f6623e6762413ea84f13f36abe80f1442bbad4766b4a0419d05611648df46f25f0324f30b5e93343b8b3745db387a8bdd32b415",
+    "creado": 1793283229726
   }
 }

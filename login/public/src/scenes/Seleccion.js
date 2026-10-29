@@ -15,7 +15,7 @@ export class Seleccion extends Phaser.Scene {
       const bg = this.add.image(gameWidth / 2, gameHeight / 2, "seleccion");
       bg.setDisplaySize(gameWidth, gameHeight);
   
-      const Personaje1 = this.add.text(550, 450, "Personaje 1", {
+      const Personaje1 = this.add.text(550, 450, "PISTOLA", {
         fontSize: "32px",
         color: "#000000",
         backgroundColor: "#ff3636",
@@ -34,7 +34,7 @@ export class Seleccion extends Phaser.Scene {
       });
       
   
-      const Personaje2 = this.add.text(550, 350, "Personaje 2", {
+      const Personaje2 = this.add.text(550, 350, "ESCOPETA", {
         fontSize: "32px",
         color: "#000000",
         backgroundColor: "#ff3636",
@@ -54,7 +54,7 @@ export class Seleccion extends Phaser.Scene {
       });
   
 
-      const Personaje3 = this.add.text(550, 250, "Personaje 3", {
+      const Personaje3 = this.add.text(550, 250, "MINIGUN", {
         fontSize: "32px",
         color: "#000000",
         backgroundColor: "#ff3636",

@@ -286,7 +286,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.parry = this.sound.add("parry", { volume: volEfecto(1) });
-    this.cancion = this.sound.add("verity", { volume: volMusica(0) });
+    this.cancion = this.sound.add("verity", { volume: volMusica(1) });
     this.cancion2 = this.sound.add("phonk", { volume: volMusica(1) });
     this.cancion3 = this.sound.add("flight", { volume: volMusica(1) });
     this.cancionJ2 = this.sound.add("quagmire", { volume: volMusica(1) });
