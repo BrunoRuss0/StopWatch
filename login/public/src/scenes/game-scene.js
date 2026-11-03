@@ -2721,7 +2721,7 @@ export class GameScene extends Phaser.Scene {
       { grupo: enemies2, tex: "enemy2", esc: 0.4, vida: 4 },
       { grupo: enemies3, tex: "enemy3", esc: 0.3, vida: 6 },
       { grupo: enemies4, tex: "enemy4", esc: 0.4, vida: 4 },
-      { grupo: enemies5, tex: "enemy5", esc: 0.02, vida: 3 },
+      { grupo: enemies5, tex: "enemy5", esc: 1, vida: 3 },
       { grupo: enemies6, tex: "enemy6", esc: 0.25, vida: 2 },
       { grupo: enemies7, tex: "enemy7", esc: 0.5, vida: 4 },
       { grupo: enemies8, tex: "enemy8", esc: 0.1, vida: 2 },
