@@ -163,7 +163,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("player-back", "assets/player-back.png");
     this.load.image("player-back-right", "assets/player-back-right.png");
     this.load.image("player-back-left", "assets/player-back-left.png");
-    this.load.image("puerta", "assets/puerta.jPG");
+    this.load.image("puerta", "assets/puerta.png");
     this.load.image("cursor", "assets/cursor.png");
     this.load.image("gun", "assets/gun.png");
     this.load.image("gun2", "assets/GUN2.png");
@@ -185,6 +185,7 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy2-left-2frame", "assets/ENEMY2-left-2frame.png");
     this.load.image("enemy2-right", "assets/ENEMY2-right.png");
     this.load.image("enemy2-right-2frame", "assets/ENEMY2-right-2frame.png");
+    this.load.image("enemy3", "assets/enemy3.png");
     this.load.image("enemy4", "assets/ENEMY4.png");
     this.load.image("enemy4-2frame", "assets/ENEMY4-2frame.png");
     this.load.image("enemy4-back", "assets/ENEMY4-back.png");
@@ -193,7 +194,6 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy4-left-2frame", "assets/ENEMY4-left-2frame.png");
     this.load.image("enemy4-right", "assets/ENEMY4-right.png");
     this.load.image("enemy4-right-2frame", "assets/ENEMY4-right-2frame.png");
-    this.load.image("enemy3", "assets/enemy4.jpg");
     this.load.image("enemy5", "assets/enemy5.png");
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/ENEMY7-.png");
