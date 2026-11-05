@@ -85,7 +85,7 @@ const VELOCIDAD_BALA_ESCOPETA_JEFE = 300;
 const DASH_MIN_JEFE = 4000;
 const DASH_MAX_JEFE = 6000;
 const AVISO_DASH_JEFE = 500;
-const DURACION_DASH_JEFE = 9000;
+const DURACION_DASH_JEFE = 5000;
 const VELOCIDAD_DASH_JEFE = 1000;
 //mas velocidades y propiedades (gero benavides) de enemigos
 const VELOCIDAD_ENEMY5 = 130;
@@ -366,19 +366,19 @@ export class GameScene extends Phaser.Scene {
         mostrarMenuMejoras2(this, this.stats);
     });
     //PUERTINI GUZINI-------------------------------------------------------------------------------------------------
-    const posDoor = this.pos(1200, 300);
-    this.door = this.physics.add.staticImage(posDoor.x, posDoor.y, "puerta");
-    this.door.setScale(this.esc(0.15));
+    const posDoor = this.pos(1200, 350);
+    this.puerta = this.physics.add.staticImage(posDoor.x, posDoor.y, "puerta");
+    this.puerta.setScale(this.esc(0.15));
 
-    this.door.body.setSize(
-      this.door.displayWidth / this.door.scaleX,
-      this.door.displayHeight / this.door.scaleY
+    this.puerta.body.setSize(
+      this.puerta.displayWidth / this.puerta.scaleX,
+      this.puerta.displayHeight / this.puerta.scaleY
     );
-    this.door.body.setOffset(0, 0);
-    this.door.refreshBody();
+    this.puerta.body.setOffset(0, 0);
+    this.puerta.refreshBody();
     this.physics.add.overlap(
       player,
-      this.door,
+      this.puerta,
       this.cambiarHabitacion,
       null,
       this
@@ -427,7 +427,7 @@ export class GameScene extends Phaser.Scene {
     //ENEMY 3-------------------------------------------------------------------------------------------------------
     const posEnemy3 = this.pos(1050, 600);
     enemy3 = new Enemy3(this, posEnemy3.x, posEnemy3.y);
-    enemy3.setScale(this.esc(0.1));
+    enemy3.setScale(this.esc(0.6));
 
     this.physics.add.collider(player, enemy3, () => {
       if (hitCooldown) return;
@@ -638,7 +638,7 @@ export class GameScene extends Phaser.Scene {
     //JEFE-------------------------------------------------------------------------------------------------------
     const posJefe = this.pos(1050, 300);
     jefe = new Jefe(this, posJefe.x, posJefe.y);
-    jefe.setScale(this.esc(0.5));
+    jefe.setScale(this.esc(1));
     this.barraJefe = this.add.graphics().setDepth(99998);
 
     this.physics.add.collider(player, jefe, () => {
@@ -699,7 +699,7 @@ export class GameScene extends Phaser.Scene {
     //JEFE 3-------------------------------------------------------------------------------------------------------
     const posJefe3 = this.pos(900, 300);
     jefe3 = new Jefe3(this, posJefe3.x, posJefe3.y);
-    jefe3.setScale(this.esc(0.5));
+    jefe3.setScale(this.esc(1));
     this.barraJefe3 = this.add.graphics().setDepth(99998);
 
     this.physics.add.collider(player, jefe3, () => {
@@ -1223,7 +1223,7 @@ export class GameScene extends Phaser.Scene {
       y = Phaser.Math.Between(minY, maxY);
     } while (
       Phaser.Math.Distance.Between(x, y, player.x, player.y) < distMinPlayer ||
-      Phaser.Math.Distance.Between(x, y, this.door.x, this.door.y) <
+      Phaser.Math.Distance.Between(x, y, this.puerta.x, this.puerta.y) <
         distMinPuerta
     );
     return { x, y };
@@ -1336,6 +1336,7 @@ export class GameScene extends Phaser.Scene {
       this.cancion.play();
       this.ganaste.play();
 
+      
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
@@ -1343,6 +1344,13 @@ export class GameScene extends Phaser.Scene {
         enemyClone.setCollideWorldBounds(true);
         enemyClone.vida = 3;
         
+      }
+      for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
+        let spawn5 = this.obtenerSpawnAleatorio();
+        let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
+        enemy5Clone.setScale(this.esc(0.4));
+        enemy5Clone.setCollideWorldBounds(true);
+        enemy5Clone.vida = 3;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn2 = this.obtenerSpawnAleatorio();
@@ -1395,7 +1403,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1411,7 +1419,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1425,7 +1433,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(0, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1448,7 +1456,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1464,14 +1472,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1496,7 +1504,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1519,7 +1527,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1533,7 +1541,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1556,7 +1564,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1570,7 +1578,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1597,7 +1605,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1613,7 +1621,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1627,7 +1635,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1652,7 +1660,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1668,14 +1676,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1712,7 +1720,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1735,14 +1743,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1753,7 +1761,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1774,7 +1782,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1790,7 +1798,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1820,7 +1828,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -1848,7 +1856,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
@@ -1882,14 +1890,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setScale(this.esc(1));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
@@ -1912,14 +1920,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.2));
+        enemy10Clone.setScale(this.esc(1));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -1944,7 +1952,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setScale(this.esc(1));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
@@ -1960,7 +1968,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
@@ -1974,7 +1982,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setScale(this.esc(1));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
@@ -1990,21 +1998,21 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn5 = this.obtenerSpawnAleatorio();
         let enemy5Clone = enemies5.create(spawn5.x, spawn5.y, "enemy5");
-        enemy5Clone.setScale(this.esc(0.3));
+        enemy5Clone.setScale(this.esc(0.4));
         enemy5Clone.setCollideWorldBounds(true);
         enemy5Clone.vida = 3;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 3); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.2));
+        enemy10Clone.setScale(this.esc(1));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -2015,7 +2023,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn3 = this.obtenerSpawnAleatorio();
         let enemy3Clone = enemies3.create(spawn3.x, spawn3.y, "enemy3");
-        enemy3Clone.setScale(this.esc(0.3));
+        enemy3Clone.setScale(this.esc(1.1));
         enemy3Clone.setCollideWorldBounds(true);
         enemy3Clone.vida = 6;
       }
@@ -2036,7 +2044,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setScale(this.esc(1));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
@@ -2059,14 +2067,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.2));
+        enemy10Clone.setScale(this.esc(1));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -2089,14 +2097,14 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setScale(this.esc(1));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.2));
+        enemy10Clone.setScale(this.esc(1));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }
@@ -2119,21 +2127,21 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < Phaser.Math.Between(1, 2); i++) {
         let spawn8 = this.obtenerSpawnAleatorio();
         let enemy8Clone = enemies8.create(spawn8.x, spawn8.y, "enemy8");
-        enemy8Clone.setScale(this.esc(0.1));
+        enemy8Clone.setScale(this.esc(1));
         enemy8Clone.setCollideWorldBounds(true);
         enemy8Clone.vida = 2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn9 = this.obtenerSpawnAleatorio();
         let enemy9Clone = enemies9.create(spawn9.x, spawn9.y, "enemy9");
-        enemy9Clone.setScale(this.esc(0.5));
+        enemy9Clone.setScale(this.esc(1));
         enemy9Clone.setCollideWorldBounds(true);
         enemy9Clone.vida = 2;
       }
       for (let i = 0; i < Phaser.Math.Between(1, 1); i++) {
         let spawn10 = this.obtenerSpawnAleatorio();
         let enemy10Clone = enemies10.create(spawn10.x, spawn10.y, "enemy10");
-        enemy10Clone.setScale(this.esc(0.2));
+        enemy10Clone.setScale(this.esc(1));
         enemy10Clone.setCollideWorldBounds(true);
         enemy10Clone.vida = 4;
       }

@@ -122,7 +122,7 @@ export function mostrarMenuMejoras2(scene, stats, alTerminar) {
     const x = w / 2 + (i === 0 ? -1 : 1) * w * 0.2;
     const nivel = stats.niveles[op.id] ?? 0;
     const carta = scene.add
-      .rectangle(x, h / 2, w * 0.3, h * 0.4, 0x1d1033)
+      .rectangle(x, h / 2, w * 0.3, h * 0.4, 0x000000)
       .setStrokeStyle(3, 0x8a1ee3)
       .setDepth(D + 1)
       .setInteractive();
@@ -151,7 +151,7 @@ export function mostrarMenuMejoras2(scene, stats, alTerminar) {
       .setDepth(D + 2);
 
     carta.on("pointerover", () => carta.setFillStyle(0x3a1f66));
-    carta.on("pointerout", () => carta.setFillStyle(0x1d1033));
+    carta.on("pointerout", () => carta.setFillStyle(0x000000));
     carta.on("pointerup", () => {
       if (performance.now() - abiertoEn < 400) return;
       op.aplicar(stats, scene);
