@@ -2,7 +2,7 @@ import Enemy, { actualizarSpriteEnemy } from "../entities/Enemy.js";
 import Enemy2 from "../entities/Enemy2.js";
 import Enemy3 from "../entities/Enemy3.js";
 import Enemy4 from "../entities/Enemy4.js";
-import Enemy5 from "../entities/Enemy5.js";
+import Enemy5, { actualizarSpriteEnemy as actualizarSpriteEnemy5 } from "../entities/Enemy5.js";
 import Enemy6 from "../entities/Enemy6.js";
 import Enemy7 from "../entities/Enemy7.js";
 import Enemy8 from "../entities/Enemy8.js";
@@ -195,6 +195,9 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemy4-right", "assets/ENEMY4-right.png");
     this.load.image("enemy4-right-2frame", "assets/ENEMY4-right-2frame.png");
     this.load.image("enemy5", "assets/enemy5.png");
+    this.load.image("enemy5-4", "assets/enemy5-2.png");
+    this.load.image("enemy5-3", "assets/enemy5-3.png");
+    this.load.image("enemy5-2", "assets/enemy5-4.png");
     this.load.image("enemy6", "assets/enemy6.png");
     this.load.image("enemy7", "assets/ENEMY7-.png");
     this.load.image("enemy7-2frame", "assets/ENEMY7-2frame.png");
@@ -3250,6 +3253,13 @@ export class GameScene extends Phaser.Scene {
       this.physics.moveToObject(enemy5, player, VELOCIDAD_ENEMY5);
     }
 
+    if (enemy5.active) {
+      if (!enemy5.dasheando) {
+        this.physics.moveToObject(enemy5, player, VELOCIDAD_ENEMY5);
+      }
+      actualizarSpriteEnemy5(enemy5, this);
+    }
+    
     enemies5.children.each((enemy5Clone) => {
       if (!enemy5Clone.active) return;
       if (!enemy5Clone.dasheando) {
@@ -3259,6 +3269,7 @@ export class GameScene extends Phaser.Scene {
           this.v(VELOCIDAD_ENEMY5)
         );
       }
+      actualizarSpriteEnemy5(enemy5Clone, this);
     });
     if (enemy6.active) {
       this.physics.moveToObject(enemy6, player, this.v(300));
