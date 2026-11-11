@@ -1339,7 +1339,6 @@ export class GameScene extends Phaser.Scene {
       this.cancion.play();
       this.ganaste.play();
 
-      
       for (let i = 0; i < Phaser.Math.Between(2, 3); i++) {
         let spawn1 = this.obtenerSpawnAleatorio();
         let enemyClone = enemies.create(spawn1.x, spawn1.y, "enemy");
