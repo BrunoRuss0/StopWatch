@@ -1,71 +1,38 @@
+
 export class GameOver extends Phaser.Scene {
   constructor() {
     super({ key: "GameOver" });
   }
 
   init() {}
+
   preload() {
     this.load.image("game-over", "assets/game-over.png");
+    this.load.image("Salir2", "assets/Salir2.png");
+    this.load.image("Reintentar", "assets/Reintentar.png");
+    this.load.image("Leaderboard", "assets/Leaderboard.png");
   }
-
   create() {
     this.input.setDefaultCursor("default");
-    const gameWidth = this.scale.width;
-    const gameHeight = this.scale.height;
-    const bg = this.add.image(gameWidth / 2, gameHeight / 2, "game-over");
-    bg.setDisplaySize(gameWidth, gameHeight);
-
-    const menuboton = this.add.text(550, 450, "MAIN MENU", {
-      fontSize: "32px",
-      color: "#000000",
-      backgroundColor: "#ff3636",
-      padding: { left: 30, right: 30, top: 15, bottom: 15 },
-    });
+    const bg = this.add.image(680, 300, "game-over");
+    const menuboton = this.add.image(680, 280, "Salir2");
+    menuboton.setDisplaySize(200, 70);
     menuboton.setInteractive({ useHandCursor: true });
     menuboton.on("pointerdown", () => {
       this.scene.start("MainMenu");
     });
-    menuboton.on("pointerover", () => {
-      menuboton.setStyle({ backgroundColor: "#f7ebeb" });
-    });
-    menuboton.on("pointerout", () => {
-      menuboton.setStyle({ backgroundColor: "#ff3636" });
-    });
-
-    const restartboton = this.add.text(520, 500, "RESTART GAME", {
-      fontSize: "32px",
-      color: "#000000",
-      backgroundColor: "#ff3636",
-      padding: { left: 30, right: 30, top: 15, bottom: 15 },
-    });
+    const restartboton = this.add.image(680, 340, "Reintentar");
+    restartboton.setDisplaySize(200, 70);
     restartboton.setInteractive({ useHandCursor: true });
     restartboton.on("pointerdown", () => {
       this.scene.start("GameScene");
     });
-    restartboton.on("pointerover", () => {
-      restartboton.setStyle({ backgroundColor: "#f7ebeb" });
-    });
-    restartboton.on("pointerout", () => {
-      restartboton.setStyle({ backgroundColor: "#ff3636" });
-    });
-
-    const leaderboardButton = this.add.text(545, 560, "LEADERBOARD", {
-      fontSize: "28px",
-      color: "#000000",
-      backgroundColor: "#ff3636",
-      padding: { left: 30, right: 30, top: 15, bottom: 15 },
-    });
+    const leaderboardButton = this.add.image(680, 400, "Leaderboard");
+    leaderboardButton.setDisplaySize(200, 70);
     leaderboardButton.setInteractive({ useHandCursor: true });
     leaderboardButton.on("pointerdown", () => {
       this.scene.start("Leaderboard");
     });
-    leaderboardButton.on("pointerover", () => {
-      leaderboardButton.setStyle({ backgroundColor: "#f7ebeb" });
-    });
-    leaderboardButton.on("pointerout", () => {
-      leaderboardButton.setStyle({ backgroundColor: "#ff3636" });
-    });
   }
-
   update() {}
 }

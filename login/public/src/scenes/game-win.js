@@ -19,14 +19,22 @@ export class Gamewin extends Phaser.Scene {
     const menuboton = this.add.image(680, 320, "Salir");
     menuboton.setDisplaySize(200, 70);
     menuboton.setInteractive({ useHandCursor: true });
+    menuboton.on("pointerdown", () => {
+      this.scene.start("MainMenu");
+    });
     
     const restartboton = this.add.image(680, 375, "Play-Again");
     restartboton.setDisplaySize(200, 70);
     restartboton.setInteractive({ useHandCursor: true });
-    
+    menuboton.on("pointerdown", () => {
+      this.scene.start("GameScene");
+    });
     const leaderboardButton = this.add.image(680, 430, "Leaderboard");
     leaderboardButton.setDisplaySize(200, 70);
     leaderboardButton.setInteractive({ useHandCursor: true });
+    menuboton.on("pointerdown", () => {
+      this.scene.start("Leaderboard");
+    });
   }
 
   update() {}
