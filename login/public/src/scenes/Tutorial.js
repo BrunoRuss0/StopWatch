@@ -6,7 +6,7 @@ export class Tutorial extends Phaser.Scene {
 
   preload() {
     this.load.image("Tutorial", "assets/tutorial.png");
-  
+    this.load.image("Salir", "assets/Salir.png");
   }
 
   create() {
@@ -19,18 +19,14 @@ export class Tutorial extends Phaser.Scene {
 
     
     // boton menu
-    const menuboton = this.add.text(1000, 10, "MAIN MENU", {
-      fontSize: "42px",
-      color: "#000000",
-      backgroundColor: "#ff3636",
-      padding: { left: 50, right: 50, top: 30, bottom: 30 },
-    });
+    const menuboton = this.add.image(1200, 60, "Salir");
+    menuboton.setDisplaySize(300, 100);
     menuboton.setInteractive({ useHandCursor: true });
-    menuboton.on("pointerdown", () => this.scene.start("MainMenu"));
-    menuboton.on("pointerover", () => menuboton.setStyle({ backgroundColor: "#f7ebeb" }));
-    menuboton.on("pointerout", () => menuboton.setStyle({ backgroundColor: "#ff3636" }));
-  }
+    menuboton.on("pointerdown", () => {
+      this.scene.start("MainMenu");
+    });
 
  
  
   }
+}

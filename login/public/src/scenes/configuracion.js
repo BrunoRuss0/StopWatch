@@ -7,6 +7,7 @@ export class Configuracion extends Phaser.Scene {
 
   preload() {
     this.load.image("configuracion", "assets/dificultad.png");
+    this.load.image("Salir", "assets/Salir.png");
     this.load.audio("bala", "assets/bala.wav"); 
   }
 
@@ -27,16 +28,13 @@ export class Configuracion extends Phaser.Scene {
     this.crearSlider(x, 400, ancho, "Volumen efectos", "efectos");
 
     // boton menu
-    const menuboton = this.add.text(25, 450, "MAIN MENU", {
-      fontSize: "42px",
-      color: "#ffffff",
-      backgroundColor: "#ff3636",
-      padding: { left: 50, right: 50, top: 30, bottom: 30 },
-    });
+    const menuboton = this.add.image(680, 500, "Salir");
+    menuboton.setDisplaySize(200, 70);
     menuboton.setInteractive({ useHandCursor: true });
-    menuboton.on("pointerdown", () => this.scene.start("MainMenu"));
-    menuboton.on("pointerover", () => menuboton.setStyle({ backgroundColor: "#f7ebeb" }));
-    menuboton.on("pointerout", () => menuboton.setStyle({ backgroundColor: "#ff3636" }));
+    menuboton.on("pointerdown", () => {
+      this.scene.start("MainMenu");
+    })
+  
   }
 
   crearSlider(x, y, ancho, etiqueta, tipo) {

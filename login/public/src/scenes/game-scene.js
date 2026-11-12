@@ -44,7 +44,7 @@ let jefe2Clones;
 let jefe3;
 let enemies;
 let enemies2;
-let enemies3;
+let enemies3; 
 let enemies4;
 let enemies5;
 let enemies6;
