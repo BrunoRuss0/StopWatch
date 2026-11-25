@@ -1,3 +1,24 @@
+
+const FRAME_MS = 150;
+
+export function actualizarSpriteEnemy(obj, scene) {
+  if (!obj.active) return;
+
+  const frame = Math.floor(scene.time.now / FRAME_MS) % 4;
+
+  const sprites = [
+    "enemy5",
+    "enemy5-2",
+    "enemy5-3",
+    "enemy5-4"
+  ];
+
+  const key = sprites[frame];
+
+  if (obj.texture.key !== key) {
+    obj.setTexture(key);
+  }
+}
 export default class Enemy5 extends Phaser.Physics.Arcade.Image {
   constructor(scene, x, y) {
     super(scene, x, y, "enemy5");

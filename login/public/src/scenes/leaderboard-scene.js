@@ -12,7 +12,10 @@ export class Leaderboard extends Phaser.Scene {
     this.yaMarcado = false;
   }
 
-  preload() {}
+  preload() {
+    this.load.image("Salir", "assets/Salir.png");
+
+  }
 
  async create() {
     this.input.setDefaultCursor("default");
@@ -90,23 +93,11 @@ export class Leaderboard extends Phaser.Scene {
     // BOTON MAIN MENU-------------------------------------------------------
     const offsetX = this.victoria ? 120 : 0;
 
-    const menuboton = this.add
-      .text(gameWidth / 2 - offsetX, y, "MAIN MENU", {
-        fontSize: "28px",
-        color: "#000000",
-        backgroundColor: "#ff3636",
-        padding: { left: 20, right: 20, top: 10, bottom: 10 },
-      })
-      .setOrigin(0.5, 0);
+    const menuboton = this.add.image(670, 500, "Salir");
+    menuboton.setDisplaySize(200, 70);
     menuboton.setInteractive({ useHandCursor: true });
     menuboton.on("pointerdown", () => {
       this.scene.start("MainMenu");
-    });
-    menuboton.on("pointerover", () => {
-      menuboton.setStyle({ backgroundColor: "#f7ebeb" });
-    });
-    menuboton.on("pointerout", () => {
-      menuboton.setStyle({ backgroundColor: "#ff3636" });
     });
 
     if (this.victoria) {

@@ -6,7 +6,8 @@ export class Configuracion extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("configuracion", "assets/configuracion.jpg");
+    this.load.image("configuracion", "assets/dificultad.png");
+    this.load.image("Salir", "assets/Salir.png");
     this.load.audio("bala", "assets/bala.wav"); 
   }
 
@@ -27,27 +28,24 @@ export class Configuracion extends Phaser.Scene {
     this.crearSlider(x, 400, ancho, "Volumen efectos", "efectos");
 
     // boton menu
-    const menuboton = this.add.text(25, 450, "MAIN MENU", {
-      fontSize: "42px",
-      color: "#000000",
-      backgroundColor: "#ff3636",
-      padding: { left: 50, right: 50, top: 30, bottom: 30 },
-    });
+    const menuboton = this.add.image(680, 500, "Salir");
+    menuboton.setDisplaySize(200, 70);
     menuboton.setInteractive({ useHandCursor: true });
-    menuboton.on("pointerdown", () => this.scene.start("MainMenu"));
-    menuboton.on("pointerover", () => menuboton.setStyle({ backgroundColor: "#f7ebeb" }));
-    menuboton.on("pointerout", () => menuboton.setStyle({ backgroundColor: "#ff3636" }));
+    menuboton.on("pointerdown", () => {
+      this.scene.start("MainMenu");
+    })
+  
   }
 
   crearSlider(x, y, ancho, etiqueta, tipo) {
     const inicial = getVolumen(tipo);
-    const estiloTexto = { fontSize: "32px", color: "#000000", fontStyle: "bold" };
+    const estiloTexto = { fontSize: "32px", color: "#ffffff", fontStyle: "bold" };
     this.add.text(x, y - 55, etiqueta, estiloTexto);
     const porcentaje = this.add.text(x + ancho + 30, y - 18, "", estiloTexto);
     this.add.rectangle(x, y, ancho, 12, 0x333333).setOrigin(0, 0.5);
     const relleno = this.add.rectangle(x, y, ancho * inicial, 12, 0xff3636).setOrigin(0, 0.5);
     const manija = this.add.circle(x + ancho * inicial, y, 18, 0xf7ebeb);
-    manija.setStrokeStyle(4, 0x000000);
+    manija.setStrokeStyle(4, 0xffffff);
     manija.setInteractive({ draggable: true, useHandCursor: true });
     const actualizar = (valor) => {
       valor = Phaser.Math.Clamp(valor, 0, 1);
